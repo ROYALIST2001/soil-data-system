@@ -1,0 +1,13 @@
+# Go
+api/server
+
+# Python
+ai/__pycache__/
+*.pyc
+
+# Node / React
+web/node_modules/
+web/dist/
+
+# Environment files
+.env

@@ -1,0 +1,32 @@
+# This file starts all backend services together.
+
+services:
+   # The PostgreSQL database.
+   db:
+      image: postgres:16
+      environment:
+         POSTGRES_USER: soil_user
+         POSTGRES_PASSWORD: soil_pass
+         POSTGRES_DB: soil_db
+      ports:
+         - "5432:5432"
+      volumes:
+         - db_data:/var/lib/postgresql/data
+
+   # The Go API service.
+   api:
+      build: ./api
+      ports:
+         - "8080:8080"
+      depends_on:
+         - db
+
+   # The FastAPI AI service.
+   ai:
+      build: ./ai
+      ports:
+         - "8000:8000"
+
+# This keeps the database data safe when the container restarts.
+volumes:
+   db_data:
