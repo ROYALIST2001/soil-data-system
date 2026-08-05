@@ -12,14 +12,23 @@ services:
          - "5432:5432"
       volumes:
          - db_data:/var/lib/postgresql/data
+         - ./api/migrations:/docker-entrypoint-initdb.d # run our SQL on first start
+      healthcheck:
+         test: ["CMD-SHELL", "pg_isready -U soil_user -d soil_db"]
+         interval: 5s
+         timeout: 5s
+         retries: 5
 
    # The Go API service.
    api:
       build: ./api
       ports:
          - "8080:8080"
+      environment:
+         DATABASE_URL: "postgres://soil_user:soil_pass@db:5432/soil_db"
       depends_on:
-         - db
+         db:
+            condition: service_healthy # wait until the database is ready
 
    # The FastAPI AI service.
    ai:

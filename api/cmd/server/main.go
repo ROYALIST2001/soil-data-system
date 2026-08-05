@@ -5,20 +5,30 @@ import (
 	"net/http"
 
 	"soil-data-system/api/internal/controller"
+	"soil-data-system/api/internal/database"
+	"soil-data-system/api/internal/repository"
+	"soil-data-system/api/internal/service"
 )
 
 func main() {
-	// Create a router. It decides which function runs for each URL.
+	// 1. Connect to the database.
+	db := database.Connect()
+	defer db.Close() // close the pool when the program stops
+	log.Println("Connected to database.")
+
+	// 2. Build the layers: repository -> service -> controller.
+	readingRepo := repository.NewReadingRepository(db)
+	readingService := service.NewReadingService(readingRepo)
+	readingController := controller.NewReadingController(readingService)
+
+	// 3. Create the router and connect the routes.
 	mux := http.NewServeMux()
-
-	// When someone visits GET /health, run the HealthCheck function.
 	mux.HandleFunc("GET /health", controller.HealthCheck)
+	mux.HandleFunc("POST /readings", readingController.CreateReading)
+	mux.HandleFunc("GET /readings/{id}", readingController.GetReading)
 
-	// Print a message so we know the server started.
+	// 4. Start the server.
 	log.Println("API server starting on port 8080...")
-
-	// Start the server on port 8080.
-	// If it fails, stop the program and show the error.
 	err := http.ListenAndServe(":8080", mux)
 	if err != nil {
 		log.Fatal(err)

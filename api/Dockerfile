@@ -1,13 +1,13 @@
 # Start from an image that already has Go installed.
-FROM golang:1.22
+FROM golang:1.26
 
 # Set the working folder inside the container.
 WORKDIR /app
 
-# Copy the Go module file first (this makes rebuilds faster).
-COPY go.mod ./
+# Copy the module files first (go.sum is new, for the pgx library).
+COPY go.mod go.sum ./
 
-# Download dependencies listed in go.mod.
+# Download the libraries listed in go.mod.
 RUN go mod download
 
 # Copy the rest of the code.
