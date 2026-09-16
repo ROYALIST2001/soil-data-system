@@ -6,7 +6,6 @@ import (
 )
 
 // ReadingService holds everything it needs to do its job.
-// CHANGED: it now also holds the validation service.
 type ReadingService struct {
 	repo       *repository.ReadingRepository
 	location   *LocationService
@@ -14,7 +13,6 @@ type ReadingService struct {
 }
 
 // NewReadingService builds the service.
-// All three things are passed in from outside (dependency injection).
 func NewReadingService(
 	repo *repository.ReadingRepository,
 	location *LocationService,
@@ -27,31 +25,20 @@ func NewReadingService(
 	}
 }
 
-// CreateReading validates, places in space, then saves.
+// CreateReading validates, places in space, checks quality, then saves.
 //
-// This function knows the ORDER of the steps.
-// It does NOT know HOW each step works.
+// The ORDER of these steps matters a lot. Read the comments.
 func (s *ReadingService) CreateReading(reading model.Reading) (int, error) {
 
-	// ---------- STEP 0: VALIDATE FIRST ---------- NEW
-	//
-	// This MUST be first. Two reasons:
-	//
-	// 1. Do not waste work. Why measure distance to 500 anchors
-	//    if we are going to throw the reading away?
-	//
-	// 2. MORE IMPORTANT: do not create rubbish.
-	//    FindOrCreateAnchor CREATES a new anchor if none is near.
-	//    If we validated after it, a bad reading would leave an
-	//    ORPHAN ANCHOR in the database forever - a field with no readings.
+	// ---------- STEP 0: hard rules. Refuse impossible values. ----------
+	// This is FIRST, so bad data never creates an orphan anchor.
 	if err := s.validation.Validate(reading); err != nil {
-		// Stop here. Nothing below this line runs. Nothing is saved.
 		return 0, err
 	}
 
 	// ---------- STEP 1: find the matching field ----------
-	// This must happen before the insert, because readings.anchor_id
-	// points to it, and the database refuses links to missing rows.
+	// This MUST happen before step 3, because the quality check
+	// looks up history BY ANCHOR ID.
 	anchorID, err := s.location.FindOrCreateAnchor(reading.RawLat, reading.RawLng)
 	if err != nil {
 		return 0, err
@@ -59,11 +46,21 @@ func (s *ReadingService) CreateReading(reading model.Reading) (int, error) {
 	reading.AnchorID = &anchorID
 
 	// ---------- STEP 2: find the district ----------
-	// Can be nil, for example a point in the sea. That is allowed.
 	reading.DistrictID = s.location.FindDistrictID(reading.RawLat, reading.RawLng)
 
-	// ---------- STEP 3: save it ----------
-	// PART 2 NOTE: the quality flag will be set here, before the insert.
+	// ---------- STEP 3: soft rules. Check against history. ---------- NEW
+	//
+	// This needs the anchor from step 1, so it cannot come earlier.
+	//
+	// NOTE: a suspicious reading is NOT refused. It is SAVED with a flag.
+	// Only a real database failure returns an error here.
+	flag, err := s.validation.CheckQuality(reading)
+	if err != nil {
+		return 0, err
+	}
+	reading.QualityFlag = flag
+
+	// ---------- STEP 4: save the complete reading ----------
 	return s.repo.Insert(reading)
 }
 

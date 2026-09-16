@@ -2,85 +2,101 @@ package service
 
 import (
 	"fmt"
+	"math"
 	"strings"
 
 	"soil-data-system/api/internal/model"
+	"soil-data-system/api/internal/repository"
 )
 
-// ---------- THE RULES ----------
-// Every limit has a name. Nothing is hidden inside the code below.
-// If your supervisor asks "what are your rules?", show them this block.
+// ---------- PART 1: THE HARD RULES (unchanged) ----------
 
 const (
-	// pH scale is DEFINED as 0 to 14. Outside this is not a pH at all.
 	minPH = 0.0
 	maxPH = 14.0
 
-	// Soil nutrients cannot be negative.
-	// The maximums are generous, to catch only IMPOSSIBLE values.
-	minNutrient = 0.0
-	maxNitrogen = 1000.0 // normal farm soil: 20 to 300
-	maxPhosphor = 500.0  // normal farm soil: 5 to 100
-	maxPotassium = 1000.0 // normal farm soil: 50 to 400
+	minNutrient  = 0.0
+	maxNitrogen  = 1000.0
+	maxPhosphor  = 500.0
+	maxPotassium = 1000.0
 
-	// A field cannot have zero size.
-	// Also important: we DIVIDE by area in Phase 6.
-	// Dividing by zero would crash the program.
 	minArea = 0.0001
 	maxArea = 1000.0
 
-	// Target yield cannot be zero or negative.
 	minYield = 0.0001
 	maxYield = 100.0
 
-	// These are the limits of the Earth itself.
 	minLat = -90.0
 	maxLat = 90.0
 	minLng = -180.0
 	maxLng = 180.0
 )
 
+// ---------- PART 2: THE FLAG VALUES ----------
+// We use constants, not plain text, so a typing mistake
+// like "FLAGED" becomes an error in the editor, not a silent bug.
+
+const (
+	FlagOK           = "OK"
+	FlagFlagged      = "FLAGGED"
+	FlagQuarantined  = "QUARANTINED"
+)
+
+// ---------- PART 2: THE SOFT RULE LIMITS ----------
+
+const (
+	// How many past readings to fetch for comparison.
+	historyLimit = 5
+
+	// pH uses SUBTRACTION, because pH is a scale, not a quantity.
+	// Soil pH normally moves less than 0.5 per YEAR.
+	phJumpFlag       = 1.5 // unusual, but possible if lime was added
+	phJumpQuarantine = 3.0 // almost never real
+
+	// Nutrients use a RATIO (how many TIMES bigger), not subtraction.
+	//
+	// Why? Because +50 means very different things:
+	//   10 -> 60   is 6 times bigger.   Suspicious.
+	//   300 -> 350 is 1.17 times bigger. Normal.
+	//
+	// The 10x rule catches the most common human mistake:
+	// typing an extra zero (40 becomes 400).
+	nutrientRatioFlag       = 3.0
+	nutrientRatioQuarantine = 10.0
+)
+
 // ValidationService checks every reading before it is saved.
-// It is empty now. In Part 2 it will hold the reading repository,
-// so it can compare a new reading against that field's history.
+// CHANGED: it now holds the reading repository, so it can
+// look up a field's history.
 type ValidationService struct {
+	readingRepo *repository.ReadingRepository
 }
 
 // NewValidationService builds the service.
-func NewValidationService() *ValidationService {
-	return &ValidationService{}
+// CHANGED: it now receives the reading repository.
+func NewValidationService(readingRepo *repository.ReadingRepository) *ValidationService {
+	return &ValidationService{readingRepo: readingRepo}
 }
 
-// checkRange is a small helper.
-// We need 8 range checks. Without this helper we would write
-// almost the same if-statement 8 times.
-//
-// It also makes every error message look the same, automatically.
+// checkRange is a small helper for the hard rules. Unchanged.
 func checkRange(fieldName string, value float64, min float64, max float64) error {
 	if value < min || value > max {
-		// A GOOD error message names the field, states the rule,
-		// and shows what the user actually sent.
 		return fmt.Errorf("%s must be between %g and %g (you sent %.2f)",
 			fieldName, min, max, value)
 	}
-	return nil // nil means "no error"
+	return nil
 }
 
-// Validate checks one reading against all the hard rules.
-// It returns nil if everything is fine.
-// It returns the FIRST problem it finds.
+// Validate checks the HARD rules. Unchanged from Part 1.
+// If this fails, the reading is REFUSED. Nothing is saved.
 func (s *ValidationService) Validate(reading model.Reading) error {
 
-	// ---------- CHECK 1: the location ----------
-	// We check this first, because location is the spine of the project.
 	if err := checkRange("Latitude", reading.RawLat, minLat, maxLat); err != nil {
 		return err
 	}
 	if err := checkRange("Longitude", reading.RawLng, minLng, maxLng); err != nil {
 		return err
 	}
-
-	// ---------- CHECK 2: the soil values ----------
 	if err := checkRange("pH", reading.PH, minPH, maxPH); err != nil {
 		return err
 	}
@@ -93,8 +109,6 @@ func (s *ValidationService) Validate(reading model.Reading) error {
 	if err := checkRange("Potassium", reading.K, minNutrient, maxPotassium); err != nil {
 		return err
 	}
-
-	// ---------- CHECK 3: the crop context ----------
 	if err := checkRange("Field area", reading.Area, minArea, maxArea); err != nil {
 		return err
 	}
@@ -102,14 +116,6 @@ func (s *ValidationService) Validate(reading model.Reading) error {
 		return err
 	}
 
-	// ---------- CHECK 4: required text fields ----------
-	// GO TRAP: if a NUMBER is missing from the JSON, Go makes it 0.
-	// So a missing pH would arrive as 0, which passes the range check!
-	//
-	// Text is different. A missing text field arrives as "".
-	// So we can reliably check text for being empty.
-	//
-	// TrimSpace removes spaces, so "   " also counts as empty.
 	if strings.TrimSpace(reading.Crop) == "" {
 		return fmt.Errorf("Crop is required")
 	}
@@ -117,6 +123,116 @@ func (s *ValidationService) Validate(reading model.Reading) error {
 		return fmt.Errorf("Growth stage is required")
 	}
 
-	// Everything passed. nil means "no error".
 	return nil
+}
+
+// ---------- PART 2: THE SOFT RULES ----------
+
+// changeRatio works out how many TIMES bigger the new value is.
+//
+// IMPORTANT: this protects against dividing by zero.
+// In Go, dividing by zero gives +Inf (infinity), which would
+// break every comparison below it.
+func changeRatio(oldValue float64, newValue float64) float64 {
+	// No old value to compare against.
+	// Return 1.0, which means "no change". The safe, neutral answer.
+	if oldValue <= 0 {
+		return 1.0
+	}
+
+	ratio := newValue / oldValue
+
+	// If the value went DOWN, flip it, so we always get a number >= 1.
+	// A drop to one tenth is just as suspicious as a rise to ten times.
+	if ratio < 1 {
+		ratio = 1 / ratio
+	}
+
+	return ratio
+}
+
+// worseFlag returns whichever of the two flags is more serious.
+// We use this because several checks run, and the WORST one wins.
+func worseFlag(a string, b string) string {
+	// QUARANTINED is the most serious.
+	if a == FlagQuarantined || b == FlagQuarantined {
+		return FlagQuarantined
+	}
+	if a == FlagFlagged || b == FlagFlagged {
+		return FlagFlagged
+	}
+	return FlagOK
+}
+
+// CheckQuality compares a new reading against that field's history
+// and decides: OK, FLAGGED, or QUARANTINED.
+//
+// IMPORTANT: a suspicious reading is NOT an error.
+// The error slot is only used if the DATABASE fails.
+func (s *ValidationService) CheckQuality(reading model.Reading) (string, error) {
+
+	// ---------- STEP 1: is there an anchor? ----------
+	// Without one we cannot look up history.
+	// Phase 3 always sets it, but we check anyway. Defensive programming.
+	if reading.AnchorID == nil {
+		return FlagOK, nil
+	}
+
+	// ---------- STEP 2: fetch this field's recent GOOD readings ----------
+	history, err := s.readingRepo.FindRecentByAnchor(*reading.AnchorID, historyLimit)
+	if err != nil {
+		// The DATABASE failed. This IS a real error.
+		return "", err
+	}
+
+	// ---------- STEP 3: is there any history? ----------
+	// This is the first reading from this field.
+	// No history means no judgement. Accept it.
+	if len(history) == 0 {
+		return FlagOK, nil
+	}
+
+	// ---------- STEP 4: compare against the most recent one ----------
+	// history[0] is the NEWEST, because the SQL sorted DESC.
+	// The newest is the best comparison, because it is closest in time.
+	last := history[0]
+
+	flag := FlagOK
+
+	// ---------- STEP 5: check the pH jump ----------
+	// Subtraction, because pH is a SCALE, not a quantity.
+	// math.Abs makes the number positive, because we care about
+	// HOW BIG the change is, not the direction.
+	phJump := math.Abs(reading.PH - last.PH)
+
+	if phJump >= phJumpQuarantine {
+		flag = worseFlag(flag, FlagQuarantined)
+	} else if phJump >= phJumpFlag {
+		flag = worseFlag(flag, FlagFlagged)
+	}
+
+	// ---------- STEP 6: check the nutrients ----------
+	// Ratio, because nutrients are QUANTITIES.
+	// We check all three: N, P, K.
+	nutrients := []struct {
+		oldValue float64
+		newValue float64
+	}{
+		{last.N, reading.N},
+		{last.P, reading.P},
+		{last.K, reading.K},
+	}
+
+	for _, item := range nutrients {
+		ratio := changeRatio(item.oldValue, item.newValue)
+
+		if ratio >= nutrientRatioQuarantine {
+			flag = worseFlag(flag, FlagQuarantined)
+		} else if ratio >= nutrientRatioFlag {
+			flag = worseFlag(flag, FlagFlagged)
+		}
+	}
+
+	// ---------- STEP 7: return the WORST flag found ----------
+	return flag, nil
 }

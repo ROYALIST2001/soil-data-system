@@ -31,12 +31,12 @@ func main() {
 
 	// ---------- STEP 4: build the services (the thinking layer) ----------
 
-	// NEW: the validation service. It needs nothing, so it is built first.
-	validationService := service.NewValidationService()
+	// CHANGED: validation now needs the reading repository,
+	// so it can look up a field's history.
+	validationService := service.NewValidationService(readingRepo)
 
 	locationService := service.NewLocationService(anchorRepo, boundaries)
 
-	// CHANGED: the reading service now receives the validation service too.
 	readingService := service.NewReadingService(
 		readingRepo,
 		locationService,
