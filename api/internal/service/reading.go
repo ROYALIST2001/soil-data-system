@@ -6,51 +6,64 @@ import (
 )
 
 // ReadingService holds everything it needs to do its job.
-// CHANGED: it now also holds the location service.
+// CHANGED: it now also holds the validation service.
 type ReadingService struct {
-	repo     *repository.ReadingRepository
-	location *LocationService
+	repo       *repository.ReadingRepository
+	location   *LocationService
+	validation *ValidationService
 }
 
 // NewReadingService builds the service.
-// Both things are passed in from outside. This is dependency injection.
+// All three things are passed in from outside (dependency injection).
 func NewReadingService(
 	repo *repository.ReadingRepository,
 	location *LocationService,
+	validation *ValidationService,
 ) *ReadingService {
 	return &ReadingService{
-		repo:     repo,
-		location: location,
+		repo:       repo,
+		location:   location,
+		validation: validation,
 	}
 }
 
-// CreateReading places the reading in space, then saves it.
+// CreateReading validates, places in space, then saves.
 //
 // This function knows the ORDER of the steps.
-// It does NOT know HOW each step works. That is the point.
+// It does NOT know HOW each step works.
 func (s *ReadingService) CreateReading(reading model.Reading) (int, error) {
 
-	// STEP 1: find the matching field, or make a new one.
+	// ---------- STEP 0: VALIDATE FIRST ---------- NEW
 	//
-	// This MUST happen first, because readings.anchor_id points to it.
-	// The database will REFUSE a link to a row that does not exist.
+	// This MUST be first. Two reasons:
+	//
+	// 1. Do not waste work. Why measure distance to 500 anchors
+	//    if we are going to throw the reading away?
+	//
+	// 2. MORE IMPORTANT: do not create rubbish.
+	//    FindOrCreateAnchor CREATES a new anchor if none is near.
+	//    If we validated after it, a bad reading would leave an
+	//    ORPHAN ANCHOR in the database forever - a field with no readings.
+	if err := s.validation.Validate(reading); err != nil {
+		// Stop here. Nothing below this line runs. Nothing is saved.
+		return 0, err
+	}
+
+	// ---------- STEP 1: find the matching field ----------
+	// This must happen before the insert, because readings.anchor_id
+	// points to it, and the database refuses links to missing rows.
 	anchorID, err := s.location.FindOrCreateAnchor(reading.RawLat, reading.RawLng)
 	if err != nil {
 		return 0, err
 	}
-
-	// The & makes a pointer, because our model field is *int.
 	reading.AnchorID = &anchorID
 
-	// STEP 2: find which district the point falls inside.
-	//
-	// No & here, because FindDistrictID ALREADY returns a pointer.
-	// This can be nil, for example a point in the sea. That is allowed.
+	// ---------- STEP 2: find the district ----------
+	// Can be nil, for example a point in the sea. That is allowed.
 	reading.DistrictID = s.location.FindDistrictID(reading.RawLat, reading.RawLng)
 
-	// STEP 3: the reading is now complete. Save it.
-	//
-	// PHASE 4 NOTE: data validation will be added here, before this line.
+	// ---------- STEP 3: save it ----------
+	// PART 2 NOTE: the quality flag will be set here, before the insert.
 	return s.repo.Insert(reading)
 }
 
