@@ -5,9 +5,10 @@ api/server
 ai/__pycache__/
 *.pyc
 
-# Node / React
-web/node_modules/
-web/dist/
+# React Native / Node
+# node_modules is very large. Anyone can rebuild it with "npm install".
+mobile/node_modules/
+mobile/.expo/
 
-# Environment files
+# Environment files. These may hold passwords. Never save them in Git.
 .env
