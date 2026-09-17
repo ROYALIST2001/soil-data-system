@@ -6,51 +6,61 @@ import (
 )
 
 // ReadingService holds everything it needs to do its job.
-// CHANGED: it now also holds the location service.
 type ReadingService struct {
-	repo     *repository.ReadingRepository
-	location *LocationService
+	repo       *repository.ReadingRepository
+	location   *LocationService
+	validation *ValidationService
 }
 
 // NewReadingService builds the service.
-// Both things are passed in from outside. This is dependency injection.
 func NewReadingService(
 	repo *repository.ReadingRepository,
 	location *LocationService,
+	validation *ValidationService,
 ) *ReadingService {
 	return &ReadingService{
-		repo:     repo,
-		location: location,
+		repo:       repo,
+		location:   location,
+		validation: validation,
 	}
 }
 
-// CreateReading places the reading in space, then saves it.
+// CreateReading validates, places in space, checks quality, then saves.
 //
-// This function knows the ORDER of the steps.
-// It does NOT know HOW each step works. That is the point.
+// The ORDER of these steps matters a lot. Read the comments.
 func (s *ReadingService) CreateReading(reading model.Reading) (int, error) {
 
-	// STEP 1: find the matching field, or make a new one.
-	//
-	// This MUST happen first, because readings.anchor_id points to it.
-	// The database will REFUSE a link to a row that does not exist.
+	// ---------- STEP 0: hard rules. Refuse impossible values. ----------
+	// This is FIRST, so bad data never creates an orphan anchor.
+	if err := s.validation.Validate(reading); err != nil {
+		return 0, err
+	}
+
+	// ---------- STEP 1: find the matching field ----------
+	// This MUST happen before step 3, because the quality check
+	// looks up history BY ANCHOR ID.
 	anchorID, err := s.location.FindOrCreateAnchor(reading.RawLat, reading.RawLng)
 	if err != nil {
 		return 0, err
 	}
-
-	// The & makes a pointer, because our model field is *int.
 	reading.AnchorID = &anchorID
 
-	// STEP 2: find which district the point falls inside.
-	//
-	// No & here, because FindDistrictID ALREADY returns a pointer.
-	// This can be nil, for example a point in the sea. That is allowed.
+	// ---------- STEP 2: find the district ----------
 	reading.DistrictID = s.location.FindDistrictID(reading.RawLat, reading.RawLng)
 
-	// STEP 3: the reading is now complete. Save it.
+	// ---------- STEP 3: soft rules. Check against history. ---------- NEW
 	//
-	// PHASE 4 NOTE: data validation will be added here, before this line.
+	// This needs the anchor from step 1, so it cannot come earlier.
+	//
+	// NOTE: a suspicious reading is NOT refused. It is SAVED with a flag.
+	// Only a real database failure returns an error here.
+	flag, err := s.validation.CheckQuality(reading)
+	if err != nil {
+		return 0, err
+	}
+	reading.QualityFlag = flag
+
+	// ---------- STEP 4: save the complete reading ----------
 	return s.repo.Insert(reading)
 }
 
