@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, Button, ScrollView, StyleSheet, Alert } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 import InputField from "../components/InputField";
 import SelectField from "../components/SelectField";
@@ -10,6 +11,7 @@ import { useAppSelector } from "../store";
 import { NewReading } from "../types/reading";
 
 export default function SoilEntryScreen() {
+  const navigation = useNavigation<any>();
 
   // ---------- FORM STATE ----------
   // Numbers are kept as TEXT while typing. We convert at submit time.
@@ -72,6 +74,11 @@ export default function SoilEntryScreen() {
     };
 
     await submit(reading);
+
+    // Move to the result screen.
+    // With React Navigation we NAVIGATE, instead of relying
+    // on the store status to swap screens.
+    navigation.navigate("Result");
   }
 
   return (

@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, Button, ScrollView, StyleSheet } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 import { useAppSelector, useAppDispatch } from "../store";
 import { resetReading } from "../store/readingSlice";
@@ -37,6 +38,7 @@ function getQualityMessage(flag: string) {
 }
 
 export default function ResultScreen() {
+  const navigation = useNavigation<any>();
   const dispatch = useAppDispatch();
   const reading = useAppSelector((state) => state.reading.result);
 
@@ -97,7 +99,10 @@ export default function ResultScreen() {
                 ? "Getting advice..."
                 : "Get Fertilizer Recommendation"
             }
-            onPress={() => fetchRecommendation(reading.reading_id)}
+            onPress={async () => {
+              await fetchRecommendation(reading.reading_id);
+              navigation.navigate("Recommendation");
+            }}
             disabled={recStatus === "loading"}
           />
         </View>
@@ -118,7 +123,10 @@ export default function ResultScreen() {
       <View style={styles.buttonRow}>
         <Button
           title="Enter Another Reading"
-          onPress={() => dispatch(resetReading())}
+          onPress={() => {
+            dispatch(resetReading());
+            navigation.navigate("SoilEntry");
+          }}
         />
       </View>
     </ScrollView>

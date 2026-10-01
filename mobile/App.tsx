@@ -2,40 +2,20 @@ import React from "react";
 import { StatusBar } from "expo-status-bar";
 import { Provider } from "react-redux";
 
-import { store, useAppSelector } from "./src/store";
-import SoilEntryScreen from "./src/screens/SoilEntryScreen";
-import ResultScreen from "./src/screens/ResultScreen";
-import RecommendationScreen from "./src/screens/RecommendationScreen";
+import { store } from "./src/store";
+import AppNavigator from "./src/navigation/AppNavigator";
 
-// Chooses which screen to show, based on the store.
+// Look how much SIMPLER this file is now.
 //
-// It MUST be a separate component, because useAppSelector
-// only works INSIDE the Provider below.
-function AppContent() {
-  const readingStatus = useAppSelector((state) => state.reading.status);
-  const recStatus = useAppSelector((state) => state.recommendation.status);
-
-  // ORDER MATTERS. We check the DEEPEST screen first.
-  //
-  // Simple navigation for three screens.
-  // In Phase 7 we will have five, and we will add React Navigation.
-  // Adding a big library for three screens is not worth it yet.
-  if (recStatus === "success") {
-    return <RecommendationScreen />;
-  }
-
-  if (readingStatus === "success") {
-    return <ResultScreen />;
-  }
-
-  return <SoilEntryScreen />;
-}
-
+// Before: an if-chain choosing screens by store status.
+// Now: React Navigation handles it all.
+//
+// This is what happens when you move a job into the right place.
 export default function App() {
   return (
     <Provider store={store}>
-      <AppContent />
-      <StatusBar style="auto" />
+      <AppNavigator />
+      <StatusBar style="light" />
     </Provider>
   );
 }
