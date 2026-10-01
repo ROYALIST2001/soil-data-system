@@ -1,12 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector, TypedUseSelectorHook } from "react-redux";
 import readingReducer from "./readingSlice";
+import recommendationReducer from "./recommendationSlice"; // NEW
 
 // Build the ONE store from all our slices.
-// We have one slice now. We will add more in later phases.
 export const store = configureStore({
   reducer: {
     reading: readingReducer,
+    recommendation: recommendationReducer, // NEW
   },
 });
 

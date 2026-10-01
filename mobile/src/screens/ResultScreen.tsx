@@ -1,67 +1,64 @@
 import React from "react";
-import { View, Text, Button, StyleSheet } from "react-native";
+import { View, Text, Button, ScrollView, StyleSheet } from "react-native";
 
 import { useAppSelector, useAppDispatch } from "../store";
 import { resetReading } from "../store/readingSlice";
+import { useRecommendation } from "../hooks/useRecommendation";
 
-// Decide what warning to show, based on the quality flag.
-// We keep this OUT of the screen body, so the screen stays easy to read.
+// Decide what quality warning to show.
 function getQualityMessage(flag: string) {
   if (flag === "QUARANTINED") {
     return {
       show: true,
-      color: "#c92a2a", // red
+      color: "#c92a2a",
       background: "#ffe3e3",
       title: "This reading looks wrong",
       text:
         "The values changed very sharply compared to your last test at this field. " +
         "Please check that you typed them correctly. " +
-        "This reading is saved, but it will not be used in the graphs until it is reviewed.",
+        "This reading is saved, but no fertilizer advice can be given from it.",
     };
   }
 
   if (flag === "FLAGGED") {
     return {
       show: true,
-      color: "#e8842c", // orange
+      color: "#e8842c",
       background: "#ffe8cc",
       title: "This reading looks unusual",
       text:
         "The values changed more than expected since your last test at this field. " +
         "If you added lime or fertilizer recently, this may be correct. " +
-        "This reading is saved, but it will not be used in the graphs until it is reviewed.",
+        "This reading is saved, but no fertilizer advice can be given from it.",
     };
   }
 
-  // Flag is OK. Show nothing.
   return { show: false, color: "", background: "", title: "", text: "" };
 }
 
 export default function ResultScreen() {
   const dispatch = useAppDispatch();
-
-  // Read the saved reading from the store.
   const reading = useAppSelector((state) => state.reading.result);
 
-  // Safety check. If there is nothing, draw nothing.
+  // NEW: the recommendation state and hook.
+  const recStatus = useAppSelector((state) => state.recommendation.status);
+  const recMessage = useAppSelector((state) => state.recommendation.message);
+  const { fetchRecommendation } = useRecommendation();
+
   if (!reading) {
     return null;
   }
 
-  // Work out the warning, if any.
   const quality = getQualityMessage(reading.quality_flag);
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Reading Saved</Text>
 
       <Text style={styles.row}>Reading ID: {reading.reading_id}</Text>
-
       <Text style={styles.row}>
         Location: {reading.raw_lat.toFixed(5)}, {reading.raw_lng.toFixed(5)}
       </Text>
-
-      {/* These two lines prove the location brain worked. */}
       <Text style={styles.row}>
         Field (anchor): {reading.anchor_id ?? "not matched"}
       </Text>
@@ -69,14 +66,12 @@ export default function ResultScreen() {
         District ID: {reading.district_id ?? "outside all districts"}
       </Text>
       <Text style={styles.row}>Zone: {reading.zone}</Text>
-
       <Text style={styles.row}>
         Soil: N {reading.n} | P {reading.p} | K {reading.k} | pH {reading.ph}
       </Text>
       <Text style={styles.row}>Crop: {reading.crop}</Text>
 
-      {/* NEW: show a clear warning box if the reading was flagged.
-          The && means: if quality.show is false, draw nothing. */}
+      {/* Quality warning, if any. */}
       {quality.show && (
         <View
           style={[
@@ -91,23 +86,51 @@ export default function ResultScreen() {
         </View>
       )}
 
+      {/* ---------- NEW: the recommendation button ----------
+          ONLY shown if the reading passed the quality check.
+          Showing a button that ALWAYS fails is bad design. */}
+      {reading.quality_flag === "OK" && (
+        <View style={styles.buttonRow}>
+          <Button
+            title={
+              recStatus === "loading"
+                ? "Getting advice..."
+                : "Get Fertilizer Recommendation"
+            }
+            onPress={() => fetchRecommendation(reading.reading_id)}
+            disabled={recStatus === "loading"}
+          />
+        </View>
+      )}
+
+      {/* The reading was flagged. Calm ORANGE, not a red crash. */}
+      {recStatus === "flagged" && (
+        <View style={styles.flaggedBox}>
+          <Text style={styles.flaggedText}>{recMessage}</Text>
+        </View>
+      )}
+
+      {/* A real error. Red. */}
+      {recStatus === "error" && (
+        <Text style={styles.error}>{recMessage}</Text>
+      )}
+
       <View style={styles.buttonRow}>
         <Button
           title="Enter Another Reading"
           onPress={() => dispatch(resetReading())}
         />
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 20, paddingTop: 60 },
+  container: { padding: 20, paddingTop: 60, paddingBottom: 40 },
   title: { fontSize: 22, fontWeight: "bold", marginBottom: 20 },
   row: { fontSize: 16, marginBottom: 8 },
-  buttonRow: { marginTop: 20 },
+  buttonRow: { marginTop: 16 },
 
-  // The warning box.
   warningBox: {
     marginTop: 16,
     padding: 12,
@@ -116,4 +139,16 @@ const styles = StyleSheet.create({
   },
   warningTitle: { fontSize: 15, fontWeight: "bold", marginBottom: 6 },
   warningText: { fontSize: 13, color: "#333", lineHeight: 19 },
+
+  flaggedBox: {
+    marginTop: 14,
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: "#ffe8cc",
+    borderLeftWidth: 4,
+    borderLeftColor: "#e8842c",
+  },
+  flaggedText: { fontSize: 13, color: "#495057", lineHeight: 19 },
+
+  error: { color: "red", marginTop: 14, fontSize: 13 },
 });
