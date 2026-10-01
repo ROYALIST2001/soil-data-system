@@ -23,9 +23,6 @@ const (
 	minArea = 0.0001
 	maxArea = 1000.0
 
-	minYield = 0.0001
-	maxYield = 100.0
-
 	minLat = -90.0
 	maxLat = 90.0
 	minLng = -180.0
@@ -124,9 +121,6 @@ func (s *ValidationService) Validate(reading model.Reading) error {
 	if err := checkRange("Field area", reading.Area, minArea, maxArea); err != nil {
 		return err
 	}
-	if err := checkRange("Target yield", reading.TargetYield, minYield, maxYield); err != nil {
-		return err
-	}
 
 	// ---------- CHECK 4: crop must be one we know ----------
 	//
@@ -152,6 +146,24 @@ func (s *ValidationService) Validate(reading model.Reading) error {
 	if !found {
 		return fmt.Errorf("Growth stage '%s' is not supported. Choose one of: %s",
 			reading.Stage, strings.Join(model.StageNames(), ", "))
+	}
+
+	// ---------- CHECK 6: target yield must be realistic FOR THIS CROP ----------
+	//
+	// This MUST come after the crop check, because we need to know
+	// WHICH crop it is before we know its maximum.
+	//
+	// A generic "under 100 tonnes" check is useless: it would allow
+	// 50 tonnes of rice per hectare, which is physically impossible.
+	cropInfo := model.AllowedCrops[reading.Crop]
+
+	if reading.TargetYield <= 0 {
+		return fmt.Errorf("Target yield must be more than 0")
+	}
+
+	if reading.TargetYield > cropInfo.MaxYield {
+		return fmt.Errorf("Target yield for %s cannot be more than %g tonnes per hectare (you sent %.2f)",
+			cropInfo.Label, cropInfo.MaxYield, reading.TargetYield)
 	}
 
 	return nil
