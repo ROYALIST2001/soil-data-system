@@ -68,6 +68,7 @@ export default function ResultScreen() {
       <Text style={styles.row}>
         District ID: {reading.district_id ?? "outside all districts"}
       </Text>
+      <Text style={styles.row}>Zone: {reading.zone}</Text>
 
       <Text style={styles.row}>
         Soil: N {reading.n} | P {reading.p} | K {reading.k} | pH {reading.ph}

@@ -22,6 +22,10 @@ export interface Reading extends NewReading {
   district_id: number | null;  // empty if the point is outside all districts
   created_at: string;
   quality_flag: string;
+
+  // Derived by the server from the district. Not stored in the database.
+  // Values: "wet", "dry", or "intermediate".
+  zone: string;
 }
 
 // The small answer from POST /readings.

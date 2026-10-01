@@ -39,9 +39,10 @@ type Point struct {
 	Lng float64
 }
 
-// DistrictBoundary is one district and its outline.
+// DistrictBoundary is one district, its outline, and its zone.
 type DistrictBoundary struct {
-	DistrictID int     // the id from the database
-	Name       string  // the district name
+	DistrictID int
+	Name       string
+	Zone       string  // NEW: wet, dry, or intermediate
 	Ring       []Point // the outline corners, in order
 }

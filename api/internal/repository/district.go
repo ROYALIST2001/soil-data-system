@@ -29,26 +29,28 @@ func (repo *DistrictRepository) LoadBoundaries(filePath string) ([]model.Distric
 	// ---------- STEP 1: read id and name from the database ----------
 
 	rows, err := repo.db.Query(context.Background(),
-		`SELECT district_id, name FROM districts`)
+		`SELECT district_id, name, zone FROM districts`)
 
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	// A map is a lookup table.
-	// Give it a name, and it gives you the id.
+	// Two lookup tables: name -> id, and name -> zone.
 	idByName := make(map[string]int)
+	zoneByName := make(map[string]string)
 
 	for rows.Next() {
 		var id int
 		var name string
+		var zone string
 
-		if err := rows.Scan(&id, &name); err != nil {
+		if err := rows.Scan(&id, &name, &zone); err != nil {
 			return nil, err
 		}
 
 		idByName[name] = id
+		zoneByName[name] = zone
 	}
 
 	// ---------- STEP 2: read the GeoJSON file from disk ----------
@@ -105,6 +107,7 @@ func (repo *DistrictRepository) LoadBoundaries(filePath string) ([]model.Distric
 		boundaries = append(boundaries, model.DistrictBoundary{
 			DistrictID: id,
 			Name:       name,
+			Zone:       zoneByName[name], // NEW
 			Ring:       points,
 		})
 	}

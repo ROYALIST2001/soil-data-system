@@ -30,7 +30,12 @@ func NewReadingService(
 // The ORDER of these steps matters a lot. Read the comments.
 func (s *ReadingService) CreateReading(reading model.Reading) (int, error) {
 
-	// ---------- STEP 0: hard rules. Refuse impossible values. ----------
+	// ---------- STEP 0a: clean the text fields ---------- NEW
+	// "Rice" becomes "rice". " vegetative " becomes "vegetative".
+	// We do this BEFORE validating, so a capital letter is not an error.
+	reading = s.validation.Normalize(reading)
+
+	// ---------- STEP 0b: hard rules. Refuse impossible values. ----------
 	// This is FIRST, so bad data never creates an orphan anchor.
 	if err := s.validation.Validate(reading); err != nil {
 		return 0, err
@@ -64,7 +69,16 @@ func (s *ReadingService) CreateReading(reading model.Reading) (int, error) {
 	return s.repo.Insert(reading)
 }
 
-// GetReading reads one reading by id. This did NOT change.
+// GetReading reads one reading by id, and fills in its derived zone.
 func (s *ReadingService) GetReading(id int) (model.Reading, error) {
-	return s.repo.GetByID(id)
+	reading, err := s.repo.GetByID(id)
+	if err != nil {
+		return reading, err
+	}
+
+	// Zone is DERIVED, not stored. We work it out from the district.
+	// Phase 6 will send this same value to the model.
+	reading.Zone = s.location.ZoneForDistrict(reading.DistrictID)
+
+	return reading, nil
 }
