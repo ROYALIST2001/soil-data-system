@@ -19,3 +19,6 @@ ai/notebooks/data/*.csv
 
 # Python virtual environment
 ai/notebooks/venv/
+
+# NOTE: ai/artifacts/ is deliberately NOT ignored.
+# Docker copies those files into the image, so Phase 6 needs them in Git.
