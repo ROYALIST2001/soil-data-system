@@ -83,14 +83,14 @@ export default function SoilEntryScreen() {
       <Text style={styles.title}>Soil Data Entry</Text>
 
       {/* The SAME component used 8 times, with different props. */}
-      <InputField label="Nitrogen (N)" value={n} onChangeText={setN} numeric />
-      <InputField label="Phosphorus (P)" value={p} onChangeText={setP} numeric />
-      <InputField label="Potassium (K)" value={k} onChangeText={setK} numeric />
+      <InputField label="Nitrogen (N) — mg/kg" value={n} onChangeText={setN} numeric />
+      <InputField label="Phosphorus (P) — mg/kg" value={p} onChangeText={setP} numeric />
+      <InputField label="Potassium (K) — mg/kg" value={k} onChangeText={setK} numeric />
       <InputField label="pH" value={ph} onChangeText={setPh} numeric />
       <InputField label="Crop" value={crop} onChangeText={setCrop} />
       <InputField label="Growth Stage" value={stage} onChangeText={setStage} />
-      <InputField label="Target Yield (t)" value={targetYield} onChangeText={setTargetYield} numeric />
-      <InputField label="Field Area (ha)" value={area} onChangeText={setArea} numeric />
+      <InputField label="Target Yield — tonnes per hectare" value={targetYield} onChangeText={setTargetYield} numeric />
+      <InputField label="Field Area — hectares" value={area} onChangeText={setArea} numeric />
 
       <View style={styles.buttonRow}>
         <Button
