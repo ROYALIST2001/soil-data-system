@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"soil-data-system/api/internal/client"
 	"soil-data-system/api/internal/controller"
 	"soil-data-system/api/internal/database"
 	"soil-data-system/api/internal/repository"
@@ -22,37 +23,48 @@ func main() {
 	anchorRepo := repository.NewAnchorRepository(db)
 	districtRepo := repository.NewDistrictRepository(db)
 
-	// ---------- STEP 3: load the district shapes ONCE ----------
+	// ---------- STEP 3: build the client (talks to other services) ----------
+	// NEW. A repository gets data from a DATABASE.
+	// A client talks to another SERVICE. Similar, but different enough
+	// to keep separate.
+	aiClient := client.NewAIClient()
+
+	// ---------- STEP 4: load the district shapes ONCE ----------
 	boundaries, err := districtRepo.LoadBoundaries("data/districts.geojson")
 	if err != nil {
 		log.Fatal("Cannot load district boundaries: ", err)
 	}
 	log.Printf("Loaded %d district boundaries.", len(boundaries))
 
-	// ---------- STEP 4: build the services (the thinking layer) ----------
-
-	// CHANGED: validation now needs the reading repository,
-	// so it can look up a field's history.
+	// ---------- STEP 5: build the services (the thinking layer) ----------
+	// Build in dependency order: the thing NEEDED comes before
+	// the thing that needs it.
 	validationService := service.NewValidationService(readingRepo)
-
 	locationService := service.NewLocationService(anchorRepo, boundaries)
+	fertilizerService := service.NewFertilizerService() // NEW
 
 	readingService := service.NewReadingService(
 		readingRepo,
 		locationService,
 		validationService,
+		aiClient,          // NEW
+		fertilizerService, // NEW
 	)
 
-	// ---------- STEP 5: build the controllers (the front door) ----------
+	// ---------- STEP 6: build the controllers (the front door) ----------
 	readingController := controller.NewReadingController(readingService)
 
-	// ---------- STEP 6: connect the routes ----------
+	// ---------- STEP 7: connect the routes ----------
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /health", controller.HealthCheck)
 	mux.HandleFunc("POST /readings", readingController.CreateReading)
 	mux.HandleFunc("GET /readings/{id}", readingController.GetReading)
 
-	// ---------- STEP 7: start the server ----------
+	// NEW: the recommendation endpoint.
+	mux.HandleFunc("GET /readings/{id}/recommendation",
+		readingController.GetRecommendation)
+
+	// ---------- STEP 8: start the server ----------
 	log.Println("API server starting on port 8080...")
 	if err := http.ListenAndServe(":8080", mux); err != nil {
 		log.Fatal(err)
