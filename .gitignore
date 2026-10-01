@@ -12,3 +12,10 @@ mobile/.expo/
 
 # Environment files. These may hold passwords. Never save them in Git.
 .env
+
+# Notebook working files
+ai/notebooks/.ipynb_checkpoints/
+ai/notebooks/data/*.csv
+
+# Python virtual environment
+ai/notebooks/venv/
