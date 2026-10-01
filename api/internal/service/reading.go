@@ -30,7 +30,12 @@ func NewReadingService(
 // The ORDER of these steps matters a lot. Read the comments.
 func (s *ReadingService) CreateReading(reading model.Reading) (int, error) {
 
-	// ---------- STEP 0: hard rules. Refuse impossible values. ----------
+	// ---------- STEP 0a: clean the text fields ---------- NEW
+	// "Rice" becomes "rice". " vegetative " becomes "vegetative".
+	// We do this BEFORE validating, so a capital letter is not an error.
+	reading = s.validation.Normalize(reading)
+
+	// ---------- STEP 0b: hard rules. Refuse impossible values. ----------
 	// This is FIRST, so bad data never creates an orphan anchor.
 	if err := s.validation.Validate(reading); err != nil {
 		return 0, err
