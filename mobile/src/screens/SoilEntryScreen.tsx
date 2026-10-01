@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { View, Text, Button, ScrollView, StyleSheet, Alert } from "react-native";
 
 import InputField from "../components/InputField";
+import SelectField from "../components/SelectField";
+import { CROPS, STAGES, MAX_YIELD } from "../constants/vocabulary";
 import { useLocation } from "../hooks/useLocation";
 import { useSubmitReading } from "../hooks/useSubmitReading";
 import { useAppSelector } from "../store";
@@ -10,40 +12,39 @@ import { NewReading } from "../types/reading";
 export default function SoilEntryScreen() {
 
   // ---------- FORM STATE ----------
-  // These are TEXT, not numbers. TextInput always gives text.
-  // We convert to numbers only at submit time, using parseFloat.
-  // Why? Because while typing, "6." is not a valid number yet.
+  // Numbers are kept as TEXT while typing. We convert at submit time.
   const [n, setN] = useState("");
   const [p, setP] = useState("");
   const [k, setK] = useState("");
   const [ph, setPh] = useState("");
-  const [crop, setCrop] = useState("Rice");
-  const [stage, setStage] = useState("vegetative");
   const [targetYield, setTargetYield] = useState("");
   const [area, setArea] = useState("");
 
+  // CHANGED: crop and stage are now chosen from a list, not typed.
+  // The starting values must be real keys from vocabulary.ts.
+  const [crop, setCrop] = useState("rice");
+  const [stage, setStage] = useState("vegetative");
+
   // ---------- LOCATION STATE ----------
-  // null means "not captured yet".
   const [lat, setLat] = useState<number | null>(null);
   const [lng, setLng] = useState<number | null>(null);
 
   // ---------- LOGIC LAYER ----------
-  // "loading: locating" RENAMES loading to locating,
-  // because we have two different loading states in this screen.
   const { getCurrentLocation, loading: locating, error: locationError } = useLocation();
   const { submit } = useSubmitReading();
 
   // ---------- READ FROM THE STORE ----------
-  // When these values change, this screen redraws automatically.
   const status = useAppSelector((state) => state.reading.status);
   const submitError = useAppSelector((state) => state.reading.error);
+
+  // The maximum yield for whichever crop is chosen right now.
+  // This is read during render, so it updates automatically
+  // when the farmer picks a different crop.
+  const maxYieldForCrop = MAX_YIELD[crop];
 
   // ---------- BUTTON 1: capture the location ----------
   async function handleGetLocation() {
     const coords = await getCurrentLocation();
-
-    // If it worked, save the two numbers.
-    // If it failed, the hook already set an error message.
     if (coords) {
       setLat(coords.lat);
       setLng(coords.lng);
@@ -52,14 +53,11 @@ export default function SoilEntryScreen() {
 
   // ---------- BUTTON 2: send everything to the API ----------
   async function handleSubmit() {
-
-    // The location is required. Stop if we do not have it.
     if (lat === null || lng === null) {
       Alert.alert("Location needed", "Please capture your location first.");
       return;
     }
 
-    // NOW we turn the text values into numbers.
     const reading: NewReading = {
       raw_lat: lat,
       raw_lng: lng,
@@ -67,29 +65,41 @@ export default function SoilEntryScreen() {
       p: parseFloat(p),
       k: parseFloat(k),
       ph: parseFloat(ph),
-      crop: crop,
-      stage: stage,
+      crop: crop,     // always a valid key, because it came from the list
+      stage: stage,   // same
       target_yield: parseFloat(targetYield),
       area: parseFloat(area),
     };
 
-    // Hand it to the logic layer. The screen's job is finished.
     await submit(reading);
   }
 
   return (
-    // ScrollView lets the user scroll, because the form is long.
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Soil Data Entry</Text>
 
-      {/* The SAME component used 8 times, with different props. */}
+      {/* CHANGED: units are now shown on every number field. */}
       <InputField label="Nitrogen (N) — mg/kg" value={n} onChangeText={setN} numeric />
       <InputField label="Phosphorus (P) — mg/kg" value={p} onChangeText={setP} numeric />
       <InputField label="Potassium (K) — mg/kg" value={k} onChangeText={setK} numeric />
       <InputField label="pH" value={ph} onChangeText={setPh} numeric />
-      <InputField label="Crop" value={crop} onChangeText={setCrop} />
-      <InputField label="Growth Stage" value={stage} onChangeText={setStage} />
-      <InputField label="Target Yield — tonnes per hectare" value={targetYield} onChangeText={setTargetYield} numeric />
+
+      {/* CHANGED: dropdowns instead of text boxes.
+          Now a wrong word is IMPOSSIBLE, not just caught later. */}
+      <SelectField label="Crop" value={crop} options={CROPS} onSelect={setCrop} />
+      <SelectField label="Growth Stage" value={stage} options={STAGES} onSelect={setStage} />
+
+      <InputField
+        label="Target Yield — tonnes per hectare"
+        value={targetYield}
+        onChangeText={setTargetYield}
+        numeric
+      />
+      {/* A helpful hint. The Go server enforces the real limit. */}
+      <Text style={styles.hint}>
+        Maximum for this crop: {maxYieldForCrop} tonnes per hectare
+      </Text>
+
       <InputField label="Field Area — hectares" value={area} onChangeText={setArea} numeric />
 
       <View style={styles.buttonRow}>
@@ -99,8 +109,6 @@ export default function SoilEntryScreen() {
         />
       </View>
 
-      {/* Show this ONLY if we have coordinates.
-          The && means: if the left side is false, draw nothing. */}
       {lat !== null && lng !== null && (
         <Text style={styles.info}>
           Location captured: {lat.toFixed(5)}, {lng.toFixed(5)}
@@ -113,13 +121,12 @@ export default function SoilEntryScreen() {
         <Button
           title={status === "loading" ? "Saving..." : "Submit Reading"}
           onPress={handleSubmit}
-          // Disabled while saving, so the user cannot press twice
-          // and create two readings by mistake.
           disabled={status === "loading"}
         />
       </View>
 
       {submitError && <Text style={styles.error}>{submitError}</Text>}
+
     </ScrollView>
   );
 }
@@ -130,4 +137,5 @@ const styles = StyleSheet.create({
   buttonRow: { marginVertical: 10 },
   info: { color: "green", marginVertical: 6 },
   error: { color: "red", marginVertical: 6 },
+  hint: { fontSize: 12, color: "#666", marginTop: -6, marginBottom: 12 },
 });
