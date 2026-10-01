@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 
+	"soil-data-system/api/internal/client"
 	"soil-data-system/api/internal/model"
 	"soil-data-system/api/internal/repository"
 )
@@ -22,14 +23,22 @@ import (
 // Simple and fast was the right trade for this project.
 const areaRadiusDegrees = 0.025
 
-// AnalyticsService produces the history graphs.
+// AnalyticsService produces the history graphs and clustering.
+// CHANGED: it now also holds the AI client, for clustering.
 type AnalyticsService struct {
-	repo *repository.AnalyticsRepository
+	repo     *repository.AnalyticsRepository
+	aiClient *client.AIClient
 }
 
 // NewAnalyticsService builds the service.
-func NewAnalyticsService(repo *repository.AnalyticsRepository) *AnalyticsService {
-	return &AnalyticsService{repo: repo}
+func NewAnalyticsService(
+	repo *repository.AnalyticsRepository,
+	aiClient *client.AIClient,
+) *AnalyticsService {
+	return &AnalyticsService{
+		repo:     repo,
+		aiClient: aiClient,
+	}
 }
 
 // FieldHistory returns the history for ONE exact field.
@@ -112,4 +121,39 @@ func (s *AnalyticsService) buildSeries(
 		TotalReadings: total,
 		Points:        points,
 	}
+}
+
+// Clusters groups districts by soil similarity.
+// NEW in Phase 7 Part 2.
+func (s *AnalyticsService) Clusters() (model.ClusterResult, error) {
+
+	var empty model.ClusterResult
+
+	// ---------- STEP 1: get the district averages ----------
+	// The repository already filters out flagged readings.
+	districts, err := s.repo.DistrictAverages()
+	if err != nil {
+		return empty, err
+	}
+
+	// ---------- STEP 2: check we have enough ----------
+	//
+	// You cannot make groups from 2 districts.
+	// We check HERE too, as well as in Python, so the farmer
+	// gets a clear message without a network round trip.
+	//
+	// This is DEFENCE IN DEPTH: each service protects itself.
+	if len(districts) < 4 {
+		return empty, fmt.Errorf(
+			"only %d districts have data. At least 4 are needed for clustering",
+			len(districts))
+	}
+
+	// ---------- STEP 3: ask the AI service ----------
+	result, err := s.aiClient.Cluster(districts)
+	if err != nil {
+		return empty, fmt.Errorf("clustering failed: %w", err)
+	}
+
+	return *result, nil
 }

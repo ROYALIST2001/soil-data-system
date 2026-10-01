@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"soil-data-system/api/internal/model"
 )
 
 // PredictRequest is what we SEND to the AI service.
@@ -96,6 +98,50 @@ func (c *AIClient) Predict(req PredictRequest) (*PredictResponse, error) {
 
 	// ---------- STEP 4: read the answer ----------
 	var result PredictResponse
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, fmt.Errorf("could not read the AI reply: %w", err)
+	}
+
+	return &result, nil
+}
+
+// ClusterRequest is what we SEND to the AI service.
+type ClusterRequest struct {
+	Districts []model.DistrictSoil `json:"districts"`
+	MaxK      int                  `json:"max_k"`
+}
+
+// Cluster asks the AI service to group districts by soil similarity.
+func (c *AIClient) Cluster(districts []model.DistrictSoil) (*model.ClusterResult, error) {
+
+	request := ClusterRequest{
+		Districts: districts,
+		MaxK:      6, // test K = 2 up to 6
+	}
+
+	body, err := json.Marshal(request)
+	if err != nil {
+		return nil, fmt.Errorf("could not build the request: %w", err)
+	}
+
+	resp, err := c.httpClient.Post(
+		c.baseURL+"/cluster",
+		"application/json",
+		bytes.NewBuffer(body),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("could not reach the AI service: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		// Read FastAPI's helpful message instead of throwing it away.
+		errBody, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("AI service returned %d: %s",
+			resp.StatusCode, string(errBody))
+	}
+
+	var result model.ClusterResult
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return nil, fmt.Errorf("could not read the AI reply: %w", err)
 	}

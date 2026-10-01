@@ -2,7 +2,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from app.controller import health, predict
+# CHANGED: added cluster.
+from app.controller import health, predict, cluster
 from app.repository.model_loader import store
 
 
@@ -43,3 +44,4 @@ app = FastAPI(title="Soil AI Service", lifespan=lifespan)
 # Attach the controllers. One line per controller.
 app.include_router(health.router)
 app.include_router(predict.router)
+app.include_router(cluster.router)

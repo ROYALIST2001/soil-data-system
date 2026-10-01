@@ -186,3 +186,58 @@ func scanAggregated(rows interface {
 
 	return points, rows.Err()
 }
+
+// DistrictAverages returns the average soil for every district
+// that has data. Used for clustering.
+// NEW in Phase 7 Part 2.
+func (repo *AnalyticsRepository) DistrictAverages() ([]model.DistrictSoil, error) {
+
+	// JOIN connects the two tables: each reading knows its district_id,
+	// and we want the district's NAME as well.
+	//
+	// HAVING filters AFTER grouping. WHERE filters BEFORE.
+	// We must use HAVING here, because COUNT(*) only exists
+	// once the rows have been grouped.
+	//
+	// TIP: raising this to >= 3 would exclude districts with barely
+	// any data, giving more reliable averages. Worth mentioning
+	// in your report as a tuning option.
+	query := `
+		SELECT
+			d.district_id,
+			d.name,
+			COALESCE(AVG(r.n), 0)  AS avg_n,
+			COALESCE(AVG(r.p), 0)  AS avg_p,
+			COALESCE(AVG(r.k), 0)  AS avg_k,
+			COALESCE(AVG(r.ph), 0) AS avg_ph,
+			COUNT(*)               AS reading_count
+		FROM readings r
+		JOIN districts d ON d.district_id = r.district_id
+		WHERE r.quality_flag = 'OK'
+		GROUP BY d.district_id, d.name
+		HAVING COUNT(*) >= 1
+		ORDER BY d.name
+	`
+
+	rows, err := repo.db.Query(context.Background(), query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var results []model.DistrictSoil
+
+	for rows.Next() {
+		var d model.DistrictSoil
+
+		err := rows.Scan(&d.DistrictID, &d.Name,
+			&d.AvgN, &d.AvgP, &d.AvgK, &d.AvgPH, &d.ReadingCount)
+		if err != nil {
+			return nil, err
+		}
+
+		results = append(results, d)
+	}
+
+	return results, rows.Err()
+}

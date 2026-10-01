@@ -38,7 +38,7 @@ func main() {
 	validationService := service.NewValidationService(readingRepo)
 	locationService := service.NewLocationService(anchorRepo, boundaries)
 	fertilizerService := service.NewFertilizerService()
-	analyticsService := service.NewAnalyticsService(analyticsRepo) // NEW
+	analyticsService := service.NewAnalyticsService(analyticsRepo, aiClient) // CHANGED
 
 	readingService := service.NewReadingService(
 		readingRepo,
@@ -68,6 +68,9 @@ func main() {
 		analyticsController.AreaHistory)
 	mux.HandleFunc("GET /history/district/{districtId}",
 		analyticsController.DistrictHistory)
+
+	// NEW in Part 2: the clustering endpoint.
+	mux.HandleFunc("GET /clusters", analyticsController.Clusters)
 
 	// ---------- STEP 8: start the server ----------
 	log.Println("API server starting on port 8080...")

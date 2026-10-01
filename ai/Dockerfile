@@ -17,8 +17,16 @@ COPY requirements.txt ./
 #
 # IF YOUR WINNER IS random_forest, remove torch from requirements.txt
 # and delete the --extra-index-url part. Saves about 800 MB.
-RUN pip install --no-cache-dir -r requirements.txt \
-    --extra-index-url https://download.pytorch.org/whl/cpu
+#
+# --timeout / --retries were added because the 196 MB PyTorch wheel
+# stalls on a slow connection and fails the whole build with:
+#   ReadTimeoutError: HTTPSConnectionPool(host='download-r2.pytorch.org')
+# The pip cache mount lets a retry resume from what already downloaded,
+# instead of starting the 196 MB again. Neither changes what is installed.
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install -r requirements.txt \
+    --extra-index-url https://download.pytorch.org/whl/cpu \
+    --timeout 120 --retries 10
 
 # Copy everything else: main.py, the app package, and artifacts.
 COPY . .
