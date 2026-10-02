@@ -210,3 +210,72 @@ func (c *AIClient) ReviewQuality(req QualityReviewRequest) (*QualityReviewRespon
 
 	return &result, nil
 }
+
+// ---------- CHAT ----------
+
+// AgentChatMessage is one message, as FastAPI expects it.
+type AgentChatMessage struct {
+	Role       string `json:"role"`
+	Content    string `json:"content"`
+	ToolCalls  any    `json:"tool_calls,omitempty"`
+	ToolCallID string `json:"tool_call_id,omitempty"`
+}
+
+// AgentToolResult is a tool result we send back to the agent.
+type AgentToolResult struct {
+	ToolCallID string `json:"tool_call_id"`
+	Name       string `json:"name"`
+	Content    string `json:"content"`
+}
+
+// AgentChatRequest is what we SEND to the agent.
+type AgentChatRequest struct {
+	Messages    []AgentChatMessage `json:"messages"`
+	ToolResults []AgentToolResult  `json:"tool_results"`
+}
+
+// AgentToolCall is the agent asking us to run a tool.
+type AgentToolCall struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+// AgentChatResponse is what the agent sends back.
+type AgentChatResponse struct {
+	NeedsTools bool               `json:"needs_tools"`
+	ToolCalls  []AgentToolCall    `json:"tool_calls"`
+	Answer     *string            `json:"answer"`
+	Messages   []AgentChatMessage `json:"messages"`
+}
+
+// Chat runs one round of the agent loop.
+func (c *AIClient) Chat(req AgentChatRequest) (*AgentChatResponse, error) {
+
+	body, err := json.Marshal(req)
+	if err != nil {
+		return nil, fmt.Errorf("could not build the request: %w", err)
+	}
+
+	resp, err := c.httpClient.Post(
+		c.baseURL+"/agent/chat",
+		"application/json",
+		bytes.NewBuffer(body),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("could not reach the agent: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		errBody, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("agent returned %d: %s",
+			resp.StatusCode, string(errBody))
+	}
+
+	var result AgentChatResponse
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, fmt.Errorf("could not read the agent reply: %w", err)
+	}
+
+	return &result, nil
+}

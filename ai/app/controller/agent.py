@@ -5,8 +5,11 @@ It receives the request and sends the reply. No thinking.
 
 from fastapi import APIRouter, HTTPException
 
-from app.schema.agent import QualityReviewRequest, QualityReviewResponse
-from app.service import quality_agent
+from app.schema.agent import (
+    QualityReviewRequest, QualityReviewResponse,
+    ChatRequest, ChatResponse,
+)
+from app.service import quality_agent, advisory_agent
 from app.client.llm_client import LLMError, is_available
 
 router = APIRouter()
@@ -37,6 +40,31 @@ def quality_review_endpoint(request: QualityReviewRequest):
         # Do NOT leak the internal message. It could reveal how the
         # service is built, or in the worst case contain the API key.
         raise HTTPException(status_code=500, detail="Quality review failed.")
+
+
+@router.post("/agent/chat", response_model=ChatResponse)
+def chat_endpoint(request: ChatRequest):
+    """
+    Run one round of the Advisory Agent.
+
+    Go drives the loop. We decide what should happen next:
+    either run some tools, or give the final answer.
+    """
+
+    if not is_available():
+        raise HTTPException(
+            status_code=503,
+            detail="No LLM API key is configured. Set LLM_API_KEY in .env.",
+        )
+
+    try:
+        return advisory_agent.chat(request)
+
+    except LLMError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+
+    except Exception:
+        raise HTTPException(status_code=500, detail="Chat failed.")
 
 
 @router.get("/agent/status")

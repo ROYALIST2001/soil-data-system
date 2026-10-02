@@ -40,6 +40,9 @@ func main() {
 	fertilizerService := service.NewFertilizerService()
 	analyticsService := service.NewAnalyticsService(analyticsRepo, aiClient) // CHANGED
 
+	// NEW: the chat service drives the agent loop and executes the tools.
+	// It needs the OTHER services, so it is built LAST.
+
 	readingService := service.NewReadingService(
 		readingRepo,
 		locationService,
@@ -48,9 +51,18 @@ func main() {
 		fertilizerService,
 	)
 
+	chatService := service.NewChatService(
+		readingRepo,
+		readingService,
+		analyticsService,
+		locationService,
+		aiClient,
+	)
+
 	// ---------- STEP 6: build the controllers (the front door) ----------
 	readingController := controller.NewReadingController(readingService)
 	analyticsController := controller.NewAnalyticsController(analyticsService) // NEW
+	chatController := controller.NewChatController(chatService)                // NEW
 
 	// ---------- STEP 7: connect the routes ----------
 	mux := http.NewServeMux()
@@ -71,6 +83,9 @@ func main() {
 
 	// NEW in Part 2: the clustering endpoint.
 	mux.HandleFunc("GET /clusters", analyticsController.Clusters)
+
+	// NEW: the farmer advisory chatbot.
+	mux.HandleFunc("POST /chat", chatController.Chat)
 
 	// ---------- STEP 8: start the server ----------
 	log.Println("API server starting on port 8080...")

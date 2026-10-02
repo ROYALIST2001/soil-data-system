@@ -113,6 +113,70 @@ def chat(
         raise LLMError("The LLM reply was not in the expected format.")
 
 
+def chat_with_tools(
+    messages: list,
+    tools: list,
+    temperature: float = 0.3,
+) -> dict:
+    """
+    Send a conversation WITH TOOLS and get the raw reply message.
+
+    This is different from chat() above.
+
+    chat()            returns TEXT
+    chat_with_tools() returns the whole MESSAGE object, because the
+                      reply might contain TOOL CALLS instead of text.
+
+    Returns a dict like:
+      {"role": "assistant", "content": "...", "tool_calls": [...]}
+    """
+
+    if not is_available():
+        raise LLMError(
+            "No LLM API key is configured. Set LLM_API_KEY in your .env file."
+        )
+
+    body = {
+        "model": LLM_MODEL,
+        "messages": messages,
+        "temperature": temperature,
+    }
+
+    # Only send the tools list if we actually have tools.
+    # Some providers complain about an empty list.
+    if tools:
+        body["tools"] = tools
+        # "auto" means: the model decides whether to use a tool.
+        # We do NOT force it. Sometimes plain text is the right answer.
+        body["tool_choice"] = "auto"
+
+    headers = {
+        "Authorization": f"Bearer {LLM_API_KEY}",
+        "Content-Type": "application/json",
+    }
+
+    try:
+        with httpx.Client(timeout=TIMEOUT_SECONDS) as client:
+            response = client.post(
+                f"{LLM_BASE_URL}/chat/completions",
+                json=body,
+                headers=headers,
+            )
+    except httpx.TimeoutException:
+        raise LLMError("The LLM took too long to answer.")
+    except httpx.RequestError as e:
+        raise LLMError(f"Could not reach the LLM service: {e}")
+
+    if response.status_code != 200:
+        raise LLMError(f"The LLM service returned status {response.status_code}.")
+
+    try:
+        data = response.json()
+        return data["choices"][0]["message"]
+    except (KeyError, IndexError, ValueError):
+        raise LLMError("The LLM reply was not in the expected format.")
+
+
 def parse_json_reply(text: str) -> dict:
     """
     Turn the model's reply into a Python dictionary.

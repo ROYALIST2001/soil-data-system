@@ -49,3 +49,60 @@ class QualityReviewResponse(BaseModel):
     agrees_with_rules: bool
 
     confidence: str = Field(..., description="low, medium or high")
+
+
+# ---------- CHAT ----------
+
+class ChatMessage(BaseModel):
+    """One message in the conversation."""
+    role: str = Field(..., description="user, assistant, tool or system")
+    content: Optional[str] = None
+
+    # These are only present on tool-related messages.
+    tool_calls: Optional[list] = None
+    tool_call_id: Optional[str] = None
+
+
+class ToolResult(BaseModel):
+    """A tool result Go is sending back to us."""
+    tool_call_id: str
+    name: str
+    content: str
+
+
+class ChatRequest(BaseModel):
+    """
+    What Go sends us.
+
+    NOTE: Go drives the loop. It sends the conversation so far,
+    plus any tool results it has just gathered.
+    """
+    messages: List[ChatMessage] = Field(default_factory=list)
+    tool_results: List[ToolResult] = Field(default_factory=list)
+
+
+class ToolCallRequest(BaseModel):
+    """The agent asking Go to run a tool."""
+
+    id: str
+    name: str
+
+
+class ChatResponse(BaseModel):
+    """
+    What we send back.
+
+    EITHER:
+      - needs_tools = true, with a list of tools to run, OR
+      - needs_tools = false, with the final answer
+    """
+    needs_tools: bool
+
+    # If needs_tools is true:
+    tool_calls: List[ToolCallRequest] = Field(default_factory=list)
+
+    # If needs_tools is false:
+    answer: Optional[str] = None
+
+    # The full message list, so Go can send it back next round.
+    messages: List[ChatMessage] = Field(default_factory=list)
