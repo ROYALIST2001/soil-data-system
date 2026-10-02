@@ -85,6 +85,15 @@ export default function ResultScreen() {
             {quality.title}
           </Text>
           <Text style={styles.warningText}>{quality.text}</Text>
+
+          {/* NEW: the agent's explanation, if we have one.
+              The agent is OPTIONAL, so this can be empty. */}
+          {reading.agent_note && (
+            <View style={styles.agentBox}>
+              <Text style={styles.agentLabel}>What our review found:</Text>
+              <Text style={styles.agentText}>{reading.agent_note}</Text>
+            </View>
+          )}
         </View>
       )}
 
@@ -159,4 +168,18 @@ const styles = StyleSheet.create({
   flaggedText: { fontSize: 13, color: "#495057", lineHeight: 19 },
 
   error: { color: "red", marginTop: 14, fontSize: 13 },
+
+  agentBox: {
+    marginTop: 10,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(0,0,0,0.12)",
+  },
+  agentLabel: {
+    fontSize: 12,
+    fontWeight: "bold",
+    color: "#495057",
+    marginBottom: 3,
+  },
+  agentText: { fontSize: 13, color: "#333", lineHeight: 19 },
 });

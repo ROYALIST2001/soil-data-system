@@ -64,7 +64,17 @@ func (s *ReadingService) CreateReading(reading model.Reading) (int, error) {
 	}
 	reading.QualityFlag = flag
 
-	// STEP 4: save it.
+	// ---------- STEP 4: ask the agent to EXPLAIN, if flagged ---------- NEW
+	//
+	// WE ONLY CALL THE AGENT FOR FLAGGED READINGS.
+	//
+	// WHY? Most readings are OK, so most submits never touch the LLM.
+	// That keeps the common case FAST and FREE.
+	if flag != FlagOK {
+		s.attachAgentNote(&reading)
+	}
+
+	// ---------- STEP 5: save the complete reading ----------
 	return s.repo.Insert(reading)
 }
 
@@ -138,4 +148,63 @@ func (s *ReadingService) GetRecommendation(id int) (model.Recommendation, error)
 	)
 
 	return recommendation, nil
+}
+
+// attachAgentNote asks the Data-Quality Agent to explain a flagged reading.
+//
+// IMPORTANT: this is OPTIONAL. If it fails, we simply save WITHOUT a note.
+// The reading is still stored. The flag still stands. Nothing breaks.
+//
+// RULE: the optional feature must never break the essential one.
+func (s *ReadingService) attachAgentNote(reading *model.Reading) {
+
+	if reading.AnchorID == nil {
+		return
+	}
+
+	// Get the field's recent GOOD readings, for grounding.
+	// Without real facts, the model would invent numbers.
+	history, err := s.repo.FindRecentByAnchor(*reading.AnchorID, 5)
+	if err != nil {
+		// Cannot get history. Skip the agent. Not a failure.
+		return
+	}
+
+	// Build the history list, OLDEST first, so the story reads naturally.
+	var items []client.HistoryItem
+	for i := len(history) - 1; i >= 0; i-- {
+		h := history[i]
+		items = append(items, client.HistoryItem{
+			Date: h.CreatedAt.Format("2006-01-02"),
+			N:    h.N,
+			P:    h.P,
+			K:    h.K,
+			PH:   h.PH,
+			Crop: h.Crop,
+		})
+	}
+
+	result, err := s.aiClient.ReviewQuality(client.QualityReviewRequest{
+		SoilN:    reading.N,
+		SoilP:    reading.P,
+		SoilK:    reading.K,
+		SoilPH:   reading.PH,
+		Crop:     reading.Crop,
+		Stage:    reading.Stage,
+		RuleFlag: reading.QualityFlag,
+		History:  items,
+	})
+
+	if err != nil {
+		// The LLM is down, the key is missing, or the free tier ran out.
+		// SAVE WITHOUT A NOTE. The reading is not lost.
+		return
+	}
+
+	// Store what the agent said.
+	//
+	// NOTE: we do NOT change reading.QualityFlag.
+	// THE RULES DECIDE. THE LLM ONLY EXPLAINS.
+	reading.AgentNote = &result.Explanation
+	reading.AgentVerdict = &result.AgentVerdict
 }

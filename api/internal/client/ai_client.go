@@ -148,3 +148,65 @@ func (c *AIClient) Cluster(districts []model.DistrictSoil) (*model.ClusterResult
 
 	return &result, nil
 }
+
+// QualityReviewRequest is what we SEND to the agent.
+type QualityReviewRequest struct {
+	SoilN    float64       `json:"soil_n"`
+	SoilP    float64       `json:"soil_p"`
+	SoilK    float64       `json:"soil_k"`
+	SoilPH   float64       `json:"soil_ph"`
+	Crop     string        `json:"crop"`
+	Stage    string        `json:"stage"`
+	RuleFlag string        `json:"rule_flag"`
+	History  []HistoryItem `json:"history"`
+}
+
+// HistoryItem is one past reading, for grounding.
+type HistoryItem struct {
+	Date string  `json:"date"`
+	N    float64 `json:"n"`
+	P    float64 `json:"p"`
+	K    float64 `json:"k"`
+	PH   float64 `json:"ph"`
+	Crop string  `json:"crop"`
+}
+
+// QualityReviewResponse is what the agent sends back.
+type QualityReviewResponse struct {
+	Explanation     string `json:"explanation"`
+	AgentVerdict    string `json:"agent_verdict"`
+	AgreesWithRules bool   `json:"agrees_with_rules"`
+	Confidence      string `json:"confidence"`
+}
+
+// ReviewQuality asks the Data-Quality Agent to explain a flagged reading.
+func (c *AIClient) ReviewQuality(req QualityReviewRequest) (*QualityReviewResponse, error) {
+
+	body, err := json.Marshal(req)
+	if err != nil {
+		return nil, fmt.Errorf("could not build the request: %w", err)
+	}
+
+	resp, err := c.httpClient.Post(
+		c.baseURL+"/agent/quality-review",
+		"application/json",
+		bytes.NewBuffer(body),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("could not reach the agent: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		errBody, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("agent returned %d: %s",
+			resp.StatusCode, string(errBody))
+	}
+
+	var result QualityReviewResponse
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, fmt.Errorf("could not read the agent reply: %w", err)
+	}
+
+	return &result, nil
+}

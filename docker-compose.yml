@@ -44,6 +44,14 @@ services:
     build: ./ai
     ports:
       - "8000:8000"
+    environment:
+      # NEW: the LLM settings, read from the .env file.
+      #
+      # The ${...} syntax reads from .env automatically.
+      # The KEY NEVER APPEARS IN THIS FILE, so it is safe in Git.
+      LLM_BASE_URL: "${LLM_BASE_URL}"
+      LLM_API_KEY: "${LLM_API_KEY}"
+      LLM_MODEL: "${LLM_MODEL}"
 
 volumes:
   db_data:

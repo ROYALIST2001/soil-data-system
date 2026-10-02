@@ -19,15 +19,16 @@ func NewReadingRepository(db *pgxpool.Pool) *ReadingRepository {
 
 // Insert saves a new reading and gives back its new id.
 func (repo *ReadingRepository) Insert(reading model.Reading) (int, error) {
-	// CHANGED: quality_flag is now included.
+	// CHANGED: agent_note and agent_verdict are now included.
 	// Before, the database filled it in automatically with 'OK'.
 	// Now the SERVICE decides the value, so we must send it.
 	query := `
 		INSERT INTO readings
 			(raw_lat, raw_lng, anchor_id, district_id,
-			 n, p, k, ph, crop, stage, target_yield, area, quality_flag)
+			 n, p, k, ph, crop, stage, target_yield, area,
+			 quality_flag, agent_note, agent_verdict)
 		VALUES
-			($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+			($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
 		RETURNING reading_id
 	`
 
@@ -39,7 +40,9 @@ func (repo *ReadingRepository) Insert(reading model.Reading) (int, error) {
 		reading.AnchorID, reading.DistrictID,
 		reading.N, reading.P, reading.K, reading.PH,
 		reading.Crop, reading.Stage, reading.TargetYield, reading.Area,
-		reading.QualityFlag, // the new value
+		reading.QualityFlag,
+		reading.AgentNote,    // NEW
+		reading.AgentVerdict, // NEW
 	).Scan(&newID)
 
 	return newID, err
@@ -50,7 +53,7 @@ func (repo *ReadingRepository) GetByID(id int) (model.Reading, error) {
 	query := `
 		SELECT reading_id, raw_lat, raw_lng, anchor_id, district_id,
 		       n, p, k, ph, crop, stage, target_yield, area,
-		       created_at, quality_flag
+		       created_at, quality_flag, agent_note, agent_verdict
 		FROM readings
 		WHERE reading_id = $1
 	`
@@ -61,6 +64,7 @@ func (repo *ReadingRepository) GetByID(id int) (model.Reading, error) {
 		&r.ReadingID, &r.RawLat, &r.RawLng, &r.AnchorID, &r.DistrictID,
 		&r.N, &r.P, &r.K, &r.PH, &r.Crop, &r.Stage, &r.TargetYield, &r.Area,
 		&r.CreatedAt, &r.QualityFlag,
+		&r.AgentNote, &r.AgentVerdict, // NEW
 	)
 
 	return r, err
@@ -87,7 +91,7 @@ func (repo *ReadingRepository) FindRecentByAnchor(
 	query := `
 		SELECT reading_id, raw_lat, raw_lng, anchor_id, district_id,
 		       n, p, k, ph, crop, stage, target_yield, area,
-		       created_at, quality_flag
+		       created_at, quality_flag, agent_note, agent_verdict
 		FROM readings
 		WHERE anchor_id = $1 AND quality_flag = 'OK'
 		ORDER BY created_at DESC
@@ -109,6 +113,7 @@ func (repo *ReadingRepository) FindRecentByAnchor(
 			&r.ReadingID, &r.RawLat, &r.RawLng, &r.AnchorID, &r.DistrictID,
 			&r.N, &r.P, &r.K, &r.PH, &r.Crop, &r.Stage, &r.TargetYield, &r.Area,
 			&r.CreatedAt, &r.QualityFlag,
+			&r.AgentNote, &r.AgentVerdict, // NEW
 		)
 		if err != nil {
 			return nil, err

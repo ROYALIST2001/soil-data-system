@@ -26,6 +26,12 @@ export interface Reading extends NewReading {
   // Derived by the server from the district. Not stored in the database.
   // Values: "wet", "dry", or "intermediate".
   zone: string;
+
+  // NEW in Phase 8: what the Data-Quality Agent said.
+  // These can be null - the agent only runs for flagged readings,
+  // and it is optional.
+  agent_note: string | null;
+  agent_verdict: string | null;
 }
 
 // The small answer from POST /readings.
