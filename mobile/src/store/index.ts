@@ -2,14 +2,17 @@ import { configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector, TypedUseSelectorHook } from "react-redux";
 import readingReducer from "./readingSlice";
 import recommendationReducer from "./recommendationSlice";
-import analyticsReducer from "./analyticsSlice"; // NEW
+import analyticsReducer from "./analyticsSlice";
+import chatReducer from "./chatSlice"; // NEW
 
 // Build the ONE store from all our slices.
+// Four slices now. Each one owns ONE topic.
 export const store = configureStore({
   reducer: {
     reading: readingReducer,
     recommendation: recommendationReducer,
-    analytics: analyticsReducer, // NEW
+    analytics: analyticsReducer,
+    chat: chatReducer, // NEW
   },
 });
 

@@ -10,6 +10,7 @@ import RecommendationScreen from "../screens/RecommendationScreen";
 import HistoryScreen from "../screens/HistoryScreen";
 import MapScreen from "../screens/MapScreen";
 import ClustersScreen from "../screens/ClustersScreen";
+import ChatScreen from "../screens/ChatScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -103,6 +104,17 @@ export default function AppNavigator() {
             headerShown: false,
             tabBarIcon: ({ color }) => (
               <Text style={{ color, fontSize: 18 }}>🏞️</Text>
+            ),
+          }}
+        />
+
+        <Tab.Screen
+          name="Ask"
+          component={ChatScreen}
+          options={{
+            title: "Soil Advisor",
+            tabBarIcon: ({ color }) => (
+              <Text style={{ color, fontSize: 18 }}>💬</Text>
             ),
           }}
         />
