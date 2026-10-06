@@ -24,6 +24,7 @@ func main() {
 	districtRepo := repository.NewDistrictRepository(db)
 	analyticsRepo := repository.NewAnalyticsRepository(db) // NEW
 	farmerRepo := repository.NewFarmerRepository(db)    // NEW in Phase 9
+	landRepo := repository.NewLandRepository(db)        // NEW in Phase 9
 
 	// ---------- STEP 3: build the client (talks to other services) ----------
 	aiClient := client.NewAIClient()
@@ -44,6 +45,11 @@ func main() {
 	// NEW in Phase 9: farmer accounts. It needs nothing but its own
 	// repository, so it can be built straight away.
 	farmerService := service.NewFarmerService(farmerRepo)
+
+	// NEW in Phase 9: a farmer's lands and the crops on them.
+	// It needs the farmer repository too, so it can refuse a land for a
+	// farmer who does not exist.
+	landService := service.NewLandService(landRepo, farmerRepo)
 
 	// NEW: the chat service drives the agent loop and executes the tools.
 	// It needs the OTHER services, so it is built LAST.
@@ -69,6 +75,7 @@ func main() {
 	analyticsController := controller.NewAnalyticsController(analyticsService) // NEW
 	chatController := controller.NewChatController(chatService)                // NEW
 	farmerController := controller.NewFarmerController(farmerService)          // NEW
+	landController := controller.NewLandController(landService)                 // NEW
 
 	// ---------- STEP 7: connect the routes ----------
 	mux := http.NewServeMux()
@@ -99,6 +106,13 @@ func main() {
 	// obvious reason that you cannot have an account before you make one.
 	mux.HandleFunc("POST /signup", farmerController.Signup)
 	mux.HandleFunc("POST /login", farmerController.Login)
+
+	// NEW in Phase 9: lands and the crops on them.
+	mux.HandleFunc("POST /lands", landController.CreateLand)
+	mux.HandleFunc("GET /farmers/{farmerId}/lands", landController.GetLands)
+	mux.HandleFunc("POST /lands/{landId}/crops", landController.AddCrop)
+	mux.HandleFunc("DELETE /lands/{landId}", landController.DeleteLand)
+	mux.HandleFunc("DELETE /crops/{cropId}", landController.DeleteCrop)
 
 	// ---------- STEP 8: start the server ----------
 	log.Println("API server starting on port 8080...")
