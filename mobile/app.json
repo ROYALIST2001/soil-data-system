@@ -27,7 +27,8 @@
         {
           "locationAlwaysAndWhenInUsePermission": "This app uses your location to record where each soil test was taken."
         }
-      ]
+      ],
+      "expo-secure-store"
     ]
   }
 }
