@@ -23,6 +23,7 @@ func main() {
 	anchorRepo := repository.NewAnchorRepository(db)
 	districtRepo := repository.NewDistrictRepository(db)
 	analyticsRepo := repository.NewAnalyticsRepository(db) // NEW
+	farmerRepo := repository.NewFarmerRepository(db)    // NEW in Phase 9
 
 	// ---------- STEP 3: build the client (talks to other services) ----------
 	aiClient := client.NewAIClient()
@@ -39,6 +40,10 @@ func main() {
 	locationService := service.NewLocationService(anchorRepo, boundaries)
 	fertilizerService := service.NewFertilizerService()
 	analyticsService := service.NewAnalyticsService(analyticsRepo, aiClient) // CHANGED
+
+	// NEW in Phase 9: farmer accounts. It needs nothing but its own
+	// repository, so it can be built straight away.
+	farmerService := service.NewFarmerService(farmerRepo)
 
 	// NEW: the chat service drives the agent loop and executes the tools.
 	// It needs the OTHER services, so it is built LAST.
@@ -63,6 +68,7 @@ func main() {
 	readingController := controller.NewReadingController(readingService)
 	analyticsController := controller.NewAnalyticsController(analyticsService) // NEW
 	chatController := controller.NewChatController(chatService)                // NEW
+	farmerController := controller.NewFarmerController(farmerService)          // NEW
 
 	// ---------- STEP 7: connect the routes ----------
 	mux := http.NewServeMux()
@@ -86,6 +92,13 @@ func main() {
 
 	// NEW: the farmer advisory chatbot.
 	mux.HandleFunc("POST /chat", chatController.Chat)
+
+	// NEW in Phase 9: farmer accounts.
+	//
+	// These two are the only routes that work WITHOUT an account, for the
+	// obvious reason that you cannot have an account before you make one.
+	mux.HandleFunc("POST /signup", farmerController.Signup)
+	mux.HandleFunc("POST /login", farmerController.Login)
 
 	// ---------- STEP 8: start the server ----------
 	log.Println("API server starting on port 8080...")
