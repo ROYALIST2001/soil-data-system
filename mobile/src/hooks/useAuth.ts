@@ -12,6 +12,7 @@ import {
   sessionEmpty,
   sessionRestored,
 } from "../store/authSlice";
+import { landsCleared } from "../store/landSlice";
 
 // ---------------------------------------------------------------------
 // useSessionRestore - looks for a saved farmer when the app starts.
@@ -116,6 +117,14 @@ export function useAuth() {
     // Clear the phone's copy FIRST. If we only cleared the store, the next
     // app start would read the old session and log them back in.
     await clearSession();
+
+    // FORGET THE LANDS TOO.
+    //
+    // Without this, the next farmer to log in on the same phone would see
+    // the previous farmer's lands and crops for a moment, until the reload
+    // finished. That is somebody else's private data on screen, and it
+    // would be our bug, not a server problem.
+    dispatch(landsCleared());
     dispatch(loggedOut());
   }
 

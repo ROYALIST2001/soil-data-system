@@ -14,13 +14,19 @@ import ChatScreen from "../screens/ChatScreen";
 import LoginScreen from "../screens/LoginScreen";
 import SignupScreen from "../screens/SignupScreen";
 import ProfileScreen from "../screens/ProfileScreen";
+import LandSetupScreen from "../screens/LandSetupScreen";
+import MyLandsScreen from "../screens/MyLandsScreen";
+import AddLandScreen from "../screens/AddLandScreen";
+import AddCropScreen from "../screens/AddCropScreen";
 
 import { useSessionRestore } from "../hooks/useAuth";
+import { useLandsBootstrap } from "../hooks/useLands";
 import { useAppSelector } from "../store";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
+const LandStack = createNativeStackNavigator();
 
 // ---------- THE TEST STACK ----------
 //
@@ -64,6 +70,37 @@ function LoginFlow() {
       <AuthStack.Screen name="Login" component={LoginScreen} />
       <AuthStack.Screen name="Signup" component={SignupScreen} />
     </AuthStack.Navigator>
+  );
+}
+
+// ---------- THE LANDS STACK ----------
+//
+// My Lands -> Add Land -> Add Crop. Going DEEPER into one topic, so a stack,
+// not tabs. Same reasoning as the Test stack above.
+function LandsStack() {
+  return (
+    <LandStack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: "#1b4332" },
+        headerTintColor: "#fff",
+      }}
+    >
+      <LandStack.Screen
+        name="MyLands"
+        component={MyLandsScreen}
+        options={{ title: "My Lands" }}
+      />
+      <LandStack.Screen
+        name="AddLand"
+        component={AddLandScreen}
+        options={{ title: "Register Land" }}
+      />
+      <LandStack.Screen
+        name="AddCrop"
+        component={AddCropScreen}
+        options={{ title: "Add Crop" }}
+      />
+    </LandStack.Navigator>
   );
 }
 
@@ -138,6 +175,20 @@ function MainTabs() {
         }}
       />
 
+      {/* NEW in Phase 9: the farmer's own land and crops. */}
+      <Tab.Screen
+        name="Lands"
+        component={LandsStack}
+        options={{
+          // The stack inside has its own header.
+          headerShown: false,
+          tabBarLabel: "My Lands",
+          tabBarIcon: ({ color }) => (
+            <Text style={{ color, fontSize: 18 }}>🌾</Text>
+          ),
+        }}
+      />
+
       {/* NEW in Phase 9: the farmer's own account. */}
       <Tab.Screen
         name="Profile"
@@ -166,7 +217,32 @@ export default function AppNavigator() {
   const { checking } = useSessionRestore();
   const status = useAppSelector((s) => s.auth.status);
 
+  // NEW in Phase 9: load this farmer's lands as soon as we know who they are.
+  const { checking: loadingLands } = useLandsBootstrap();
+  const setupDone = useAppSelector((s) => s.land.setupDone);
+
+  const loggedIn = status === "loggedIn";
+
   if (checking) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" color="#1b4332" />
+      </View>
+    );
+  }
+
+  if (!loggedIn) {
+    return (
+      <NavigationContainer>
+        <LoginFlow />
+      </NavigationContainer>
+    );
+  }
+
+  // Logged in, but we do not yet know whether they have any land. Showing
+  // either screen now would be a guess, and a wrong guess means the farmer
+  // watches the land registration form appear and vanish.
+  if (loadingLands) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" color="#1b4332" />
@@ -176,7 +252,7 @@ export default function AppNavigator() {
 
   return (
     <NavigationContainer>
-      {status === "loggedIn" ? <MainTabs /> : <LoginFlow />}
+      {setupDone ? <MainTabs /> : <LandSetupScreen />}
     </NavigationContainer>
   );
 }

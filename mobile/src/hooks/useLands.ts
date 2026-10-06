@@ -1,0 +1,226 @@
+import { useEffect } from "react";
+
+import { useAppDispatch, useAppSelector } from "../store";
+import * as landApi from "../api/landApi";
+import { NewLandCrop } from "../types/land";
+import {
+  cropAdded,
+  cropRemoved,
+  errorCleared,
+  landAdded,
+  landRemoved,
+  landsFailed,
+  landsLoaded,
+  landsLoading,
+  saveFailed,
+  saveStarted,
+} from "../store/landSlice";
+
+// Turn any thrown thing into a sentence we can show.
+function messageFrom(e: unknown): string {
+  return e instanceof Error
+    ? e.message
+    : "Could not reach the server. Check your connection.";
+}
+
+// ---------------------------------------------------------------------
+// useLandsBootstrap - fetches the farmer's lands once, after they log in.
+//
+// SEPARATE FROM useLands BELOW, and called in exactly ONE place:
+// AppNavigator. Same lesson as the session restore in useAuth: an effect
+// inside a shared hook runs again on every screen that uses the hook, and
+// a slow reply can then overwrite work the farmer has just done.
+// ---------------------------------------------------------------------
+export function useLandsBootstrap() {
+  const dispatch = useAppDispatch();
+
+  const authStatus = useAppSelector((s) => s.auth.status);
+  const farmer = useAppSelector((s) => s.auth.farmer);
+  const landStatus = useAppSelector((s) => s.land.status);
+
+  useEffect(() => {
+    // Only once we know who the farmer is, and only if we have not asked.
+    if (authStatus !== "loggedIn" || !farmer) {
+      return;
+    }
+    if (landStatus !== "unloaded") {
+      return;
+    }
+
+    let cancelled = false;
+
+    async function load() {
+      dispatch(landsLoading());
+
+      try {
+        const lands = await landApi.getLands(farmer!.farmer_id);
+        if (!cancelled) {
+          dispatch(landsLoaded(lands));
+        }
+      } catch (e) {
+        if (!cancelled) {
+          dispatch(landsFailed(messageFrom(e)));
+        }
+      }
+    }
+
+    load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authStatus, farmer, landStatus, dispatch]);
+
+  return {
+    // True while we genuinely do not know yet whether this farmer has land.
+    checking: landStatus === "unloaded" || landStatus === "loading",
+  };
+}
+
+// ---------------------------------------------------------------------
+// useLands - reading and changing the lands. No effects on mount.
+// ---------------------------------------------------------------------
+export function useLands() {
+  const dispatch = useAppDispatch();
+
+  const farmer = useAppSelector((s) => s.auth.farmer);
+  const lands = useAppSelector((s) => s.land.lands);
+  const status = useAppSelector((s) => s.land.status);
+  const saving = useAppSelector((s) => s.land.saving);
+  const errorMessage = useAppSelector((s) => s.land.errorMessage);
+
+  // Ask the server again from scratch. Used by pull-to-refresh and by the
+  // retry button after a failure.
+  async function reload() {
+    if (!farmer) {
+      return;
+    }
+
+    dispatch(landsLoading());
+
+    try {
+      const fresh = await landApi.getLands(farmer.farmer_id);
+      dispatch(landsLoaded(fresh));
+    } catch (e) {
+      dispatch(landsFailed(messageFrom(e)));
+    }
+  }
+
+  // Register a new land with its crops.
+  //
+  // Returns true on success, so the screen knows whether to go back. We
+  // return a value instead of navigating in here, because a hook that knows
+  // about screens is a hook that can only ever be used by one screen.
+  async function addLand(
+    name: string,
+    gnDivision: string,
+    sizeHa: number,
+    crops: NewLandCrop[]
+  ): Promise<boolean> {
+    if (!farmer) {
+      return false;
+    }
+
+    dispatch(saveStarted());
+
+    try {
+      const land = await landApi.createLand({
+        farmer_id: farmer.farmer_id,
+        name,
+        gn_division: gnDivision,
+        size_ha: sizeHa,
+        crops,
+      });
+
+      dispatch(landAdded(land));
+      return true;
+    } catch (e) {
+      dispatch(saveFailed(messageFrom(e)));
+      return false;
+    }
+  }
+
+  // Add one more crop to a land that already exists.
+  async function addCropToLand(
+    landId: number,
+    crop: string,
+    sizeHa: number
+  ): Promise<boolean> {
+    if (!farmer) {
+      return false;
+    }
+
+    dispatch(saveStarted());
+
+    try {
+      const saved = await landApi.addCrop(landId, {
+        farmer_id: farmer.farmer_id,
+        crop,
+        size_ha: sizeHa,
+      });
+
+      dispatch(cropAdded({ landId, crop: saved }));
+      return true;
+    } catch (e) {
+      dispatch(saveFailed(messageFrom(e)));
+      return false;
+    }
+  }
+
+  // Remove a whole land.
+  async function removeLand(landId: number): Promise<boolean> {
+    if (!farmer) {
+      return false;
+    }
+
+    dispatch(saveStarted());
+
+    try {
+      await landApi.deleteLand(landId, farmer.farmer_id);
+      dispatch(landRemoved(landId));
+      return true;
+    } catch (e) {
+      dispatch(saveFailed(messageFrom(e)));
+      return false;
+    }
+  }
+
+  // Remove one crop.
+  //
+  // The server refuses to remove the LAST crop on a land, and sends back a
+  // sentence saying why. We show that rather than inventing our own, so the
+  // rule only lives in one place.
+  async function removeCrop(cropId: number): Promise<boolean> {
+    if (!farmer) {
+      return false;
+    }
+
+    dispatch(saveStarted());
+
+    try {
+      await landApi.deleteCrop(cropId, farmer.farmer_id);
+      dispatch(cropRemoved(cropId));
+      return true;
+    } catch (e) {
+      dispatch(saveFailed(messageFrom(e)));
+      return false;
+    }
+  }
+
+  function clearError() {
+    dispatch(errorCleared());
+  }
+
+  return {
+    lands,
+    status,
+    saving,
+    errorMessage,
+    reload,
+    addLand,
+    addCropToLand,
+    removeLand,
+    removeCrop,
+    clearError,
+  };
+}

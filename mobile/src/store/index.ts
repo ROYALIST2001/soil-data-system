@@ -4,17 +4,19 @@ import readingReducer from "./readingSlice";
 import recommendationReducer from "./recommendationSlice";
 import analyticsReducer from "./analyticsSlice";
 import chatReducer from "./chatSlice";
-import authReducer from "./authSlice"; // NEW
+import authReducer from "./authSlice";
+import landReducer from "./landSlice"; // NEW
 
 // Build the ONE store from all our slices.
-// Five slices now. Each one owns ONE topic.
+// Six slices now. Each one owns ONE topic.
 export const store = configureStore({
   reducer: {
     reading: readingReducer,
     recommendation: recommendationReducer,
     analytics: analyticsReducer,
     chat: chatReducer,
-    auth: authReducer, // NEW
+    auth: authReducer,
+    land: landReducer, // NEW
   },
 });
 
