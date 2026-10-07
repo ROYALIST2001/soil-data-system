@@ -25,6 +25,7 @@ func main() {
 	analyticsRepo := repository.NewAnalyticsRepository(db) // NEW
 	farmerRepo := repository.NewFarmerRepository(db)    // NEW in Phase 9
 	landRepo := repository.NewLandRepository(db)        // NEW in Phase 9
+	sessionRepo := repository.NewSessionRepository(db)  // NEW in Phase 10
 
 	// ---------- STEP 3: build the client (talks to other services) ----------
 	aiClient := client.NewAIClient()
@@ -44,7 +45,7 @@ func main() {
 
 	// NEW in Phase 9: farmer accounts. It needs nothing but its own
 	// repository, so it can be built straight away.
-	farmerService := service.NewFarmerService(farmerRepo)
+	farmerService := service.NewFarmerService(farmerRepo, sessionRepo)
 
 	// NEW in Phase 9: a farmer's lands and the crops on them.
 	// It needs the farmer repository too, so it can refuse a land for a
@@ -108,6 +109,9 @@ func main() {
 	mux.HandleFunc("POST /signup", farmerController.Signup)
 	mux.HandleFunc("POST /login", farmerController.Login)
 
+	// NEW in Phase 10: ends the session, so the token stops working.
+	mux.HandleFunc("POST /logout", farmerController.Logout)
+
 	// NEW in Phase 9: lands and the crops on them.
 	mux.HandleFunc("POST /lands", landController.CreateLand)
 	mux.HandleFunc("GET /farmers/{farmerId}/lands", landController.GetLands)
@@ -116,6 +120,15 @@ func main() {
 	mux.HandleFunc("DELETE /crops/{cropId}", landController.DeleteCrop)
 
 	// ---------- STEP 8: start the server ----------
+	// Clear out sessions that have already run out. Nothing breaks without
+	// this - expired tokens are refused anyway - it just stops the table
+	// growing forever.
+	if removed, err := sessionRepo.DeleteExpired(); err != nil {
+		log.Printf("Could not clear expired sessions: %v", err)
+	} else if removed > 0 {
+		log.Printf("Cleared %d expired session(s).", removed)
+	}
+
 	log.Println("API server starting on port 8080...")
 	if err := http.ListenAndServe(":8080", mux); err != nil {
 		log.Fatal(err)

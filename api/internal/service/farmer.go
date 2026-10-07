@@ -4,6 +4,7 @@ import (
 	"errors"
 	"regexp"
 	"strings"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 
@@ -78,12 +79,33 @@ var ErrInvalidCredentials = errors.New("NIC or password is incorrect")
 
 // FarmerService creates accounts and checks logins.
 type FarmerService struct {
-	farmerRepo *repository.FarmerRepository
+	farmerRepo  *repository.FarmerRepository
+	sessionRepo *repository.SessionRepository
 }
 
 // NewFarmerService builds the service.
-func NewFarmerService(farmerRepo *repository.FarmerRepository) *FarmerService {
-	return &FarmerService{farmerRepo: farmerRepo}
+func NewFarmerService(
+	farmerRepo *repository.FarmerRepository,
+	sessionRepo *repository.SessionRepository,
+) *FarmerService {
+	return &FarmerService{farmerRepo: farmerRepo, sessionRepo: sessionRepo}
+}
+
+// StartSession issues a token for an account that has already been checked.
+//
+// Kept separate from Signup and Login so there is exactly ONE place a token
+// is created. If issuing a session ever needs to change - shorter expiry,
+// logging, a limit on how many a person may hold - there is one function to
+// edit rather than two that might drift apart.
+func (s *FarmerService) StartSession(
+	farmerID int,
+) (string, time.Time, error) {
+	return s.sessionRepo.Create(farmerID)
+}
+
+// EndSession logs one session out.
+func (s *FarmerService) EndSession(token string) error {
+	return s.sessionRepo.Delete(token)
 }
 
 // Signup creates one new farmer account.

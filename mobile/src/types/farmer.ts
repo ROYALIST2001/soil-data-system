@@ -11,6 +11,13 @@ export interface Farmer {
   mobile: string;
   email: string;
   created_at: string;
+
+  // NEW in Phase 10. "FARMER", "GN_OFFICER" or "DEPT_OFFICER".
+  // The phone app only ever shows farmers; the officer roles belong to the
+  // dashboard website. It is here so the app can recognise an officer
+  // logging in on a phone by mistake and say so politely.
+  role: string;
+  scope_division: string | null;
 }
 
 // What we SEND when a new farmer signs up.
@@ -32,4 +39,14 @@ export interface LoginData {
 // What the server sends back for BOTH signup and login.
 export interface AuthResponse {
   farmer: Farmer;
+
+  // NEW in Phase 10: proof of who we are, sent back on every later request.
+  token: string;
+  expires_at: string;
+}
+
+// What we keep on the phone between app starts.
+export interface SavedSession {
+  farmer: Farmer;
+  token: string;
 }

@@ -1,7 +1,7 @@
 import * as SecureStore from "expo-secure-store";
-import { Farmer } from "../types/farmer";
+import { Farmer, SavedSession } from "../types/farmer";
 
-// Where the saved farmer lives on the phone.
+// Where the saved session lives on the phone.
 const SESSION_KEY = "soil_session_farmer";
 
 // WHY expo-secure-store AND NOT A PLAIN FILE?
@@ -10,18 +10,26 @@ const SESSION_KEY = "soil_session_farmer";
 // the iOS Keychain). Another app cannot read it, and it is encrypted at
 // rest. A normal file or AsyncStorage would be plain text on the device.
 //
-// WHAT WE SAVE: the farmer's details only. NOT the password. If this store
-// were somehow read, there is nothing in it to log in with.
+// WHAT WE SAVE: the farmer's details and their session token. NOT the
+// password - that is never stored anywhere, on the phone or the server.
+//
+// Since Phase 10 the token is what PROVES who the caller is, so it is
+// exactly the sort of thing that belongs in protected storage rather than
+// an ordinary file.
 //
 // EVERY FUNCTION HERE SWALLOWS ITS ERRORS. Saving a session is a
 // convenience, never the point of the app. If the secure store is
 // unavailable - and it is on web - the farmer must still be able to log in
 // and work. A broken convenience must never break the real feature.
 
-// Save the farmer so the app can skip the login screen next time.
-export async function saveSession(farmer: Farmer): Promise<void> {
+// Save the session so the app can skip the login screen next time.
+export async function saveSession(
+  farmer: Farmer,
+  token: string
+): Promise<void> {
   try {
-    await SecureStore.setItemAsync(SESSION_KEY, JSON.stringify(farmer));
+    const payload: SavedSession = { farmer, token };
+    await SecureStore.setItemAsync(SESSION_KEY, JSON.stringify(payload));
   } catch (e) {
     // Could not save. The farmer stays logged in for this run, and will
     // simply have to log in again next time. Nothing is broken.
@@ -41,8 +49,8 @@ export async function saveSession(farmer: Farmer): Promise<void> {
 // annoyance; a frozen app is not.
 const STORE_TIMEOUT_MS = 2000;
 
-// Load the saved farmer, or null if there is none.
-export async function loadSession(): Promise<Farmer | null> {
+// Load the saved session, or null if there is none.
+export async function loadSession(): Promise<SavedSession | null> {
   try {
     // Promise.race finishes as soon as EITHER promise finishes. So this is
     // "the stored value, or null after two seconds, whichever comes first".
@@ -61,8 +69,19 @@ export async function loadSession(): Promise<Farmer | null> {
     // expect, treat it as "no session" rather than crashing on startup -
     // which would leave the farmer with an app that cannot even open.
     const parsed = JSON.parse(raw);
-    if (parsed && typeof parsed.farmer_id === "number") {
-      return parsed as Farmer;
+
+    // A session saved before Phase 10 holds a bare farmer and no token. It
+    // cannot prove anything to the server any more, so it is not a usable
+    // session. Returning null sends them to the login screen, which is the
+    // right outcome - not a crash, and not a login that silently fails on
+    // the first request.
+    if (
+      parsed &&
+      parsed.farmer &&
+      typeof parsed.farmer.farmer_id === "number" &&
+      typeof parsed.token === "string"
+    ) {
+      return parsed as SavedSession;
     }
 
     return null;
@@ -71,7 +90,7 @@ export async function loadSession(): Promise<Farmer | null> {
   }
 }
 
-// Forget the saved farmer. Used by Logout.
+// Forget the saved session. Used by Logout.
 export async function clearSession(): Promise<void> {
   try {
     await SecureStore.deleteItemAsync(SESSION_KEY);

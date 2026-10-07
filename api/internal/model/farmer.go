@@ -14,6 +14,17 @@ type Farmer struct {
 	Email      string    `json:"email"`
 	CreatedAt  time.Time `json:"created_at"`
 
+	// NEW in Phase 10: what this account is allowed to do.
+	//
+	// FARMER       - their own data only
+	// GN_OFFICER   - every farmer in ONE Grama Niladhari division
+	// DEPT_OFFICER - every farmer in the country
+	Role string `json:"role"`
+
+	// Which division a GN officer covers. NULL for everybody else: a farmer
+	// has authority over nobody, a department officer over everybody.
+	ScopeDivision *string `json:"scope_division"`
+
 	// json:"-" means NEVER put this field in a JSON reply.
 	//
 	// This one tag is the only thing standing between us and leaking
@@ -49,4 +60,12 @@ type LoginRequest struct {
 // json:"-" tag above.
 type AuthResponse struct {
 	Farmer Farmer `json:"farmer"`
+
+	// NEW in Phase 10: proof of who they are, for every later request.
+	//
+	// The caller sends this back as "Authorization: Bearer <token>" and the
+	// server looks it up. This is what replaces the old arrangement where
+	// the caller simply announced which farmer they were and was believed.
+	Token     string    `json:"token"`
+	ExpiresAt time.Time `json:"expires_at"`
 }

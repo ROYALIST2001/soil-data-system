@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../store";
 import * as authApi from "../api/authApi";
 import { clearSession, loadSession, saveSession } from "../storage/session";
+import { setAuthToken } from "../api/http";
 import { LoginData, SignupData } from "../types/farmer";
 import {
   authFailed,
@@ -47,7 +48,12 @@ export function useSessionRestore() {
       }
 
       if (saved) {
-        dispatch(sessionRestored(saved));
+        // THE TOKEN GOES BACK FIRST, before we announce the farmer is
+        // logged in. The moment the store says "loggedIn", other screens
+        // start making requests - and a request sent without the token
+        // would come back 401 and bounce the farmer out.
+        setAuthToken(saved.token);
+        dispatch(sessionRestored(saved.farmer));
       } else {
         dispatch(sessionEmpty());
       }
@@ -80,10 +86,12 @@ export function useAuth() {
     try {
       const result = await authApi.signup(data);
 
+      setAuthToken(result.token);
+
       // Save FIRST, then announce. If saving fails it is swallowed inside
       // saveSession, so the farmer is logged in either way - they just
       // have to log in again next time.
-      await saveSession(result.farmer);
+      await saveSession(result.farmer, result.token);
       dispatch(authSucceeded(result.farmer));
     } catch (e) {
       const message =
@@ -101,7 +109,9 @@ export function useAuth() {
     try {
       const result = await authApi.login(data);
 
-      await saveSession(result.farmer);
+      setAuthToken(result.token);
+
+      await saveSession(result.farmer, result.token);
       dispatch(authSucceeded(result.farmer));
     } catch (e) {
       const message =
@@ -117,6 +127,9 @@ export function useAuth() {
     // Clear the phone's copy FIRST. If we only cleared the store, the next
     // app start would read the old session and log them back in.
     await clearSession();
+
+    // Drop the token so nothing sent after this point carries it.
+    setAuthToken(null);
 
     // FORGET THE LANDS TOO.
     //

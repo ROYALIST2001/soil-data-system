@@ -61,6 +61,12 @@ func (repo *FarmerRepository) Insert(
 		GNDivision: gnDivision,
 		Mobile:     mobile,
 		Email:      email,
+
+		// Signup ALWAYS creates a farmer. The role column has a default of
+		// FARMER and this insert never touches it, so there is no request
+		// anybody can craft that makes themselves an officer. Officer
+		// accounts are created by the seed command instead.
+		Role: "FARMER",
 	}
 
 	err := repo.db.QueryRow(
@@ -81,7 +87,7 @@ func (repo *FarmerRepository) Insert(
 func (repo *FarmerRepository) FindByNIC(nic string) (model.Farmer, error) {
 	query := `
 		SELECT farmer_id, nic, full_name, gn_division, mobile, email,
-		       password_hash, created_at
+		       password_hash, created_at, role, scope_division
 		FROM farmers
 		WHERE nic = $1
 	`
@@ -90,7 +96,7 @@ func (repo *FarmerRepository) FindByNIC(nic string) (model.Farmer, error) {
 
 	err := repo.db.QueryRow(context.Background(), query, nic).Scan(
 		&f.FarmerID, &f.NIC, &f.FullName, &f.GNDivision, &f.Mobile,
-		&f.Email, &f.PasswordHash, &f.CreatedAt,
+		&f.Email, &f.PasswordHash, &f.CreatedAt, &f.Role, &f.ScopeDivision,
 	)
 
 	// pgx.ErrNoRows means the query worked fine and found nothing.
@@ -110,7 +116,7 @@ func (repo *FarmerRepository) FindByNIC(nic string) (model.Farmer, error) {
 func (repo *FarmerRepository) FindByID(farmerID int) (model.Farmer, error) {
 	query := `
 		SELECT farmer_id, nic, full_name, gn_division, mobile, email,
-		       password_hash, created_at
+		       password_hash, created_at, role, scope_division
 		FROM farmers
 		WHERE farmer_id = $1
 	`
@@ -119,7 +125,7 @@ func (repo *FarmerRepository) FindByID(farmerID int) (model.Farmer, error) {
 
 	err := repo.db.QueryRow(context.Background(), query, farmerID).Scan(
 		&f.FarmerID, &f.NIC, &f.FullName, &f.GNDivision, &f.Mobile,
-		&f.Email, &f.PasswordHash, &f.CreatedAt,
+		&f.Email, &f.PasswordHash, &f.CreatedAt, &f.Role, &f.ScopeDivision,
 	)
 
 	if errors.Is(err, pgx.ErrNoRows) {

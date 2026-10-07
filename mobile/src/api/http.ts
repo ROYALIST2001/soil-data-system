@@ -23,6 +23,30 @@ const TIMEOUT_MS = 12000;
 // Raised when the request ran out of time.
 export class TimeoutError extends Error {}
 
+// ---------- THE SESSION TOKEN ----------
+//
+// Since Phase 10 the server no longer believes the app when it says which
+// farmer it is. Every request carries a token instead, and the server looks
+// up who that is.
+//
+// The token is held HERE, in the one module every request already goes
+// through, rather than being passed down through each api function. That
+// means adding it was a two-line change instead of touching every call, and
+// it is impossible to write a new request that forgets it.
+//
+// It is kept in memory only. The copy that survives closing the app lives in
+// the phone's protected storage, in storage/session.ts.
+let authToken: string | null = null;
+
+// Called after login, signup, and when a saved session is restored.
+export function setAuthToken(token: string | null): void {
+  authToken = token;
+}
+
+export function getAuthToken(): string | null {
+  return authToken;
+}
+
 // Just the host and port, for error messages.
 //
 // WHY PUT AN ADDRESS IN A MESSAGE A FARMER MIGHT SEE?
@@ -85,6 +109,20 @@ export async function fetchWithTimeout(
   if (__DEV__) {
     console.log(`[api] ${init?.method ?? "GET"} ${url}`);
   }
+
+  // Attach the token, if we have one.
+  //
+  // The headers already on the request are kept, so a caller setting
+  // Content-Type does not lose it.
+  const headers: Record<string, string> = {
+    ...((init?.headers as Record<string, string>) ?? {}),
+  };
+
+  if (authToken) {
+    headers.Authorization = `Bearer ${authToken}`;
+  }
+
+  init = { ...init, headers };
 
   const controller = new AbortController();
 

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strings"
 
 	"soil-data-system/api/internal/model"
 	"soil-data-system/api/internal/service"
@@ -85,9 +86,21 @@ func (c *FarmerController) Signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Log them straight in. Making somebody type the password they just
+	// chose, one second after choosing it, helps nobody.
+	token, expiresAt, err := c.service.StartSession(farmer.FarmerID)
+	if err != nil {
+		writeAuthError(w, err)
+		return
+	}
+
 	// 201 Created, because a new thing now exists that did not before.
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(model.AuthResponse{Farmer: farmer})
+	json.NewEncoder(w).Encode(model.AuthResponse{
+		Farmer:    farmer,
+		Token:     token,
+		ExpiresAt: expiresAt,
+	})
 }
 
 // Login handles POST /login
@@ -108,7 +121,37 @@ func (c *FarmerController) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	token, expiresAt, err := c.service.StartSession(farmer.FarmerID)
+	if err != nil {
+		writeAuthError(w, err)
+		return
+	}
+
 	// 200 OK, not 201. Logging in does not create anything.
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(model.AuthResponse{Farmer: farmer})
+	json.NewEncoder(w).Encode(model.AuthResponse{
+		Farmer:    farmer,
+		Token:     token,
+		ExpiresAt: expiresAt,
+	})
+}
+
+// Logout handles POST /logout
+//
+// Deleting the row is what makes a session table worth having: the token
+// stops working immediately, everywhere. A JWT could not be taken back.
+func (c *FarmerController) Logout(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	header := r.Header.Get("Authorization")
+	token := strings.TrimSpace(strings.TrimPrefix(header, "Bearer "))
+
+	if token != "" {
+		// An error here is not worth failing the request over. The caller
+		// is logging out; from their side it has already happened.
+		_ = c.service.EndSession(token)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"status": "logged out"})
 }
