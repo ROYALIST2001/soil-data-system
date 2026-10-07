@@ -26,6 +26,7 @@ func main() {
 	farmerRepo := repository.NewFarmerRepository(db)    // NEW in Phase 9
 	landRepo := repository.NewLandRepository(db)        // NEW in Phase 9
 	sessionRepo := repository.NewSessionRepository(db)  // NEW in Phase 10
+	officerRepo := repository.NewOfficerRepository(db)  // NEW in Phase 10
 
 	// ---------- STEP 3: build the client (talks to other services) ----------
 	aiClient := client.NewAIClient()
@@ -51,6 +52,9 @@ func main() {
 	// It needs the farmer repository too, so it can refuse a land for a
 	// farmer who does not exist.
 	landService := service.NewLandService(landRepo, farmerRepo)
+
+	// NEW in Phase 10: the two officer dashboards.
+	officerService := service.NewOfficerService(officerRepo, landRepo)
 
 	// NEW: the chat service drives the agent loop and executes the tools.
 	// It needs the OTHER services, so it is built LAST.
@@ -78,6 +82,10 @@ func main() {
 	chatController := controller.NewChatController(chatService)                // NEW
 	farmerController := controller.NewFarmerController(farmerService)          // NEW
 	landController := controller.NewLandController(landService)                 // NEW
+	officerController := controller.NewOfficerController(officerService)       // NEW
+
+	// NEW in Phase 10: proves who is calling, before any officer route runs.
+	auth := controller.NewAuthMiddleware(sessionRepo)
 
 	// ---------- STEP 7: connect the routes ----------
 	mux := http.NewServeMux()
@@ -119,6 +127,27 @@ func main() {
 	mux.HandleFunc("DELETE /lands/{landId}", landController.DeleteLand)
 	mux.HandleFunc("DELETE /crops/{cropId}", landController.DeleteCrop)
 
+	// ---------- NEW in Phase 10: the officer dashboards ----------
+	//
+	// EVERY ONE of these goes through RequireOfficer, which proves the
+	// caller is logged in AND is an officer. A farmer's token reaches these
+	// routes and is turned away with 403.
+	//
+	// Note there is no route here a farmer may call. The dashboards are a
+	// separate surface, not the farmer API with extra parameters.
+	mux.HandleFunc("GET /officer/me",
+		auth.RequireOfficer(officerController.Me))
+	mux.HandleFunc("GET /officer/divisions",
+		auth.RequireOfficer(officerController.Divisions))
+	mux.HandleFunc("GET /officer/farmers",
+		auth.RequireOfficer(officerController.Farmers))
+	mux.HandleFunc("GET /officer/farmers/{farmerId}",
+		auth.RequireOfficer(officerController.FarmerDetail))
+	mux.HandleFunc("GET /officer/readings",
+		auth.RequireOfficer(officerController.Readings))
+	mux.HandleFunc("GET /officer/map/readings",
+		auth.RequireOfficer(officerController.MapPoints))
+
 	// ---------- STEP 8: start the server ----------
 	// Clear out sessions that have already run out. Nothing breaks without
 	// this - expired tokens are refused anyway - it just stops the table
@@ -130,7 +159,12 @@ func main() {
 	}
 
 	log.Println("API server starting on port 8080...")
-	if err := http.ListenAndServe(":8080", mux); err != nil {
+
+	// WithCORS wraps the WHOLE router, so every route - including the
+	// OPTIONS preflight the browser sends before any authenticated request -
+	// answers with the right headers. Wrapping one route at a time would
+	// mean the first one somebody forgot would fail in the browser only.
+	if err := http.ListenAndServe(":8080", controller.WithCORS(mux)); err != nil {
 		log.Fatal(err)
 	}
 }
