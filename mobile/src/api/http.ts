@@ -23,6 +23,19 @@ const TIMEOUT_MS = 12000;
 // Raised when the request ran out of time.
 export class TimeoutError extends Error {}
 
+// Just the host and port, for error messages.
+//
+// WHY PUT AN ADDRESS IN A MESSAGE A FARMER MIGHT SEE?
+// Because the single most common failure in this project is the laptop's
+// WiFi address changing, and the message "could not reach 10.1.2.3:8080"
+// says which address was tried. Without it, every network problem looks
+// identical and has to be debugged from scratch. A slightly technical
+// message that explains itself beats a tidy one that explains nothing.
+function hostOf(url: string): string {
+  const match = url.match(/^https?:\/\/([^/]+)/);
+  return match ? match[1] : url;
+}
+
 // Read the error message the server sent.
 //
 // Our Go API sends real sentences like:
@@ -42,45 +55,86 @@ export async function readServerError(response: Response): Promise<string> {
   return "Server returned status " + response.status;
 }
 
-// fetch, but it always finishes.
+// fetch, but it ALWAYS finishes.
 //
-// AbortController is the standard way to stop a request. We start a timer,
-// and if it fires first we abort, which makes fetch reject.
+// FIRST ATTEMPT, AND WHY IT FAILED.
+// The obvious way is AbortController: start a timer, abort the request when
+// it fires. That is the documented approach and it is what we tried first.
+// It did nothing. The app still hung forever on a request that never
+// answered. React Native's fetch did not act on the abort signal, so the
+// promise never settled and the timer had no effect anybody could see.
+//
+// The lesson: a timeout that depends on somebody else honouring it is not a
+// timeout. So we no longer depend on it.
+//
+// Promise.race settles as soon as EITHER side settles. The timer is ours and
+// always fires, so this function always returns or throws - whatever fetch
+// does or does not do. We still send the abort signal, because when it IS
+// honoured it frees the socket instead of leaving it dangling. But nothing
+// now depends on that.
 export async function fetchWithTimeout(
   url: string,
   init?: RequestInit,
   timeoutMs: number = TIMEOUT_MS
 ): Promise<Response> {
 
+  // __DEV__ is true only while running from the Expo dev server, never in a
+  // release build. Printing every request here means the Metro terminal
+  // shows exactly which address the app is calling - which is the fastest
+  // way to spot a stale or wrong address.
+  if (__DEV__) {
+    console.log(`[api] ${init?.method ?? "GET"} ${url}`);
+  }
+
   const controller = new AbortController();
 
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  let timer: ReturnType<typeof setTimeout> | undefined;
 
-  try {
-    return await fetch(url, { ...init, signal: controller.signal });
+  const timeout = new Promise<never>((_resolve, reject) => {
+    timer = setTimeout(() => {
+      // Best effort: ask fetch to stop. If it ignores us, the race below
+      // has already rejected and the app has moved on regardless.
+      try {
+        controller.abort();
+      } catch (e) {
+        // Some runtimes have no AbortController at all. Not our problem
+        // any more - the rejection below is what actually matters.
+      }
 
-  } catch (e) {
-    // An abort and a real network failure both land here, and they need
-    // DIFFERENT messages, because the farmer has to do different things.
-    //
-    // Timed out  -> the address is probably wrong, or the server is not up.
-    // Failed     -> the phone could not reach the network at all.
-    if (controller.signal.aborted) {
-      throw new TimeoutError(
-        "The server did not answer in time. Check that your laptop is " +
-        "running and that the phone is on the same WiFi."
+      reject(
+        new TimeoutError(
+          `Could not reach ${hostOf(url)} within ` +
+          `${Math.round(timeoutMs / 1000)} seconds. Check that Docker is ` +
+          `running on the laptop and that the phone is on the same WiFi.`
+        )
+      );
+    }, timeoutMs);
+  });
+
+  // Build the request promise separately so one failing cannot hide
+  // the other.
+  const request = (async () => {
+    try {
+      return await fetch(url, { ...init, signal: controller.signal });
+    } catch (e) {
+      // A genuine network failure, as opposed to our own timeout.
+      if (e instanceof TimeoutError) {
+        throw e;
+      }
+      throw new Error(
+        `Could not reach ${hostOf(url)}. Check your WiFi connection.`
       );
     }
+  })();
 
-    throw new Error(
-      "Could not reach the server. Check your WiFi connection."
-    );
-
+  try {
+    return await Promise.race([request, timeout]);
   } finally {
-    // ALWAYS clear the timer, on success and on failure. A timer left
-    // running would fire later and abort nothing, but it keeps the app
-    // awake for no reason.
-    clearTimeout(timer);
+    // ALWAYS clear the timer. Left running it would keep the app awake
+    // for no reason.
+    if (timer !== undefined) {
+      clearTimeout(timer);
+    }
   }
 }
 
