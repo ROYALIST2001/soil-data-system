@@ -27,6 +27,7 @@ func main() {
 	landRepo := repository.NewLandRepository(db)        // NEW in Phase 9
 	sessionRepo := repository.NewSessionRepository(db)  // NEW in Phase 10
 	officerRepo := repository.NewOfficerRepository(db)  // NEW in Phase 10
+	correctionRepo := repository.NewCorrectionRepository(db)
 
 	// ---------- STEP 3: build the client (talks to other services) ----------
 	aiClient := client.NewAIClient()
@@ -55,6 +56,7 @@ func main() {
 
 	// NEW in Phase 10: the two officer dashboards.
 	officerService := service.NewOfficerService(officerRepo, landRepo)
+	correctionService := service.NewCorrectionService(correctionRepo)
 
 	// NEW: the chat service drives the agent loop and executes the tools.
 	// It needs the OTHER services, so it is built LAST.
@@ -83,6 +85,7 @@ func main() {
 	farmerController := controller.NewFarmerController(farmerService)          // NEW
 	landController := controller.NewLandController(landService)                 // NEW
 	officerController := controller.NewOfficerController(officerService)       // NEW
+	correctionController := controller.NewCorrectionController(correctionService)
 
 	// NEW in Phase 10: proves who is calling, before any officer route runs.
 	auth := controller.NewAuthMiddleware(sessionRepo)
@@ -147,6 +150,15 @@ func main() {
 		auth.RequireOfficer(officerController.Readings))
 	mux.HandleFunc("GET /officer/map/readings",
 		auth.RequireOfficer(officerController.MapPoints))
+
+	// Correcting a farmer's reading. The original values are never
+	// overwritten - see migration 010.
+	mux.HandleFunc("GET /officer/readings/{readingId}",
+		auth.RequireOfficer(correctionController.Detail))
+	mux.HandleFunc("POST /officer/readings/{readingId}/correct",
+		auth.RequireOfficer(correctionController.Correct))
+	mux.HandleFunc("POST /officer/readings/{readingId}/flag",
+		auth.RequireOfficer(correctionController.Flag))
 
 	// ---------- STEP 8: start the server ----------
 	// Clear out sessions that have already run out. Nothing breaks without

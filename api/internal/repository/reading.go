@@ -53,12 +53,21 @@ func (repo *ReadingRepository) Insert(reading model.Reading) (int, error) {
 	return newID, err
 }
 
-// GetByID reads one reading using its id. This did NOT change.
+// GetByID reads one reading using its id.
+//
+// CHANGED in Phase 10: it now returns the values IN FORCE, not the raw ones.
+// If an officer corrected a number, that is what comes back, and the
+// fertilizer recommendation is calculated from it. The farmer's original is
+// still in the table and is read separately by the correction service, which
+// is the only part of the system that needs to see both.
 func (repo *ReadingRepository) GetByID(id int) (model.Reading, error) {
 	query := `
 		SELECT reading_id, raw_lat, raw_lng, anchor_id, district_id,
-		       n, p, k, ph, crop, stage, target_yield, area,
-		       created_at, quality_flag, agent_note, agent_verdict,
+		       COALESCE(corrected_n, n), COALESCE(corrected_p, p),
+		       COALESCE(corrected_k, k), COALESCE(corrected_ph, ph),
+		       crop, stage, target_yield, area,
+		       created_at, COALESCE(officer_flag, quality_flag),
+		       agent_note, agent_verdict,
 		       farmer_id, land_id, land_crop_id
 		FROM readings
 		WHERE reading_id = $1
@@ -97,11 +106,14 @@ func (repo *ReadingRepository) FindRecentByAnchor(
 	//   LIMIT $2              -> only a few rows, for speed
 	query := `
 		SELECT reading_id, raw_lat, raw_lng, anchor_id, district_id,
-		       n, p, k, ph, crop, stage, target_yield, area,
-		       created_at, quality_flag, agent_note, agent_verdict,
+		       COALESCE(corrected_n, n), COALESCE(corrected_p, p),
+		       COALESCE(corrected_k, k), COALESCE(corrected_ph, ph),
+		       crop, stage, target_yield, area,
+		       created_at, COALESCE(officer_flag, quality_flag),
+		       agent_note, agent_verdict,
 		       farmer_id, land_id, land_crop_id
 		FROM readings
-		WHERE anchor_id = $1 AND quality_flag = 'OK'
+		WHERE anchor_id = $1 AND COALESCE(officer_flag, quality_flag) = 'OK'
 		ORDER BY created_at DESC
 		LIMIT $2
 	`
