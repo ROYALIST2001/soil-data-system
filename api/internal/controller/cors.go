@@ -39,9 +39,17 @@ func allowedOrigins() []string {
 		return parts
 	}
 
+	// Vite uses 5173 by default, but if that port is already taken - by
+	// another project on the same machine, which happens - it quietly moves
+	// to the next free one. Allowing a few means the dashboard still works
+	// instead of failing with a CORS error that blames the wrong thing.
 	return []string{
-		"http://localhost:5173", // Vite's default while developing
+		"http://localhost:5173",
 		"http://127.0.0.1:5173",
+		"http://localhost:5174",
+		"http://127.0.0.1:5174",
+		"http://localhost:5175",
+		"http://127.0.0.1:5175",
 	}
 }
 
