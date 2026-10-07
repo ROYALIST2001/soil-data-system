@@ -9,6 +9,8 @@ ai/__pycache__/
 # node_modules is very large. Anyone can rebuild it with "npm install".
 mobile/node_modules/
 mobile/.expo/
+# Expo also drops a cache folder at the repo root if started from here.
+.expo/
 
 # Environment files. These may hold passwords. Never save them in Git.
 .env
