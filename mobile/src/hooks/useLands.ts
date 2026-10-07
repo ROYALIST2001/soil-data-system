@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { useAppDispatch, useAppSelector } from "../store";
 import * as landApi from "../api/landApi";
@@ -15,6 +15,13 @@ import {
   saveFailed,
   saveStarted,
 } from "../store/landSlice";
+
+// The longest the app will EVER sit on the startup spinner.
+//
+// Comfortably longer than the 12 second request timeout, so in normal use
+// the request decides the outcome and this never fires. It exists purely so
+// that nothing can leave the farmer stuck.
+const MAX_WAIT_MS = 15000;
 
 // Turn any thrown thing into a sentence we can show.
 function messageFrom(e: unknown): string {
@@ -71,9 +78,32 @@ export function useLandsBootstrap() {
     };
   }, [authStatus, farmer, landStatus, dispatch]);
 
+  // A LAST-RESORT STOP.
+  //
+  // Everything below this line exists because the app once sat on a
+  // "Loading your land" spinner forever. The request never came back, the
+  // timeout we relied on was ignored, and the farmer had no way forward.
+  //
+  // So this no longer trusts the request to finish at all. After a few
+  // seconds we stop waiting, whatever the network is doing. Being wrong
+  // about how many lands somebody has is a small problem. An app that
+  // never opens is not.
+  const [gaveUp, setGaveUp] = useState(false);
+
+  useEffect(() => {
+    if (landStatus !== "unloaded" && landStatus !== "loading") {
+      return;
+    }
+
+    const timer = setTimeout(() => setGaveUp(true), MAX_WAIT_MS);
+    return () => clearTimeout(timer);
+  }, [landStatus]);
+
   return {
-    // True while we genuinely do not know yet whether this farmer has land.
-    checking: landStatus === "unloaded" || landStatus === "loading",
+    // True while we genuinely do not know yet whether this farmer has land,
+    // and have not waited too long.
+    checking:
+      !gaveUp && (landStatus === "unloaded" || landStatus === "loading"),
   };
 }
 
