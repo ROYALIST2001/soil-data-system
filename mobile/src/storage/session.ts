@@ -28,10 +28,30 @@ export async function saveSession(farmer: Farmer): Promise<void> {
   }
 }
 
+// How long we are willing to wait for the phone's secure storage.
+//
+// WHY A TIMEOUT ON READING THE DISK?
+// Because this read happens BEFORE the app can draw anything. The whole app
+// waits on it. If it ever fails to come back, the farmer stares at a spinner
+// with no error and no way forward - the app looks completely broken.
+//
+// Two seconds is far longer than a real read needs. If it has not answered by
+// then, we treat it as "nobody is saved" and show the login screen. The worst
+// case is that a logged-in farmer has to log in again. That is a small
+// annoyance; a frozen app is not.
+const STORE_TIMEOUT_MS = 2000;
+
 // Load the saved farmer, or null if there is none.
 export async function loadSession(): Promise<Farmer | null> {
   try {
-    const raw = await SecureStore.getItemAsync(SESSION_KEY);
+    // Promise.race finishes as soon as EITHER promise finishes. So this is
+    // "the stored value, or null after two seconds, whichever comes first".
+    const raw = await Promise.race([
+      SecureStore.getItemAsync(SESSION_KEY),
+      new Promise<null>((resolve) =>
+        setTimeout(() => resolve(null), STORE_TIMEOUT_MS)
+      ),
+    ]);
     if (!raw) {
       return null;
     }

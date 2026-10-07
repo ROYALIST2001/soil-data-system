@@ -2,7 +2,9 @@ import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Text, View, ActivityIndicator, StyleSheet } from "react-native";
+import {
+  Text, View, ActivityIndicator, StyleSheet, TouchableOpacity,
+} from "react-native";
 
 import SoilEntryScreen from "../screens/SoilEntryScreen";
 import ResultScreen from "../screens/ResultScreen";
@@ -19,8 +21,8 @@ import MyLandsScreen from "../screens/MyLandsScreen";
 import AddLandScreen from "../screens/AddLandScreen";
 import AddCropScreen from "../screens/AddCropScreen";
 
-import { useSessionRestore } from "../hooks/useAuth";
-import { useLandsBootstrap } from "../hooks/useLands";
+import { useAuth, useSessionRestore } from "../hooks/useAuth";
+import { useLands, useLandsBootstrap } from "../hooks/useLands";
 import { useAppSelector } from "../store";
 
 const Tab = createBottomTabNavigator();
@@ -220,6 +222,10 @@ export default function AppNavigator() {
   // NEW in Phase 9: load this farmer's lands as soon as we know who they are.
   const { checking: loadingLands } = useLandsBootstrap();
   const setupDone = useAppSelector((s) => s.land.setupDone);
+  const landStatus = useAppSelector((s) => s.land.status);
+  const landError = useAppSelector((s) => s.land.errorMessage);
+  const { reload } = useLands();
+  const { logout } = useAuth();
 
   const loggedIn = status === "loggedIn";
 
@@ -239,6 +245,28 @@ export default function AppNavigator() {
     );
   }
 
+  // Could not load the lands at all.
+  //
+  // NEVER leave the farmer on a spinner with no way out. Before this, a
+  // failed load meant an endless spinner and no explanation - the app simply
+  // looked broken. Now they see what went wrong and can retry or log out.
+  if (landStatus === "error") {
+    return (
+      <View style={styles.loading}>
+        <Text style={styles.errorTitle}>Cannot reach the server</Text>
+        <Text style={styles.errorText}>{landError}</Text>
+
+        <TouchableOpacity style={styles.retryButton} onPress={reload}>
+          <Text style={styles.retryText}>Try again</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.logoutLink} onPress={logout}>
+          <Text style={styles.logoutLinkText}>Log out</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   // Logged in, but we do not yet know whether they have any land. Showing
   // either screen now would be a guess, and a wrong guess means the farmer
   // watches the land registration form appear and vanish.
@@ -246,6 +274,7 @@ export default function AppNavigator() {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" color="#1b4332" />
+        <Text style={styles.loadingText}>Loading your land...</Text>
       </View>
     );
   }
@@ -260,6 +289,23 @@ export default function AppNavigator() {
 const styles = StyleSheet.create({
   loading: {
     flex: 1, justifyContent: "center",
-    alignItems: "center", backgroundColor: "#fff",
+    alignItems: "center", backgroundColor: "#fff", padding: 30,
   },
+  loadingText: { marginTop: 14, fontSize: 13, color: "#868e96" },
+
+  errorTitle: {
+    fontSize: 18, fontWeight: "bold",
+    color: "#1b4332", marginBottom: 10, textAlign: "center",
+  },
+  errorText: {
+    fontSize: 14, color: "#868e96",
+    textAlign: "center", lineHeight: 20, marginBottom: 22,
+  },
+  retryButton: {
+    backgroundColor: "#1b4332", borderRadius: 8,
+    paddingVertical: 12, paddingHorizontal: 30,
+  },
+  retryText: { color: "#fff", fontSize: 15, fontWeight: "bold" },
+  logoutLink: { paddingVertical: 16 },
+  logoutLinkText: { color: "#868e96", fontSize: 13 },
 });

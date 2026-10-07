@@ -1,31 +1,14 @@
 import { API_BASE_URL } from "../config";
+import { postJson, requestJson, requestNoBody } from "./http";
 import {
   AddCropData, CreateLandData, Land, LandCrop, LandsResponse,
 } from "../types/land";
 
-// Read the real message the server sent, the same as the other api files.
-async function readServerError(response: Response): Promise<string> {
-  try {
-    const body = await response.json();
-    if (body && typeof body.error === "string") {
-      return body.error;
-    }
-  } catch (e) {
-    // Not JSON. Fall through.
-  }
-  return "Server returned status " + response.status;
-}
-
 // Every land this farmer owns, with the crops on each.
 export async function getLands(farmerId: number): Promise<Land[]> {
-
-  const response = await fetch(`${API_BASE_URL}/farmers/${farmerId}/lands`);
-
-  if (!response.ok) {
-    throw new Error(await readServerError(response));
-  }
-
-  const body: LandsResponse = await response.json();
+  const body = await requestJson<LandsResponse>(
+    `${API_BASE_URL}/farmers/${farmerId}/lands`
+  );
 
   // The server sends [] for a farmer with no lands, but a missing or odd
   // body should not crash the screen either. An empty list is the safe
@@ -35,18 +18,7 @@ export async function getLands(farmerId: number): Promise<Land[]> {
 
 // Register one new land together with its crops.
 export async function createLand(data: CreateLandData): Promise<Land> {
-
-  const response = await fetch(`${API_BASE_URL}/lands`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) {
-    throw new Error(await readServerError(response));
-  }
-
-  return response.json();
+  return requestJson<Land>(`${API_BASE_URL}/lands`, postJson(data));
 }
 
 // Add one more crop to a land that already exists.
@@ -54,18 +26,10 @@ export async function addCrop(
   landId: number,
   data: AddCropData
 ): Promise<LandCrop> {
-
-  const response = await fetch(`${API_BASE_URL}/lands/${landId}/crops`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) {
-    throw new Error(await readServerError(response));
-  }
-
-  return response.json();
+  return requestJson<LandCrop>(
+    `${API_BASE_URL}/lands/${landId}/crops`,
+    postJson(data)
+  );
 }
 
 // Remove a whole land, and everything growing on it.
@@ -76,15 +40,10 @@ export async function deleteLand(
   landId: number,
   farmerId: number
 ): Promise<void> {
-
-  const response = await fetch(
+  return requestNoBody(
     `${API_BASE_URL}/lands/${landId}?farmer_id=${farmerId}`,
     { method: "DELETE" }
   );
-
-  if (!response.ok) {
-    throw new Error(await readServerError(response));
-  }
 }
 
 // Remove one crop from a land.
@@ -92,13 +51,8 @@ export async function deleteCrop(
   cropId: number,
   farmerId: number
 ): Promise<void> {
-
-  const response = await fetch(
+  return requestNoBody(
     `${API_BASE_URL}/crops/${cropId}?farmer_id=${farmerId}`,
     { method: "DELETE" }
   );
-
-  if (!response.ok) {
-    throw new Error(await readServerError(response));
-  }
 }
