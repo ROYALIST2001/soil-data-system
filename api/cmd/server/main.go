@@ -60,6 +60,7 @@ func main() {
 		validationService,
 		aiClient,
 		fertilizerService,
+		landRepo, // NEW in Phase 10: to verify a reading's land is the farmer's
 	)
 
 	chatService := service.NewChatService(

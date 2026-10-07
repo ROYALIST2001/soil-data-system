@@ -26,9 +26,11 @@ func (repo *ReadingRepository) Insert(reading model.Reading) (int, error) {
 		INSERT INTO readings
 			(raw_lat, raw_lng, anchor_id, district_id,
 			 n, p, k, ph, crop, stage, target_yield, area,
-			 quality_flag, agent_note, agent_verdict)
+			 quality_flag, agent_note, agent_verdict,
+			 farmer_id, land_id, land_crop_id)
 		VALUES
-			($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+			($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
+			 $16, $17, $18)
 		RETURNING reading_id
 	`
 
@@ -41,8 +43,11 @@ func (repo *ReadingRepository) Insert(reading model.Reading) (int, error) {
 		reading.N, reading.P, reading.K, reading.PH,
 		reading.Crop, reading.Stage, reading.TargetYield, reading.Area,
 		reading.QualityFlag,
-		reading.AgentNote,    // NEW
-		reading.AgentVerdict, // NEW
+		reading.AgentNote,
+		reading.AgentVerdict,
+		reading.FarmerID,   // NEW in Phase 10
+		reading.LandID,     // NEW in Phase 10
+		reading.LandCropID, // NEW in Phase 10
 	).Scan(&newID)
 
 	return newID, err
@@ -53,7 +58,8 @@ func (repo *ReadingRepository) GetByID(id int) (model.Reading, error) {
 	query := `
 		SELECT reading_id, raw_lat, raw_lng, anchor_id, district_id,
 		       n, p, k, ph, crop, stage, target_yield, area,
-		       created_at, quality_flag, agent_note, agent_verdict
+		       created_at, quality_flag, agent_note, agent_verdict,
+		       farmer_id, land_id, land_crop_id
 		FROM readings
 		WHERE reading_id = $1
 	`
@@ -64,7 +70,8 @@ func (repo *ReadingRepository) GetByID(id int) (model.Reading, error) {
 		&r.ReadingID, &r.RawLat, &r.RawLng, &r.AnchorID, &r.DistrictID,
 		&r.N, &r.P, &r.K, &r.PH, &r.Crop, &r.Stage, &r.TargetYield, &r.Area,
 		&r.CreatedAt, &r.QualityFlag,
-		&r.AgentNote, &r.AgentVerdict, // NEW
+		&r.AgentNote, &r.AgentVerdict,
+		&r.FarmerID, &r.LandID, &r.LandCropID, // NEW in Phase 10
 	)
 
 	return r, err
@@ -91,7 +98,8 @@ func (repo *ReadingRepository) FindRecentByAnchor(
 	query := `
 		SELECT reading_id, raw_lat, raw_lng, anchor_id, district_id,
 		       n, p, k, ph, crop, stage, target_yield, area,
-		       created_at, quality_flag, agent_note, agent_verdict
+		       created_at, quality_flag, agent_note, agent_verdict,
+		       farmer_id, land_id, land_crop_id
 		FROM readings
 		WHERE anchor_id = $1 AND quality_flag = 'OK'
 		ORDER BY created_at DESC
@@ -113,7 +121,8 @@ func (repo *ReadingRepository) FindRecentByAnchor(
 			&r.ReadingID, &r.RawLat, &r.RawLng, &r.AnchorID, &r.DistrictID,
 			&r.N, &r.P, &r.K, &r.PH, &r.Crop, &r.Stage, &r.TargetYield, &r.Area,
 			&r.CreatedAt, &r.QualityFlag,
-			&r.AgentNote, &r.AgentVerdict, // NEW
+			&r.AgentNote, &r.AgentVerdict,
+			&r.FarmerID, &r.LandID, &r.LandCropID, // NEW in Phase 10
 		)
 		if err != nil {
 			return nil, err

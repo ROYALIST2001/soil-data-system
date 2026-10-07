@@ -11,6 +11,16 @@ export interface NewReading {
   stage: string;
   target_yield: number;
   area: number;
+
+  // NEW in Phase 10: who sent it, and which land and crop it came from.
+  //
+  // The server checks that the land really belongs to this farmer, so these
+  // are not taken on trust. They are what lets an officer later ask
+  // "show me this farmer's soil tests" - a question the system could not
+  // answer at all before.
+  farmer_id: number;
+  land_id: number;
+  land_crop_id: number;
 }
 
 // What the server SENDS BACK.

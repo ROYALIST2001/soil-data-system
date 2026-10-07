@@ -8,6 +8,7 @@ import { CROPS, STAGES, MAX_YIELD, Option } from "../constants/vocabulary";
 import { useLocation } from "../hooks/useLocation";
 import { useSubmitReading } from "../hooks/useSubmitReading";
 import { useLands } from "../hooks/useLands";
+import { useAuth } from "../hooks/useAuth";
 import { useAppSelector } from "../store";
 import { NewReading } from "../types/reading";
 
@@ -29,6 +30,9 @@ export default function SoilEntryScreen() {
   // land once and reusing it means the number is the same on every test, and
   // the history for that land actually lines up.
   const { lands } = useLands();
+
+  // Who is sending this reading. Phase 10 links every reading to its farmer.
+  const { farmer } = useAuth();
 
   const [landId, setLandId] = useState<number | null>(
     lands.length > 0 ? lands[0].land_id : null
@@ -123,6 +127,11 @@ export default function SoilEntryScreen() {
       return;
     }
 
+    if (!farmer) {
+      Alert.alert("Not logged in", "Please log in again.");
+      return;
+    }
+
     const reading: NewReading = {
       raw_lat: lat,
       raw_lng: lng,
@@ -134,6 +143,11 @@ export default function SoilEntryScreen() {
       stage: stage,
       target_yield: parseFloat(targetYield),
       area: area,     // the registered size of this crop, not typed
+
+      // NEW in Phase 10: the reading now knows whose it is.
+      farmer_id: farmer.farmer_id,
+      land_id: selectedLand.land_id,
+      land_crop_id: selectedCrop.land_crop_id,
     };
 
     await submit(reading);
