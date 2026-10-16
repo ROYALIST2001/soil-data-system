@@ -20,6 +20,7 @@ import LandSetupScreen from "../screens/LandSetupScreen";
 import MyLandsScreen from "../screens/MyLandsScreen";
 import AddLandScreen from "../screens/AddLandScreen";
 import AddCropScreen from "../screens/AddCropScreen";
+import ReliefScreen from "../screens/ReliefScreen";
 
 import { useAuth, useSessionRestore } from "../hooks/useAuth";
 import { useLands, useLandsBootstrap } from "../hooks/useLands";
@@ -187,6 +188,19 @@ function MainTabs() {
           tabBarLabel: "My Lands",
           tabBarIcon: ({ color }) => (
             <Text style={{ color, fontSize: 18 }}>🌾</Text>
+          ),
+        }}
+      />
+
+      {/* NEW in Phase 11: disaster relief claims. */}
+      <Tab.Screen
+        name="Relief"
+        component={ReliefScreen}
+        options={{
+          title: "Disaster Relief",
+          tabBarLabel: "Relief",
+          tabBarIcon: ({ color }) => (
+            <Text style={{ color, fontSize: 18 }}>🌧️</Text>
           ),
         }}
       />
