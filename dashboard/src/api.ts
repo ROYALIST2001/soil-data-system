@@ -1,6 +1,7 @@
 import type {
-  Account, DivisionSummary, FarmerDetail, FarmerSummary,
-  LoginResponse, MapPoint, ReadingDetail, ReadingRow,
+  Account, Claim, ClaimDetail, DisasterEvent, DivisionSummary, EventRate,
+  FarmerDetail, FarmerSummary, LoginResponse, MapPoint, ReadingDetail,
+  ReadingRow,
 } from "./types";
 
 // Where the Go API lives.
@@ -218,4 +219,67 @@ export async function logout(): Promise<void> {
     // out locally, so this must never block.
   }
   setToken(null);
+}
+
+// ---------- DISASTER RELIEF ----------
+
+export async function getDisasters(): Promise<DisasterEvent[]> {
+  const body = await request<{ disasters: DisasterEvent[] }>(
+    "/officer/disasters"
+  );
+  return body.disasters ?? [];
+}
+
+export async function declareDisaster(event: {
+  name: string;
+  disaster_type: string;
+  started_on: string;
+  ended_on: string;
+  description: string;
+  divisions: string[];
+  rates: EventRate[];
+}): Promise<DisasterEvent> {
+  return request<DisasterEvent>("/officer/disasters", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(event),
+  });
+}
+
+export async function closeDisaster(eventId: number): Promise<void> {
+  await request(`/officer/disasters/${eventId}/close`, { method: "POST" });
+}
+
+export async function getClaims(
+  status: string,
+  eventId?: number
+): Promise<Claim[]> {
+  const params = new URLSearchParams();
+  if (status) params.set("status", status);
+  if (eventId) params.set("event", String(eventId));
+
+  const query = params.toString() ? `?${params.toString()}` : "";
+  const body = await request<{ claims: Claim[] }>(`/officer/claims${query}`);
+  return body.claims ?? [];
+}
+
+export async function getClaim(claimId: number): Promise<ClaimDetail> {
+  return request<ClaimDetail>(`/officer/claims/${claimId}`);
+}
+
+// One function for all four steps.
+//
+// Verify, approve, reject and pay differ only in the word in the URL and
+// whether an area travels with them. Four near-identical functions would be
+// four places for one to drift.
+export async function claimStep(
+  claimId: number,
+  step: "verify" | "approve" | "reject" | "pay",
+  body: { note: string; verified_area_ha?: number }
+): Promise<ClaimDetail> {
+  return request<ClaimDetail>(`/officer/claims/${claimId}/${step}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
 }

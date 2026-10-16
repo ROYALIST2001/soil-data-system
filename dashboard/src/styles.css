@@ -213,3 +213,91 @@ button.ghost {
 .changed { color: var(--orange); font-weight: 600; }
 .history { font-size: 13px; }
 .history li { margin-bottom: 10px; line-height: 1.5; }
+
+/* ---------- claim statuses ---------- */
+
+.claim-SUBMITTED  { background: #e7f5ff; color: #1864ab; }
+.claim-VERIFIED   { background: var(--green-pale); color: var(--green-dark); }
+.claim-APPROVED   { background: #fff3bf; color: #a07800; }
+.claim-PAID       { background: #d3f9d8; color: #2b8a3e; }
+.claim-REJECTED   { background: #ffe3e3; color: var(--red); }
+
+/* ---------- tabs ---------- */
+
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+.tab {
+  background: #fff;
+  border: 1px solid var(--grey-3);
+  border-radius: 20px;
+  padding: 7px 15px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--text);
+}
+.tab:hover { border-color: var(--green); }
+.tab-on {
+  background: var(--green-dark);
+  border-color: var(--green-dark);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ---------- navigation in the top bar ---------- */
+
+.nav { display: flex; gap: 4px; margin-left: 20px; }
+.nav button {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.75);
+  padding: 7px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.nav button:hover { background: rgba(255,255,255,0.12); color: #fff; }
+.nav button.on { background: rgba(255,255,255,0.18); color: #fff; font-weight: 600; }
+
+/* ---------- declared disaster cards ---------- */
+
+.event-card {
+  border: 1px solid var(--grey-3);
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 12px;
+}
+
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip {
+  background: #fff;
+  border: 1px solid var(--grey-3);
+  border-radius: 20px;
+  padding: 7px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--text);
+}
+.chip-on {
+  background: var(--green-pale);
+  border-color: var(--green);
+  color: var(--green-dark);
+  font-weight: 600;
+}
+
+.rate-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--grey-1);
+  border-radius: 8px;
+  padding: 9px 13px;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.link-danger {
+  background: none;
+  border: none;
+  color: var(--orange);
+  cursor: pointer;
+  font-size: 13px;
+}

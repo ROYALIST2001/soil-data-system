@@ -123,3 +123,84 @@ export interface LoginResponse {
   token: string;
   expires_at: string;
 }
+
+// ---------- DISASTER RELIEF ----------
+
+export interface EventRate {
+  crop: string;
+  rate_per_hectare: number;
+}
+
+export interface DisasterEvent {
+  event_id: number;
+  name: string;
+  disaster_type: string;
+  started_on: string;
+  ended_on: string;
+  description: string;
+  status: "OPEN" | "CLOSED";
+  declared_by: number;
+  declared_by_name: string;
+  declared_at: string;
+
+  // Which Grama Niladhari divisions this disaster affected. A farmer
+  // outside all of them cannot claim.
+  divisions: string[];
+
+  // Rupees per hectare, per crop. The amount is worked out from these,
+  // never typed by an officer.
+  rates: EventRate[];
+
+  claim_count: number;
+  total_amount: number;
+}
+
+export type ClaimStatus =
+  | "SUBMITTED" | "VERIFIED" | "APPROVED" | "PAID" | "REJECTED";
+
+export interface Claim {
+  claim_id: number;
+  event_id: number;
+  event_name: string;
+
+  farmer_id: number;
+  farmer_name: string;
+  gn_division: string;
+  farmer_phone: string;
+
+  land_id: number;
+  land_name: string;
+  land_crop_id: number;
+  crop: string;
+
+  // How much of that crop the farmer has registered in total, so an officer
+  // can see at a glance whether somebody is asking for more than they grow.
+  registered_area_ha: number;
+
+  claimed_area_ha: number;
+  verified_area_ha: number | null;
+  amount_lkr: number | null;
+  rate_per_hectare: number | null;
+
+  farmer_note: string;
+  status: ClaimStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ClaimEvent {
+  claim_event_id: number;
+  claim_id: number;
+  actor_id: number;
+  actor_name: string;
+  actor_role: string;
+  from_status: string;
+  to_status: string;
+  note: string;
+  created_at: string;
+}
+
+export interface ClaimDetail {
+  claim: Claim;
+  history: ClaimEvent[];
+}

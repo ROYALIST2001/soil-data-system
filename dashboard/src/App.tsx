@@ -4,22 +4,35 @@ import LoginPage from "./LoginPage";
 import DepartmentPage from "./DepartmentPage";
 import FarmerPage from "./FarmerPage";
 import ReadingPage from "./ReadingPage";
+import ClaimsPage from "./ClaimsPage";
+import ClaimPage from "./ClaimPage";
+import DisastersPage from "./DisastersPage";
 import type { Account } from "./types";
 
 // Which screen is showing.
 //
-// A plain state value rather than a router. This dashboard has four screens
-// and no need for shareable links, so a router would be a dependency and a
-// set of concepts bought for nothing.
+// A plain state value rather than a router. This dashboard has a handful of
+// screens and no need for shareable links, so a router would be a dependency
+// and a set of concepts bought for nothing.
 type View =
-  | { name: "list" }
+  | { name: "farmers" }
   | { name: "farmer"; farmerId: number }
-  | { name: "reading"; readingId: number };
+  | { name: "reading"; readingId: number }
+  | { name: "claims" }
+  | { name: "claim"; claimId: number }
+  | { name: "disasters" };
+
+// The three top-level areas.
+const SECTIONS = [
+  { key: "farmers", label: "Farmers & Soil" },
+  { key: "claims", label: "Relief Claims" },
+  { key: "disasters", label: "Disasters" },
+] as const;
 
 export default function App() {
   const [account, setAccount] = useState<Account | null>(null);
   const [checking, setChecking] = useState(true);
-  const [view, setView] = useState<View>({ name: "list" });
+  const [view, setView] = useState<View>({ name: "farmers" });
 
   // ---------- Is the saved token still good? ----------
   //
@@ -57,7 +70,7 @@ export default function App() {
   async function handleLogout() {
     await api.logout();
     setAccount(null);
-    setView({ name: "list" });
+    setView({ name: "farmers" });
   }
 
   if (checking) {
@@ -68,34 +81,66 @@ export default function App() {
     return <LoginPage onLoggedIn={setAccount} />;
   }
 
-  const isDivisionOfficer = account.role === "GN_OFFICER";
+  const isDepartment = account.role === "DEPT_OFFICER";
 
-  // A division officer may correct readings; a department officer oversees.
-  // The server enforces this too - this only decides what we offer.
-  const canCorrect = isDivisionOfficer;
+  // A division officer may correct soil readings and verify claims.
+  // The department oversees and releases money. The server enforces both -
+  // this only decides what the screen offers.
+  const canCorrect = !isDepartment;
+
+  // Which section a view belongs to, for highlighting the right tab.
+  const section =
+    view.name === "claims" || view.name === "claim"
+      ? "claims"
+      : view.name === "disasters"
+      ? "disasters"
+      : "farmers";
+
+  function go(key: (typeof SECTIONS)[number]["key"]) {
+    setView(
+      key === "claims"
+        ? { name: "claims" }
+        : key === "disasters"
+        ? { name: "disasters" }
+        : { name: "farmers" }
+    );
+  }
 
   return (
     <>
       <div className="topbar">
         <h1>Soil Data System</h1>
-        <span style={{ fontSize: 13, opacity: 0.85 }}>
-          {isDivisionOfficer
-            ? `${account.scope_division ?? "—"} division`
-            : "Department of Agriculture"}
-        </span>
 
-        <span className="who">{account.full_name}</span>
+        <nav className="nav">
+          {SECTIONS.map((s) => (
+            <button
+              key={s.key}
+              className={section === s.key ? "on" : undefined}
+              onClick={() => go(s.key)}
+            >
+              {s.label}
+            </button>
+          ))}
+        </nav>
+
+        <span className="who">
+          {account.full_name}
+          <span style={{ opacity: 0.7 }}>
+            {" · "}
+            {isDepartment
+              ? "Department"
+              : `${account.scope_division ?? "—"} division`}
+          </span>
+        </span>
         <button onClick={handleLogout}>Sign out</button>
       </div>
 
-      {view.name === "list" && (
+      {view.name === "farmers" && (
         <DepartmentPage
-          lockedDivision={isDivisionOfficer ? account.scope_division : null}
+          lockedDivision={isDepartment ? null : account.scope_division}
           onOpenFarmer={(farmerId) => setView({ name: "farmer", farmerId })}
           onOpenReading={(readingId) =>
-            canCorrect
-              ? setView({ name: "reading", readingId })
-              : undefined
+            canCorrect ? setView({ name: "reading", readingId }) : undefined
           }
         />
       )}
@@ -104,7 +149,7 @@ export default function App() {
         <FarmerPage
           farmerId={view.farmerId}
           canCorrect={canCorrect}
-          onBack={() => setView({ name: "list" })}
+          onBack={() => setView({ name: "farmers" })}
           onOpenReading={(readingId) => setView({ name: "reading", readingId })}
         />
       )}
@@ -112,8 +157,27 @@ export default function App() {
       {view.name === "reading" && (
         <ReadingPage
           readingId={view.readingId}
-          onBack={() => setView({ name: "list" })}
+          onBack={() => setView({ name: "farmers" })}
         />
+      )}
+
+      {view.name === "claims" && (
+        <ClaimsPage
+          isDepartment={isDepartment}
+          onOpenClaim={(claimId) => setView({ name: "claim", claimId })}
+        />
+      )}
+
+      {view.name === "claim" && (
+        <ClaimPage
+          claimId={view.claimId}
+          isDepartment={isDepartment}
+          onBack={() => setView({ name: "claims" })}
+        />
+      )}
+
+      {view.name === "disasters" && (
+        <DisastersPage isDepartment={isDepartment} />
       )}
     </>
   );
