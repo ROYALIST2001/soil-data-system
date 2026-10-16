@@ -28,6 +28,7 @@ func main() {
 	sessionRepo := repository.NewSessionRepository(db)  // NEW in Phase 10
 	officerRepo := repository.NewOfficerRepository(db)  // NEW in Phase 10
 	correctionRepo := repository.NewCorrectionRepository(db)
+	disasterRepo := repository.NewDisasterRepository(db) // NEW in Phase 11
 
 	// ---------- STEP 3: build the client (talks to other services) ----------
 	aiClient := client.NewAIClient()
@@ -58,6 +59,13 @@ func main() {
 	officerService := service.NewOfficerService(officerRepo, landRepo)
 	correctionService := service.NewCorrectionService(correctionRepo)
 
+	// NEW in Phase 11: disaster relief. It needs the land repository to
+	// check a claimed crop really belongs to the farmer, and the farmer
+	// repository to find out which division they are in.
+	disasterService := service.NewDisasterService(
+		disasterRepo, landRepo, farmerRepo,
+	)
+
 	// NEW: the chat service drives the agent loop and executes the tools.
 	// It needs the OTHER services, so it is built LAST.
 
@@ -86,6 +94,7 @@ func main() {
 	landController := controller.NewLandController(landService)                 // NEW
 	officerController := controller.NewOfficerController(officerService)       // NEW
 	correctionController := controller.NewCorrectionController(correctionService)
+	disasterController := controller.NewDisasterController(disasterService)
 
 	// NEW in Phase 10: proves who is calling, before any officer route runs.
 	auth := controller.NewAuthMiddleware(sessionRepo)
@@ -159,6 +168,38 @@ func main() {
 		auth.RequireOfficer(correctionController.Correct))
 	mux.HandleFunc("POST /officer/readings/{readingId}/flag",
 		auth.RequireOfficer(correctionController.Flag))
+
+	// ---------- NEW in Phase 11: disaster relief ----------
+	//
+	// THE FARMER SIDE. Open to the app, like the other farmer routes.
+	mux.HandleFunc("GET /farmers/{farmerId}/disasters",
+		disasterController.FarmerEvents)
+	mux.HandleFunc("GET /farmers/{farmerId}/claims",
+		disasterController.FarmerClaims)
+	mux.HandleFunc("POST /claims", disasterController.SubmitClaim)
+
+	// THE OFFICER SIDE. Every route behind RequireOfficer, and the service
+	// checks the ROLE again for each step - only a GN officer may verify,
+	// only the department may approve or release money.
+	mux.HandleFunc("GET /officer/disasters",
+		auth.RequireOfficer(disasterController.ListEvents))
+	mux.HandleFunc("POST /officer/disasters",
+		auth.RequireOfficer(disasterController.DeclareEvent))
+	mux.HandleFunc("POST /officer/disasters/{eventId}/close",
+		auth.RequireOfficer(disasterController.CloseEvent))
+
+	mux.HandleFunc("GET /officer/claims",
+		auth.RequireOfficer(disasterController.OfficerClaims))
+	mux.HandleFunc("GET /officer/claims/{claimId}",
+		auth.RequireOfficer(disasterController.ClaimDetail))
+	mux.HandleFunc("POST /officer/claims/{claimId}/verify",
+		auth.RequireOfficer(disasterController.Verify))
+	mux.HandleFunc("POST /officer/claims/{claimId}/approve",
+		auth.RequireOfficer(disasterController.Approve))
+	mux.HandleFunc("POST /officer/claims/{claimId}/reject",
+		auth.RequireOfficer(disasterController.Reject))
+	mux.HandleFunc("POST /officer/claims/{claimId}/pay",
+		auth.RequireOfficer(disasterController.MarkPaid))
 
 	// ---------- STEP 8: start the server ----------
 	// Clear out sessions that have already run out. Nothing breaks without
