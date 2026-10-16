@@ -76,6 +76,65 @@ var officers = []officer{
 		Email:    "thalawa@agri.gov.lk",
 		Password: "gn1234",
 	},
+
+	// One officer per division used by the demonstration data, so the
+	// verification step can be shown anywhere a demo farmer lives. A
+	// division with farmers but no officer would leave their claims stuck
+	// at SUBMITTED with nobody able to act.
+	{
+		NIC:      "GNO00000003",
+		Name:     "Kolonnawa Division Officer",
+		Role:     "GN_OFFICER",
+		Division: "Kolonnawa",
+		Mobile:   "0734567890",
+		Email:    "kolonnawa@agri.gov.lk",
+		Password: "gn1234",
+	},
+	{
+		NIC:      "GNO00000004",
+		Name:     "Homagama Division Officer",
+		Role:     "GN_OFFICER",
+		Division: "Homagama",
+		Mobile:   "0745678901",
+		Email:    "homagama@agri.gov.lk",
+		Password: "gn1234",
+	},
+	{
+		NIC:      "GNO00000005",
+		Name:     "Negombo Division Officer",
+		Role:     "GN_OFFICER",
+		Division: "Negombo",
+		Mobile:   "0756789012",
+		Email:    "negombo@agri.gov.lk",
+		Password: "gn1234",
+	},
+	{
+		NIC:      "GNO00000006",
+		Name:     "Minuwangoda Division Officer",
+		Role:     "GN_OFFICER",
+		Division: "Minuwangoda",
+		Mobile:   "0767890123",
+		Email:    "minuwangoda@agri.gov.lk",
+		Password: "gn1234",
+	},
+	{
+		NIC:      "GNO00000007",
+		Name:     "Gampola Division Officer",
+		Role:     "GN_OFFICER",
+		Division: "Gampola",
+		Mobile:   "0778901234",
+		Email:    "gampola@agri.gov.lk",
+		Password: "gn1234",
+	},
+	{
+		NIC:      "GNO00000008",
+		Name:     "Akurana Division Officer",
+		Role:     "GN_OFFICER",
+		Division: "Akurana",
+		Mobile:   "0789012345",
+		Email:    "akurana@agri.gov.lk",
+		Password: "gn1234",
+	},
 }
 
 func main() {
