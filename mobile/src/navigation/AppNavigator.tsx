@@ -21,6 +21,7 @@ import MyLandsScreen from "../screens/MyLandsScreen";
 import AddLandScreen from "../screens/AddLandScreen";
 import AddCropScreen from "../screens/AddCropScreen";
 import ReliefScreen from "../screens/ReliefScreen";
+import SubsidyScreen from "../screens/SubsidyScreen";
 
 import { useAuth, useSessionRestore } from "../hooks/useAuth";
 import { useLands, useLandsBootstrap } from "../hooks/useLands";
@@ -201,6 +202,19 @@ function MainTabs() {
           tabBarLabel: "Relief",
           tabBarIcon: ({ color }) => (
             <Text style={{ color, fontSize: 18 }}>🌧️</Text>
+          ),
+        }}
+      />
+
+      {/* NEW in Phase 12: the fertilizer subsidy. */}
+      <Tab.Screen
+        name="Subsidy"
+        component={SubsidyScreen}
+        options={{
+          title: "Fertilizer Subsidy",
+          tabBarLabel: "Subsidy",
+          tabBarIcon: ({ color }) => (
+            <Text style={{ color, fontSize: 18 }}>💰</Text>
           ),
         }}
       />
