@@ -204,3 +204,85 @@ export interface ClaimDetail {
   claim: Claim;
   history: ClaimEvent[];
 }
+
+// ---------- FERTILIZER SUBSIDY ----------
+
+export interface SubsidyRate {
+  crop: string;
+  rate_per_hectare: number;
+}
+
+export interface SubsidyRound {
+  round_id: number;
+  name: string;
+  season: "MAHA" | "YALA";
+  opens_on: string;
+  closes_on: string;
+  description: string;
+  status: "OPEN" | "CLOSED";
+  declared_by: number;
+  declared_by_name: string;
+  declared_at: string;
+
+  divisions: string[];
+  rates: SubsidyRate[];
+
+  application_count: number;
+  total_approved: number;
+
+  // How many farmers say the money never arrived. The one number on the
+  // screen that should make somebody act.
+  disputed_count: number;
+}
+
+export type SubsidyStatus =
+  | "SUBMITTED" | "APPROVED" | "SENT"
+  | "RECEIVED" | "DISPUTED" | "RESOLVED" | "REJECTED";
+
+export interface SubsidyApplication {
+  application_id: number;
+  round_id: number;
+  round_name: string;
+  season: string;
+
+  farmer_id: number;
+  farmer_name: string;
+  gn_division: string;
+  farmer_phone: string;
+
+  land_id: number;
+  land_name: string;
+  land_crop_id: number;
+  crop: string;
+
+  area_ha: number;
+  amount_lkr: number | null;
+  rate_per_hectare: number | null;
+
+  farmer_note: string;
+  status: SubsidyStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SubsidyEvent {
+  subsidy_event_id: number;
+  application_id: number;
+  actor_id: number;
+  actor_name: string;
+
+  // "FARMER", "GN_OFFICER" or "DEPT_OFFICER". Shown on screen, because
+  // whether a step was taken by an officer or by the farmer themselves is
+  // the most important thing about it.
+  actor_role: string;
+
+  from_status: string;
+  to_status: string;
+  note: string;
+  created_at: string;
+}
+
+export interface SubsidyDetail {
+  application: SubsidyApplication;
+  history: SubsidyEvent[];
+}

@@ -1,7 +1,7 @@
 import type {
   Account, Claim, ClaimDetail, DisasterEvent, DivisionSummary, EventRate,
   FarmerDetail, FarmerSummary, LoginResponse, MapPoint, ReadingDetail,
-  ReadingRow,
+  ReadingRow, SubsidyApplication, SubsidyDetail, SubsidyRate, SubsidyRound,
 } from "./types";
 
 // Where the Go API lives.
@@ -282,4 +282,74 @@ export async function claimStep(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
+}
+
+// ---------- FERTILIZER SUBSIDY ----------
+
+export async function getSubsidyRounds(): Promise<SubsidyRound[]> {
+  const body = await request<{ rounds: SubsidyRound[] }>(
+    "/officer/subsidy-rounds"
+  );
+  return body.rounds ?? [];
+}
+
+export async function declareSubsidyRound(round: {
+  name: string;
+  season: string;
+  opens_on: string;
+  closes_on: string;
+  description: string;
+  divisions: string[];
+  rates: SubsidyRate[];
+}): Promise<SubsidyRound> {
+  return request<SubsidyRound>("/officer/subsidy-rounds", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(round),
+  });
+}
+
+export async function closeSubsidyRound(roundId: number): Promise<void> {
+  await request(`/officer/subsidy-rounds/${roundId}/close`, {
+    method: "POST",
+  });
+}
+
+export async function getSubsidies(
+  status: string,
+  roundId?: number
+): Promise<SubsidyApplication[]> {
+  const params = new URLSearchParams();
+  if (status) params.set("status", status);
+  if (roundId) params.set("round", String(roundId));
+
+  const query = params.toString() ? `?${params.toString()}` : "";
+  const body = await request<{ applications: SubsidyApplication[] }>(
+    `/officer/subsidies${query}`
+  );
+  return body.applications ?? [];
+}
+
+export async function getSubsidy(
+  applicationId: number
+): Promise<SubsidyDetail> {
+  return request<SubsidyDetail>(`/officer/subsidies/${applicationId}`);
+}
+
+// One function for all four officer steps. They differ only in the word in
+// the URL, so four near-identical functions would be four places for one to
+// drift.
+export async function subsidyStep(
+  applicationId: number,
+  step: "approve" | "send" | "reject" | "resolve",
+  note: string
+): Promise<SubsidyDetail> {
+  return request<SubsidyDetail>(
+    `/officer/subsidies/${applicationId}/${step}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ note }),
+    }
+  );
 }

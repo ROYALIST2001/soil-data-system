@@ -7,6 +7,9 @@ import ReadingPage from "./ReadingPage";
 import ClaimsPage from "./ClaimsPage";
 import ClaimPage from "./ClaimPage";
 import DisastersPage from "./DisastersPage";
+import SubsidiesPage from "./SubsidiesPage";
+import SubsidyPage from "./SubsidyPage";
+import SubsidyRoundsPage from "./SubsidyRoundsPage";
 import type { Account } from "./types";
 
 // Which screen is showing.
@@ -20,13 +23,18 @@ type View =
   | { name: "reading"; readingId: number }
   | { name: "claims" }
   | { name: "claim"; claimId: number }
-  | { name: "disasters" };
+  | { name: "disasters" }
+  | { name: "subsidies" }
+  | { name: "subsidy"; applicationId: number }
+  | { name: "rounds" };
 
 // The three top-level areas.
 const SECTIONS = [
   { key: "farmers", label: "Farmers & Soil" },
   { key: "claims", label: "Relief Claims" },
   { key: "disasters", label: "Disasters" },
+  { key: "subsidies", label: "Subsidy" },
+  { key: "rounds", label: "Subsidy Rounds" },
 ] as const;
 
 export default function App() {
@@ -94,6 +102,10 @@ export default function App() {
       ? "claims"
       : view.name === "disasters"
       ? "disasters"
+      : view.name === "subsidies" || view.name === "subsidy"
+      ? "subsidies"
+      : view.name === "rounds"
+      ? "rounds"
       : "farmers";
 
   function go(key: (typeof SECTIONS)[number]["key"]) {
@@ -102,6 +114,10 @@ export default function App() {
         ? { name: "claims" }
         : key === "disasters"
         ? { name: "disasters" }
+        : key === "subsidies"
+        ? { name: "subsidies" }
+        : key === "rounds"
+        ? { name: "rounds" }
         : { name: "farmers" }
     );
   }
@@ -178,6 +194,25 @@ export default function App() {
 
       {view.name === "disasters" && (
         <DisastersPage isDepartment={isDepartment} />
+      )}
+
+      {view.name === "subsidies" && (
+        <SubsidiesPage
+          isDepartment={isDepartment}
+          onOpen={(applicationId) => setView({ name: "subsidy", applicationId })}
+        />
+      )}
+
+      {view.name === "subsidy" && (
+        <SubsidyPage
+          applicationId={view.applicationId}
+          isDepartment={isDepartment}
+          onBack={() => setView({ name: "subsidies" })}
+        />
+      )}
+
+      {view.name === "rounds" && (
+        <SubsidyRoundsPage isDepartment={isDepartment} />
       )}
     </>
   );
