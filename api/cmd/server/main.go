@@ -29,6 +29,7 @@ func main() {
 	officerRepo := repository.NewOfficerRepository(db)  // NEW in Phase 10
 	correctionRepo := repository.NewCorrectionRepository(db)
 	disasterRepo := repository.NewDisasterRepository(db) // NEW in Phase 11
+	subsidyRepo := repository.NewSubsidyRepository(db)   // NEW in Phase 12
 
 	// ---------- STEP 3: build the client (talks to other services) ----------
 	aiClient := client.NewAIClient()
@@ -66,6 +67,13 @@ func main() {
 		disasterRepo, landRepo, farmerRepo,
 	)
 
+	// NEW in Phase 12: the fertilizer subsidy. Needs the same two helpers
+	// as relief: lands to confirm a crop is really the farmer's, and
+	// farmers to find out which division they are in.
+	subsidyService := service.NewSubsidyService(
+		subsidyRepo, landRepo, farmerRepo,
+	)
+
 	// NEW: the chat service drives the agent loop and executes the tools.
 	// It needs the OTHER services, so it is built LAST.
 
@@ -95,6 +103,7 @@ func main() {
 	officerController := controller.NewOfficerController(officerService)       // NEW
 	correctionController := controller.NewCorrectionController(correctionService)
 	disasterController := controller.NewDisasterController(disasterService)
+	subsidyController := controller.NewSubsidyController(subsidyService)
 
 	// NEW in Phase 10: proves who is calling, before any officer route runs.
 	auth := controller.NewAuthMiddleware(sessionRepo)
@@ -200,6 +209,47 @@ func main() {
 		auth.RequireOfficer(disasterController.Reject))
 	mux.HandleFunc("POST /officer/claims/{claimId}/pay",
 		auth.RequireOfficer(disasterController.MarkPaid))
+
+	// ---------- NEW in Phase 12: the fertilizer subsidy ----------
+	//
+	// THE FARMER SIDE.
+	//
+	// Note the last two. Every other workflow in this system is moved along
+	// by officers only; here the farmer confirms the money arrived, or says
+	// it did not. The service checks the application is theirs before
+	// either one is allowed.
+	mux.HandleFunc("GET /farmers/{farmerId}/subsidy-rounds",
+		subsidyController.FarmerRounds)
+	mux.HandleFunc("GET /farmers/{farmerId}/subsidies",
+		subsidyController.FarmerApplications)
+	mux.HandleFunc("POST /subsidies", subsidyController.Apply)
+	mux.HandleFunc("POST /subsidies/{applicationId}/received",
+		subsidyController.ConfirmReceived)
+	mux.HandleFunc("POST /subsidies/{applicationId}/dispute",
+		subsidyController.Dispute)
+
+	// THE OFFICER SIDE. Every route behind RequireOfficer, and the service
+	// checks the ROLE again for each step - only a GN officer approves,
+	// only the department sends money or settles a dispute.
+	mux.HandleFunc("GET /officer/subsidy-rounds",
+		auth.RequireOfficer(subsidyController.ListRounds))
+	mux.HandleFunc("POST /officer/subsidy-rounds",
+		auth.RequireOfficer(subsidyController.DeclareRound))
+	mux.HandleFunc("POST /officer/subsidy-rounds/{roundId}/close",
+		auth.RequireOfficer(subsidyController.CloseRound))
+
+	mux.HandleFunc("GET /officer/subsidies",
+		auth.RequireOfficer(subsidyController.OfficerApplications))
+	mux.HandleFunc("GET /officer/subsidies/{applicationId}",
+		auth.RequireOfficer(subsidyController.OfficerDetail))
+	mux.HandleFunc("POST /officer/subsidies/{applicationId}/approve",
+		auth.RequireOfficer(subsidyController.Approve))
+	mux.HandleFunc("POST /officer/subsidies/{applicationId}/send",
+		auth.RequireOfficer(subsidyController.Send))
+	mux.HandleFunc("POST /officer/subsidies/{applicationId}/reject",
+		auth.RequireOfficer(subsidyController.Reject))
+	mux.HandleFunc("POST /officer/subsidies/{applicationId}/resolve",
+		auth.RequireOfficer(subsidyController.Resolve))
 
 	// ---------- STEP 8: start the server ----------
 	// Clear out sessions that have already run out. Nothing breaks without
