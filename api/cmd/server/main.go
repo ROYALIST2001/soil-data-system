@@ -114,6 +114,11 @@ func main() {
 	mux.HandleFunc("GET /health", controller.HealthCheck)
 	mux.HandleFunc("POST /readings", readingController.CreateReading)
 	mux.HandleFunc("GET /readings/{id}", readingController.GetReading)
+
+	// The farmer's most recent reading, so Trends and Map know which field
+	// to draw as soon as they log in.
+	mux.HandleFunc("GET /farmers/{farmerId}/readings/latest",
+		readingController.LatestForFarmer)
 	mux.HandleFunc("GET /readings/{id}/recommendation",
 		readingController.GetRecommendation)
 

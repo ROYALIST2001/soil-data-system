@@ -44,6 +44,38 @@ func isValidationError(err error) bool {
 	return false
 }
 
+// LatestForFarmer handles GET /farmers/{farmerId}/readings/latest
+//
+// Returns 404 when the farmer has never submitted a reading, which is a
+// perfectly normal answer for somebody who just signed up - the app treats
+// it as "nothing to show yet", not as a failure.
+func (c *ReadingController) LatestForFarmer(
+	w http.ResponseWriter, r *http.Request,
+) {
+	w.Header().Set("Content-Type", "application/json")
+
+	farmerID, err := strconv.Atoi(r.PathValue("farmerId"))
+	if err != nil || farmerID <= 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{
+			"error": "invalid farmer id",
+		})
+		return
+	}
+
+	reading, err := c.service.LatestForFarmer(farmerID)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{
+			"error": "no readings yet",
+		})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(reading)
+}
+
 // CreateReading handles POST /readings.
 func (c *ReadingController) CreateReading(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")

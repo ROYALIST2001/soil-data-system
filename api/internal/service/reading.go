@@ -108,6 +108,25 @@ func (s *ReadingService) GetReading(id int) (model.Reading, error) {
 	return reading, nil
 }
 
+// LatestForFarmer returns the last reading this farmer submitted.
+//
+// The app calls this right after login so the Trends and Map screens know
+// which field to draw, without making the farmer submit a new test first.
+func (s *ReadingService) LatestForFarmer(
+	farmerID int,
+) (model.Reading, error) {
+
+	reading, err := s.repo.FindLatestByFarmer(farmerID)
+	if err != nil {
+		return reading, err
+	}
+
+	// Zone is DERIVED, not stored - the same as GetReading does. Without
+	// this the screen would show an empty zone for a reading that has one.
+	reading.Zone = s.location.ZoneForDistrict(reading.DistrictID)
+	return reading, nil
+}
+
 // GetRecommendation produces the fertilizer advice for one reading.
 // NEW in Phase 6.
 func (s *ReadingService) GetRecommendation(id int) (model.Recommendation, error) {

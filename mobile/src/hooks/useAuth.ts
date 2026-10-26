@@ -14,6 +14,31 @@ import {
   sessionRestored,
 } from "../store/authSlice";
 import { landsCleared } from "../store/landSlice";
+import { submitSucceeded, resetReading } from "../store/readingSlice";
+import { getLatestReading } from "../api/readingApi";
+
+// Load the farmer's last reading into the store, so the Trends and Map
+// screens have a field to draw the moment they are opened.
+//
+// SWALLOWS ITS ERRORS ON PURPOSE. This is a convenience: if it fails, those
+// two screens simply say "no readings yet", which is exactly what they said
+// before this existed. A nicety must never be able to block logging in.
+async function loadLatestReadingInto(
+  dispatch: ReturnType<typeof useAppDispatch>,
+  farmerID: number
+): Promise<void> {
+  try {
+    const reading = await getLatestReading(farmerID);
+    if (reading) {
+      // submitSucceeded is the action that puts a reading in the store.
+      // The name is about where it came from originally, not about what it
+      // means - it simply records "this is the reading in hand".
+      dispatch(submitSucceeded(reading));
+    }
+  } catch (e) {
+    // No network, or the server is down. The farmer is still logged in.
+  }
+}
 
 // ---------------------------------------------------------------------
 // useSessionRestore - looks for a saved farmer when the app starts.
@@ -54,6 +79,12 @@ export function useSessionRestore() {
         // would come back 401 and bounce the farmer out.
         setAuthToken(saved.token);
         dispatch(sessionRestored(saved.farmer));
+
+        // Fetch their last reading in the background, so Trends and Map
+        // have a field to draw. Deliberately NOT awaited: it is a
+        // convenience, and making the whole app wait on it would be
+        // paying for a nicety with the thing that matters.
+        loadLatestReadingInto(dispatch, saved.farmer.farmer_id);
       } else {
         dispatch(sessionEmpty());
       }
@@ -93,6 +124,10 @@ export function useAuth() {
       // have to log in again next time.
       await saveSession(result.farmer, result.token);
       dispatch(authSucceeded(result.farmer));
+
+      // A brand new farmer has none, which is fine - this just does
+      // nothing.
+      loadLatestReadingInto(dispatch, result.farmer.farmer_id);
     } catch (e) {
       const message =
         e instanceof Error
@@ -113,6 +148,10 @@ export function useAuth() {
 
       await saveSession(result.farmer, result.token);
       dispatch(authSucceeded(result.farmer));
+
+      // Their history is already on the server; fetch the last reading so
+      // Trends and Map work straight away rather than after a new test.
+      loadLatestReadingInto(dispatch, result.farmer.farmer_id);
     } catch (e) {
       const message =
         e instanceof Error
@@ -124,6 +163,10 @@ export function useAuth() {
 
   // ---------- Log out ----------
   async function doLogout() {
+    // Forget the last reading as well, or the next farmer to log in on this
+    // phone would see the previous one's field on the Trends screen.
+    dispatch(resetReading());
+
     // Clear the phone's copy FIRST. If we only cleared the store, the next
     // app start would read the old session and log them back in.
     await clearSession();

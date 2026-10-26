@@ -86,6 +86,48 @@ func (repo *ReadingRepository) GetByID(id int) (model.Reading, error) {
 	return r, err
 }
 
+// FindLatestByFarmer returns the most recent reading this farmer submitted.
+//
+// WHY THIS EXISTS.
+// The Trends screen draws the history of ONE field, and it needs to know
+// which field. It used to learn that only from a reading submitted during
+// the current app session - so a farmer with two years of history who had
+// just logged in was told "No readings yet". The data was there; the screen
+// simply had no way to find it.
+//
+// Note it does NOT filter on quality_flag. The point is to find the last
+// field they tested, and a flagged reading still tells us where that was.
+func (repo *ReadingRepository) FindLatestByFarmer(
+	farmerID int,
+) (model.Reading, error) {
+
+	query := `
+		SELECT reading_id, raw_lat, raw_lng, anchor_id, district_id,
+		       COALESCE(corrected_n, n), COALESCE(corrected_p, p),
+		       COALESCE(corrected_k, k), COALESCE(corrected_ph, ph),
+		       crop, stage, target_yield, area,
+		       created_at, COALESCE(officer_flag, quality_flag),
+		       agent_note, agent_verdict,
+		       farmer_id, land_id, land_crop_id
+		FROM readings
+		WHERE farmer_id = $1
+		ORDER BY created_at DESC
+		LIMIT 1
+	`
+
+	var r model.Reading
+
+	err := repo.db.QueryRow(context.Background(), query, farmerID).Scan(
+		&r.ReadingID, &r.RawLat, &r.RawLng, &r.AnchorID, &r.DistrictID,
+		&r.N, &r.P, &r.K, &r.PH, &r.Crop, &r.Stage, &r.TargetYield, &r.Area,
+		&r.CreatedAt, &r.QualityFlag,
+		&r.AgentNote, &r.AgentVerdict,
+		&r.FarmerID, &r.LandID, &r.LandCropID,
+	)
+
+	return r, err
+}
+
 // FindRecentByAnchor returns the most recent GOOD readings from one field.
 // NEW in Phase 4 Part 2.
 //
