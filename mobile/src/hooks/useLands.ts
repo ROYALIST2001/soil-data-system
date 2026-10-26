@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useAppDispatch, useAppSelector } from "../store";
 import * as landApi from "../api/landApi";
@@ -45,14 +45,40 @@ export function useLandsBootstrap() {
   const farmer = useAppSelector((s) => s.auth.farmer);
   const landStatus = useAppSelector((s) => s.land.status);
 
+  // Which farmer we have already started loading for.
+  //
+  // THIS REPLACES A CHECK ON landStatus, AND THE REASON MATTERS.
+  //
+  // The obvious way to write "only load once" is to look at the status and
+  // skip if it is no longer "unloaded". That is what this did, with
+  // landStatus listed as a dependency - and it quietly broke itself.
+  //
+  // The first thing the load does is dispatch landsLoading(), which CHANGES
+  // landStatus. Changing a dependency re-runs the effect, and re-running an
+  // effect first fires the previous run's cleanup, which set cancelled to
+  // true. So the request that had just been started was cancelled a
+  // millisecond later, the lands arrived and were thrown away, and the
+  // status sat on "loading" for ever.
+  //
+  // The farmer saw "Loading your land...", then the registration form -
+  // every single time they logged in, even with land already registered.
+  //
+  // A ref does not re-run the effect when it changes, so the thing that
+  // records "we started" can no longer interrupt the start.
+  const startedFor = useRef<number | null>(null);
+
   useEffect(() => {
-    // Only once we know who the farmer is, and only if we have not asked.
+    // Logged out: let the next farmer load their own land.
     if (authStatus !== "loggedIn" || !farmer) {
+      startedFor.current = null;
       return;
     }
-    if (landStatus !== "unloaded") {
+
+    // Already loading or loaded for this farmer.
+    if (startedFor.current === farmer.farmer_id) {
       return;
     }
+    startedFor.current = farmer.farmer_id;
 
     let cancelled = false;
 
@@ -76,7 +102,9 @@ export function useLandsBootstrap() {
     return () => {
       cancelled = true;
     };
-  }, [authStatus, farmer, landStatus, dispatch]);
+
+    // landStatus is deliberately NOT a dependency. See the comment above.
+  }, [authStatus, farmer, dispatch]);
 
   // A LAST-RESORT STOP.
   //
@@ -92,6 +120,10 @@ export function useLandsBootstrap() {
 
   useEffect(() => {
     if (landStatus !== "unloaded" && landStatus !== "loading") {
+      // Finished, one way or the other. Clear the flag so a later login on
+      // the same phone starts its wait fresh rather than inheriting a
+      // give-up from the previous farmer.
+      setGaveUp(false);
       return;
     }
 
