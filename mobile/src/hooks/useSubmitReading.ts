@@ -25,6 +25,7 @@ export function useSubmitReading() {
 
       // STEP 4: put the result in the store.
       dispatch(submitSucceeded(full));
+      return full;
 
     } catch (e) {
       // STEP 5: CHANGED - show the REAL message.
@@ -41,6 +42,7 @@ export function useSubmitReading() {
           : "Could not save the reading. Check the connection.";
 
       dispatch(submitFailed(message));
+      return null;
     }
   }
 

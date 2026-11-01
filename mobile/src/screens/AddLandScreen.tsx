@@ -1,3 +1,4 @@
+import { colors, ui } from "../theme";
 import React from "react";
 import {
   ScrollView, StyleSheet, KeyboardAvoidingView, Platform, Text,
@@ -23,7 +24,7 @@ export default function AddLandScreen() {
       style={styles.flex}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView style={ui.screen} contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
 
         <Text style={styles.intro}>
           Add another piece of land and the crops you grow on it.
@@ -45,10 +46,10 @@ export default function AddLandScreen() {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: "#fff" },
+  flex: { flex: 1, backgroundColor: colors.background },
   container: { padding: 20, paddingTop: 20, paddingBottom: 40 },
   intro: {
-    fontSize: 14, color: "#495057",
+    fontSize: 14, color: colors.secondary,
     marginBottom: 18, lineHeight: 20,
   },
 });

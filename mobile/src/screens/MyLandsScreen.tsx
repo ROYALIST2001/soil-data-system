@@ -1,3 +1,6 @@
+import { colors, ui } from "../theme";
+import Icon from "../components/Icon";
+import AppButton from "../components/AppButton";
 import React from "react";
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
@@ -72,7 +75,7 @@ export default function MyLandsScreen() {
   if (status === "loading" && lands.length === 0) {
     return (
       <View style={styles.centre}>
-        <ActivityIndicator size="large" color="#1b4332" />
+        <ActivityIndicator size="large" color={colors.forest} />
       </View>
     );
   }
@@ -100,13 +103,18 @@ export default function MyLandsScreen() {
         <RefreshControl refreshing={status === "loading"} onRefresh={reload} />
       }
     >
-      <Text style={styles.title}>My Lands</Text>
+      <Text style={ui.eyebrow}>ROOM TO GROW</Text>
+      <Text style={styles.title}>Your land. Your roots.</Text>
       <Text style={styles.subtitle}>
         {lands.length === 0
           ? "You have no land registered yet."
           : `${lands.length} land(s) registered.`}
       </Text>
 
+      <View style={styles.summary}>
+        <View><Text style={styles.summaryLabel}>REGISTERED LAND</Text><Text style={styles.summaryValue}>{lands.reduce((sum, land) => sum + land.size_ha, 0).toFixed(2)} <Text style={styles.summaryUnit}>ha</Text></Text></View>
+        <Icon name="field" color={colors.lime} size={47} strokeWidth={1.3} />
+      </View>
       {lands.map((land) => {
         const used = land.crops.reduce((sum, c) => sum + c.size_ha, 0);
         const free = land.size_ha - used;
@@ -123,6 +131,9 @@ export default function MyLandsScreen() {
               </View>
 
               <TouchableOpacity
+                style={styles.removeButton}
+                accessibilityRole="button"
+                accessibilityLabel={`Remove ${land.name}`}
                 onPress={() => confirmRemoveLand(land)}
                 disabled={saving}
               >
@@ -137,6 +148,8 @@ export default function MyLandsScreen() {
 
                 <TouchableOpacity
                   style={styles.cropRemove}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Remove ${cropLabel(c.crop)} from ${land.name}`}
                   onPress={() => confirmRemoveCrop(c.land_crop_id, cropLabel(c.crop))}
                   disabled={saving}
                 >
@@ -145,6 +158,7 @@ export default function MyLandsScreen() {
               </View>
             ))}
 
+            <View style={styles.progressTrack}><View style={[styles.progressFill, { width: `${Math.min(100, (used / land.size_ha) * 100)}%` }]} /></View>
             <Text style={styles.usedNote}>
               {used.toFixed(2)} of {land.size_ha.toFixed(2)} ha planted
               {free > 0.004 ? ` — ${free.toFixed(2)} ha free` : " — full"}
@@ -168,29 +182,32 @@ export default function MyLandsScreen() {
         );
       })}
 
-      <TouchableOpacity
-        style={styles.addLandButton}
-        onPress={() => navigation.navigate("AddLand")}
-      >
-        <Text style={styles.addLandText}>+ Register another land</Text>
-      </TouchableOpacity>
+      <AppButton title="Register another land" onPress={() => navigation.navigate("AddLand")} icon="plus" style={{ marginTop: 8 }} />
 
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  summary: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", backgroundColor: colors.forest, borderRadius: 23, padding: 23, marginBottom: 22 },
+  summaryLabel: { color: "#CDDEC8", fontSize: 10, letterSpacing: 1.5, fontWeight: "600" },
+  summaryValue: { color: colors.surface, fontSize: 36, fontWeight: "700", marginTop: 8, letterSpacing: -1 },
+  summaryUnit: { fontSize: 17, color: colors.lime },
+  progressTrack: { height: 5, backgroundColor: colors.sage, borderRadius: 3, marginTop: 14, overflow: "hidden" },
+  progressFill: { height: 5, backgroundColor: colors.primary, borderRadius: 3 },
+  removeButton: { minHeight: 44, minWidth: 50, justifyContent: "center", alignItems: "flex-end" },
   container: { padding: 18, paddingTop: 22, paddingBottom: 40 },
   centre: {
     flex: 1, justifyContent: "center",
     alignItems: "center", padding: 30,
   },
 
-  title: { fontSize: 22, fontWeight: "bold", color: "#1b4332" },
-  subtitle: { fontSize: 13, color: "#868e96", marginTop: 2, marginBottom: 18 },
+  title: { fontSize: 26, fontWeight: "700", color: colors.forest },
+  subtitle: { fontSize: 13, color: colors.muted, marginTop: 2, marginBottom: 18 },
 
   card: {
-    borderWidth: 1, borderColor: "#dee2e6", borderRadius: 10,
+    backgroundColor: colors.surface,
+    borderWidth: 1, borderColor: colors.border, borderRadius: 18,
     padding: 14, marginBottom: 14,
   },
 
@@ -198,43 +215,43 @@ const styles = StyleSheet.create({
     flexDirection: "row", alignItems: "flex-start", marginBottom: 12,
   },
   cardHeadText: { flex: 1 },
-  landName: { fontSize: 17, fontWeight: "bold", color: "#212529" },
-  landMeta: { fontSize: 12, color: "#868e96", marginTop: 2 },
-  deleteLand: { fontSize: 13, color: "#e8842c", fontWeight: "bold" },
+  landName: { fontSize: 17, fontWeight: "700", color: colors.text },
+  landMeta: { fontSize: 12, color: colors.muted, marginTop: 2 },
+  deleteLand: { fontSize: 13, color: colors.warning, fontWeight: "700" },
 
   cropRow: {
     flexDirection: "row", alignItems: "center",
-    backgroundColor: "#f1f3f5", borderRadius: 8,
+    backgroundColor: colors.sage, borderRadius: 14,
     paddingVertical: 9, paddingHorizontal: 12, marginBottom: 6,
   },
-  cropName: { flex: 1, fontSize: 15, color: "#212529" },
-  cropSize: { fontSize: 14, color: "#40916c", fontWeight: "bold" },
-  cropRemove: { marginLeft: 14, paddingHorizontal: 4 },
-  cropRemoveText: { fontSize: 15, color: "#868e96" },
+  cropName: { flex: 1, fontSize: 15, color: colors.text },
+  cropSize: { fontSize: 14, color: colors.primary, fontWeight: "700" },
+  cropRemove: { marginLeft: 8, width: 40, minHeight: 40, justifyContent: "center", alignItems: "center" },
+  cropRemoveText: { fontSize: 15, color: colors.muted },
 
-  usedNote: { fontSize: 12, color: "#868e96", marginTop: 6 },
+  usedNote: { fontSize: 12, color: colors.muted, marginTop: 6 },
 
   addCropButton: { paddingVertical: 10, marginTop: 4 },
-  addCropText: { color: "#40916c", fontSize: 14, fontWeight: "bold" },
+  addCropText: { color: colors.primary, fontSize: 14, fontWeight: "700" },
 
   addLandButton: {
-    backgroundColor: "#1b4332", borderRadius: 8,
+    backgroundColor: colors.forest, borderRadius: 14,
     paddingVertical: 14, alignItems: "center", marginTop: 6,
   },
-  addLandText: { color: "#fff", fontSize: 15, fontWeight: "bold" },
+  addLandText: { color: colors.surface, fontSize: 15, fontWeight: "700" },
 
   emptyTitle: {
-    fontSize: 17, fontWeight: "bold",
-    color: "#1b4332", marginBottom: 8,
+    fontSize: 17, fontWeight: "700",
+    color: colors.forest, marginBottom: 8,
   },
   emptyText: {
-    color: "#868e96", fontSize: 14,
+    color: colors.muted, fontSize: 14,
     textAlign: "center", lineHeight: 20, marginBottom: 18,
   },
 
   retryButton: {
-    borderWidth: 1, borderColor: "#1b4332", borderRadius: 8,
+    borderWidth: 1, borderColor: colors.forest, borderRadius: 14,
     paddingVertical: 11, paddingHorizontal: 26,
   },
-  retryText: { color: "#1b4332", fontSize: 15, fontWeight: "bold" },
+  retryText: { color: colors.forest, fontSize: 15, fontWeight: "700" },
 });

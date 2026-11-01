@@ -1,3 +1,4 @@
+import { colors, ui } from "../theme";
 import React, { useCallback } from "react";
 import {
   View, Text, ScrollView, StyleSheet, ActivityIndicator,
@@ -8,7 +9,7 @@ import { useAnalytics } from "../hooks/useAnalytics";
 import { useAppSelector } from "../store";
 
 const CLUSTER_COLORS = [
-  "#e8842c", "#40916c", "#c92a2a", "#1971c2", "#9c36b5", "#f59f00",
+  colors.warning, colors.primary, "#c92a2a", "#1971c2", "#9c36b5", "#f59f00",
 ];
 
 export default function ClustersScreen() {
@@ -25,11 +26,11 @@ export default function ClustersScreen() {
   );
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView style={ui.screen} contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
       <Text style={styles.title}>Regional Soil Groups</Text>
 
       {status === "loading" && (
-        <ActivityIndicator size="large" color="#40916c" style={{ marginTop: 30 }} />
+        <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 30 }} />
       )}
 
       {/* Not enough districts. A CALM explanation, not a red error. */}
@@ -114,44 +115,44 @@ export default function ClustersScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 20, paddingTop: 50, paddingBottom: 40 },
-  title: { fontSize: 22, fontWeight: "bold", color: "#1b4332", marginBottom: 16 },
+  container: { padding: 20, paddingTop: 20, paddingBottom: 40 },
+  title: { fontSize: 26, fontWeight: "700", color: colors.forest, marginBottom: 16 },
 
   qualityBox: {
-    backgroundColor: "#d8f3dc", padding: 12,
-    borderRadius: 8, marginBottom: 18,
+    backgroundColor: colors.sage, padding: 12,
+    borderRadius: 14, marginBottom: 18,
   },
-  qualityTitle: { fontSize: 16, fontWeight: "bold", color: "#1b4332" },
-  qualityText: { fontSize: 13, color: "#2d6a4f", marginTop: 2 },
-  qualitySmall: { fontSize: 11, color: "#495057", marginTop: 4 },
+  qualityTitle: { fontSize: 16, fontWeight: "700", color: colors.forest },
+  qualityText: { fontSize: 13, color: colors.primary, marginTop: 2 },
+  qualitySmall: { fontSize: 11, color: colors.secondary, marginTop: 4 },
 
   clusterBox: {
-    backgroundColor: "#f8f9fa", padding: 12,
-    borderRadius: 8, marginBottom: 12,
+    backgroundColor: colors.surface, padding: 12,
+    borderRadius: 14, marginBottom: 12,
     borderLeftWidth: 5,
   },
-  clusterTitle: { fontSize: 15, fontWeight: "bold", color: "#1b4332" },
-  clusterCount: { fontSize: 12, color: "#868e96", marginTop: 2 },
-  clusterNames: { fontSize: 13, color: "#495057", marginTop: 6 },
-  centreRow: { marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: "#dee2e6" },
-  centreText: { fontSize: 11, color: "#868e96" },
+  clusterTitle: { fontSize: 15, fontWeight: "700", color: colors.forest },
+  clusterCount: { fontSize: 12, color: colors.muted, marginTop: 2 },
+  clusterNames: { fontSize: 13, color: colors.secondary, marginTop: 6 },
+  centreRow: { marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: colors.border },
+  centreText: { fontSize: 11, color: colors.muted },
 
   sectionTitle: {
-    fontSize: 15, fontWeight: "bold",
-    color: "#1b4332", marginTop: 14, marginBottom: 8,
+    fontSize: 15, fontWeight: "700",
+    color: colors.forest, marginTop: 14, marginBottom: 8,
   },
-  evalBox: { backgroundColor: "#f1f3f5", padding: 12, borderRadius: 8 },
-  evalHeader: { fontSize: 12, fontWeight: "bold", color: "#1b4332", marginBottom: 4 },
-  evalRow: { fontSize: 12, color: "#495057", marginBottom: 2 },
-  evalRowChosen: { fontWeight: "bold", color: "#1b4332" },
-  evalNote: { fontSize: 11, color: "#868e96", marginTop: 8, lineHeight: 16 },
+  evalBox: { backgroundColor: colors.sage, padding: 12, borderRadius: 14 },
+  evalHeader: { fontSize: 12, fontWeight: "700", color: colors.forest, marginBottom: 4 },
+  evalRow: { fontSize: 12, color: colors.secondary, marginBottom: 2 },
+  evalRowChosen: { fontWeight: "700", color: colors.forest },
+  evalNote: { fontSize: 11, color: colors.muted, marginTop: 8, lineHeight: 16 },
 
   infoBox: {
-    backgroundColor: "#fff9db", padding: 14, borderRadius: 8,
-    borderLeftWidth: 4, borderLeftColor: "#e8842c",
+    backgroundColor: "#fff9db", padding: 14, borderRadius: 14,
+    borderLeftWidth: 4, borderLeftColor: colors.warning,
   },
-  infoTitle: { fontSize: 15, fontWeight: "bold", color: "#1b4332", marginBottom: 6 },
-  infoText: { fontSize: 13, color: "#495057", lineHeight: 19, marginBottom: 4 },
+  infoTitle: { fontSize: 15, fontWeight: "700", color: colors.forest, marginBottom: 6 },
+  infoText: { fontSize: 13, color: colors.secondary, lineHeight: 19, marginBottom: 4 },
 
-  error: { color: "red", marginTop: 20, fontSize: 13 },
+  error: { color: colors.danger, marginTop: 20, fontSize: 13 },
 });

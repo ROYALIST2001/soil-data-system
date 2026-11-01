@@ -4,6 +4,11 @@ import {
   StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator,
 } from "react-native";
 
+import { useNavigation } from "@react-navigation/native";
+import Icon from "../components/Icon";
+import AppButton from "../components/AppButton";
+import { colors } from "../theme";
+
 import { useChat } from "../hooks/useChat";
 import { useAppSelector, useAppDispatch } from "../store";
 import { clearChat } from "../store/chatSlice";
@@ -64,6 +69,7 @@ function MessageBubble({ message }: { message: DisplayMessage }) {
 
 export default function ChatScreen() {
   const [text, setText] = useState("");
+  const navigation = useNavigation<any>();
   const dispatch = useAppDispatch();
   const { send } = useChat();
 
@@ -95,11 +101,13 @@ export default function ChatScreen() {
   if (!lastReading) {
     return (
       <View style={styles.centre}>
-        <Text style={styles.emptyTitle}>No soil test yet</Text>
+        <View style={styles.emptyIcon}><Icon name="sprout" size={40} /></View>
+        <Text style={styles.emptyTitle}>Let’s get to know your soil</Text>
         <Text style={styles.emptyText}>
           The advisor needs your soil data to give real answers.
-          Go to the Test tab and submit a reading first.
+          Start with a soil test to get advice for your field.
         </Text>
+        <AppButton title="Start a soil test" icon="arrow" onPress={() => navigation.navigate("Test")} style={{ marginTop: 24 }} />
       </View>
     );
   }
@@ -113,9 +121,15 @@ export default function ChatScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={90}
     >
+      <View style={styles.contextBar}>
+        <View style={styles.contextIcon}><Icon name="sprout" size={20} /></View>
+        <View style={{ flex: 1 }}><Text style={styles.contextTitle}>Advice rooted in your field</Text>
+          <Text style={styles.contextDetail}>{lastReading.crop} · Based on your saved soil test</Text></View>
+      </View>
       {/* ---------- The message list ---------- */}
       <ScrollView
         ref={scrollRef}
+        keyboardShouldPersistTaps="handled"
         contentContainerStyle={styles.messages}
         // Scroll to the bottom whenever a message is added.
         // Without this, the user has to scroll down every time.
@@ -125,20 +139,22 @@ export default function ChatScreen() {
       >
         {messages.length === 0 && (
           <View style={styles.welcomeBox}>
-            <Text style={styles.welcomeTitle}>Ask about your soil</Text>
+            <View style={styles.welcomeIcon}><Icon name="chat" size={31} color={colors.lime} /></View>
+            <Text style={styles.welcomeTitle}>Let’s talk soil.</Text>
 
             <Text style={styles.welcomeText}>
-              I can look at your real soil readings and give advice
-              for your field.
+              A little guidance for your next growing season.
+              Ask a question or try one below.
             </Text>
 
             {SUGGESTIONS.map((s) => (
               <TouchableOpacity
                 key={s}
                 style={styles.suggestion}
+                accessibilityRole="button"
                 onPress={() => handleSend(s)}
               >
-                <Text style={styles.suggestionText}>{s}</Text>
+                <Text style={styles.suggestionText}>{s}</Text><Icon name="arrow" size={18} />
               </TouchableOpacity>
             ))}
           </View>
@@ -174,18 +190,23 @@ export default function ChatScreen() {
           value={text}
           onChangeText={setText}
           placeholder="Ask about your soil..."
-          placeholderTextColor="#adb5bd"
+          placeholderTextColor={colors.muted}
+          accessibilityLabel="Your question for the soil advisor"
+          selectionColor={colors.primary}
           multiline
           maxLength={500}
         />
 
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Send question"
+          accessibilityState={{ disabled: isThinking || !text.trim() }}
           style={[styles.sendButton, (isThinking || !text.trim()) && styles.sendDisabled]}
           onPress={() => handleSend()}
           // DISABLED while thinking, so the user cannot send twice.
           disabled={isThinking || !text.trim()}
         >
-          <Text style={styles.sendText}>Send</Text>
+          <Icon name="send" color={colors.surface} size={21} />
         </TouchableOpacity>
       </View>
 
@@ -193,6 +214,8 @@ export default function ChatScreen() {
       {messages.length > 0 && (
         <TouchableOpacity
           style={styles.clearButton}
+          accessibilityRole="button"
+          disabled={isThinking}
           onPress={() => dispatch(clearChat())}
         >
           <Text style={styles.clearText}>Start a new conversation</Text>
@@ -203,71 +226,39 @@ export default function ChatScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
-  centre: { flex: 1, justifyContent: "center", alignItems: "center", padding: 30 },
-
-  messages: { padding: 14, paddingBottom: 20 },
-
-  row: { flexDirection: "row", marginBottom: 10 },
+  container: { flex: 1, backgroundColor: colors.background },
+  centre: { flex: 1, justifyContent: "center", alignItems: "center", padding: 30, backgroundColor: colors.background },
+  contextBar: { flexDirection: "row", alignItems: "center", gap: 11, paddingHorizontal: 20, paddingVertical: 13, borderBottomWidth: 1, borderBottomColor: colors.border },
+  contextIcon: { width: 39, height: 39, borderRadius: 13, backgroundColor: colors.sage, justifyContent: "center", alignItems: "center" },
+  contextTitle: { color: colors.forest, fontWeight: "600", fontSize: 12 },
+  contextDetail: { color: colors.muted, fontSize: 10, marginTop: 5, textTransform: "capitalize" },
+  messages: { padding: 20, paddingBottom: 24, flexGrow: 1 },
+  row: { flexDirection: "row", marginBottom: 15 },
   rowLeft: { justifyContent: "flex-start" },
   rowRight: { justifyContent: "flex-end" },
-
-  bubble: { maxWidth: "82%", padding: 11, borderRadius: 14 },
-
-  // Farmer on the RIGHT, green. Advisor on the LEFT, grey.
-  // Different sides mean your eye tells who said what INSTANTLY,
-  // without reading. Every chat app does this. Do not invent
-  // something new - users already know this pattern.
-  bubbleFarmer: { backgroundColor: "#40916c", borderBottomRightRadius: 4 },
-  bubbleAdvisor: { backgroundColor: "#f1f3f5", borderBottomLeftRadius: 4 },
-
-  textFarmer: { color: "#fff", fontSize: 15, lineHeight: 21 },
-  textAdvisor: { color: "#212529", fontSize: 15, lineHeight: 21 },
-
-  toolNote: {
-    fontSize: 11, color: "#868e96", marginTop: 7,
-    paddingTop: 5, borderTopWidth: 1, borderTopColor: "#dee2e6",
-    fontStyle: "italic",
-  },
-
+  bubble: { maxWidth: "90%", padding: 16, borderRadius: 20 },
+  bubbleFarmer: { backgroundColor: colors.primary, borderBottomRightRadius: 5 },
+  bubbleAdvisor: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderBottomLeftRadius: 5 },
+  textFarmer: { color: colors.surface, fontSize: 14, lineHeight: 23 },
+  textAdvisor: { color: colors.text, fontSize: 14, lineHeight: 23 },
+  toolNote: { fontSize: 10, color: colors.primary, marginTop: 13, paddingTop: 10, borderTopWidth: 1, borderTopColor: colors.border, lineHeight: 16 },
   thinking: { flexDirection: "row", alignItems: "center" },
-  thinkingText: { marginLeft: 8, color: "#495057", fontSize: 14 },
-
-  welcomeBox: { padding: 8, marginBottom: 10 },
-  welcomeTitle: { fontSize: 18, fontWeight: "bold", color: "#1b4332", marginBottom: 6 },
-  welcomeText: { fontSize: 14, color: "#495057", marginBottom: 16, lineHeight: 20 },
-
-  suggestion: {
-    backgroundColor: "#d8f3dc", padding: 12,
-    borderRadius: 10, marginBottom: 8,
-  },
-  suggestionText: { color: "#1b4332", fontSize: 14 },
-
-  inputBar: {
-    flexDirection: "row", alignItems: "flex-end",
-    padding: 10, borderTopWidth: 1, borderTopColor: "#dee2e6",
-  },
-  input: {
-    flex: 1, borderWidth: 1, borderColor: "#ced4da",
-    borderRadius: 20, paddingHorizontal: 14, paddingVertical: 9,
-    fontSize: 15, maxHeight: 100, color: "#212529",
-  },
-  sendButton: {
-    backgroundColor: "#1b4332", paddingHorizontal: 18,
-    paddingVertical: 11, borderRadius: 20, marginLeft: 8,
-  },
-  sendDisabled: { backgroundColor: "#adb5bd" },
-  sendText: { color: "#fff", fontWeight: "bold", fontSize: 14 },
-
-  clearButton: { alignItems: "center", paddingVertical: 8 },
-  clearText: { color: "#868e96", fontSize: 12 },
-
-  errorBox: {
-    backgroundColor: "#ffe8cc", padding: 11, borderRadius: 8,
-    borderLeftWidth: 4, borderLeftColor: "#e8842c", marginTop: 6,
-  },
-  errorText: { color: "#495057", fontSize: 13, lineHeight: 19 },
-
-  emptyTitle: { fontSize: 18, fontWeight: "bold", color: "#1b4332", marginBottom: 8 },
-  emptyText: { color: "#868e96", fontSize: 14, textAlign: "center", lineHeight: 20 },
+  thinkingText: { marginLeft: 9, color: colors.secondary, fontSize: 12 },
+  welcomeBox: { paddingTop: 14, marginBottom: 12 },
+  welcomeIcon: { width: 67, height: 67, borderRadius: 23, backgroundColor: colors.forest, alignItems: "center", justifyContent: "center", marginBottom: 22 },
+  welcomeTitle: { fontSize: 29, fontWeight: "700", color: colors.forest, marginBottom: 10, letterSpacing: -0.7 },
+  welcomeText: { fontSize: 13, color: colors.secondary, marginBottom: 24, lineHeight: 22 },
+  suggestion: { flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, padding: 17, borderRadius: 15, marginBottom: 10, minHeight: 58 },
+  suggestionText: { color: colors.forest, fontSize: 13, flex: 1, lineHeight: 20 },
+  inputBar: { flexDirection: "row", alignItems: "flex-end", padding: 14, paddingTop: 12, borderTopWidth: 1, borderTopColor: colors.border, backgroundColor: colors.surface },
+  input: { flex: 1, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.background, borderRadius: 17, paddingHorizontal: 15, paddingVertical: 14, minHeight: 52, fontSize: 14, maxHeight: 120, color: colors.text },
+  sendButton: { backgroundColor: colors.primary, height: 52, width: 52, alignItems: "center", justifyContent: "center", borderRadius: 17, marginLeft: 10 },
+  sendDisabled: { backgroundColor: colors.disabled },
+  clearButton: { alignItems: "center", paddingVertical: 13, backgroundColor: colors.surface, minHeight: 44 },
+  clearText: { color: colors.secondary, fontSize: 11 },
+  errorBox: { backgroundColor: colors.warningSurface, padding: 14, borderRadius: 14, marginTop: 8 },
+  errorText: { color: colors.warning, fontSize: 13, lineHeight: 20 },
+  emptyIcon: { width: 84, height: 84, borderRadius: 27, backgroundColor: colors.sage, alignItems: "center", justifyContent: "center", marginBottom: 24 },
+  emptyTitle: { fontSize: 24, fontWeight: "700", color: colors.forest, marginBottom: 12, textAlign: "center" },
+  emptyText: { color: colors.secondary, fontSize: 14, textAlign: "center", lineHeight: 23 },
 });

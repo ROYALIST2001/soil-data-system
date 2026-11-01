@@ -1,3 +1,4 @@
+import { colors } from "../theme";
 import React, { useState } from "react";
 import {
   View, Text, StyleSheet, TouchableOpacity, ActivityIndicator,
@@ -250,7 +251,7 @@ export default function LandForm({
         disabled={saving}
       >
         {saving ? (
-          <ActivityIndicator color="#fff" />
+          <ActivityIndicator color={colors.surface} />
         ) : (
           <Text style={styles.saveText}>{saveLabel}</Text>
         )}
@@ -261,64 +262,64 @@ export default function LandForm({
 
 const styles = StyleSheet.create({
   hint: {
-    fontSize: 12, color: "#868e96",
+    fontSize: 12, color: colors.muted,
     marginTop: -8, marginBottom: 12,
   },
 
   divider: {
-    height: 1, backgroundColor: "#dee2e6",
+    height: 1, backgroundColor: colors.border,
     marginTop: 10, marginBottom: 18,
   },
 
   sectionTitle: {
-    fontSize: 17, fontWeight: "bold",
-    color: "#1b4332", marginBottom: 4,
+    fontSize: 17, fontWeight: "700",
+    color: colors.forest, marginBottom: 4,
   },
   sectionNote: {
-    fontSize: 13, color: "#495057",
+    fontSize: 13, color: colors.secondary,
     marginBottom: 14, lineHeight: 19,
   },
 
   empty: {
-    fontSize: 13, color: "#868e96",
+    fontSize: 13, color: colors.muted,
     fontStyle: "italic", marginBottom: 10,
   },
 
   cropRow: {
     flexDirection: "row", alignItems: "center",
-    backgroundColor: "#f1f3f5", borderRadius: 8,
+    backgroundColor: colors.sage, borderRadius: 14,
     paddingVertical: 10, paddingHorizontal: 12, marginBottom: 8,
   },
-  cropName: { flex: 1, fontSize: 15, color: "#212529" },
-  cropSize: { fontSize: 14, color: "#40916c", fontWeight: "bold" },
+  cropName: { flex: 1, fontSize: 15, color: colors.text },
+  cropSize: { fontSize: 14, color: colors.primary, fontWeight: "700" },
   removeButton: { marginLeft: 14 },
-  removeText: { fontSize: 13, color: "#e8842c" },
+  removeText: { fontSize: 13, color: colors.warning },
 
   freeNote: {
-    fontSize: 12, color: "#868e96",
+    fontSize: 12, color: colors.muted,
     marginTop: 4, marginBottom: 14,
   },
 
   addBox: {
-    backgroundColor: "#f8f9fa", borderRadius: 10,
+    backgroundColor: colors.surface, borderRadius: 18,
     padding: 14, marginBottom: 16,
   },
   addButton: {
-    backgroundColor: "#40916c", paddingVertical: 11,
-    borderRadius: 8, alignItems: "center",
+    backgroundColor: colors.primary, paddingVertical: 11,
+    borderRadius: 14, alignItems: "center",
   },
-  addButtonText: { color: "#fff", fontSize: 14, fontWeight: "bold" },
+  addButtonText: { color: colors.surface, fontSize: 14, fontWeight: "700" },
 
   saveButton: {
-    backgroundColor: "#1b4332", paddingVertical: 14,
-    borderRadius: 8, alignItems: "center", marginTop: 4,
+    backgroundColor: colors.forest, paddingVertical: 14,
+    borderRadius: 14, alignItems: "center", marginTop: 4,
   },
-  saveDisabled: { backgroundColor: "#adb5bd" },
-  saveText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+  saveDisabled: { backgroundColor: colors.disabled },
+  saveText: { color: colors.surface, fontSize: 16, fontWeight: "700" },
 
   errorBox: {
-    backgroundColor: "#ffe8cc", padding: 11, borderRadius: 8,
-    borderLeftWidth: 4, borderLeftColor: "#e8842c", marginBottom: 10,
+    backgroundColor: colors.warningSurface, padding: 11, borderRadius: 14,
+    borderLeftWidth: 4, borderLeftColor: colors.warning, marginBottom: 10,
   },
-  errorText: { color: "#495057", fontSize: 13, lineHeight: 19 },
+  errorText: { color: colors.secondary, fontSize: 13, lineHeight: 19 },
 });

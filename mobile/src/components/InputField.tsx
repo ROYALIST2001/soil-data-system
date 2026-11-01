@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View, Text, TextInput, StyleSheet, KeyboardTypeOptions,
 } from "react-native";
+import { colors } from "../theme";
 
 // The values this component accepts from outside.
 interface InputFieldProps {
@@ -41,6 +42,7 @@ export default function InputField({
   autoCapitalize,
   placeholder,
 }: InputFieldProps) {
+  const [focused, setFocused] = useState(false);
 
   return (
     <View style={styles.container}>
@@ -48,7 +50,11 @@ export default function InputField({
       <Text style={styles.label}>{label}</Text>
 
       <TextInput
-        style={styles.input}
+        style={[styles.input, focused && styles.focused]}
+        accessibilityLabel={label}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        selectionColor={colors.primary}
         value={value}                 // the SCREEN owns this value
         onChangeText={onChangeText}   // tell the screen when it changes
         // Show the number keypad for number fields.
@@ -57,7 +63,7 @@ export default function InputField({
         secureTextEntry={secure}
         autoCapitalize={autoCapitalize}
         placeholder={placeholder}
-        placeholderTextColor="#adb5bd"
+        placeholderTextColor={colors.muted}
         // Password managers and autocorrect fight with NIC numbers and
         // passwords, so they are off whenever the text is hidden.
         autoCorrect={!secure}
@@ -69,13 +75,18 @@ export default function InputField({
 // Styles in React Native look like CSS, but written as an object.
 // Note: backgroundColor, not background-color. No dashes allowed.
 const styles = StyleSheet.create({
-  container: { marginBottom: 12 },
-  label: { fontSize: 14, marginBottom: 4, color: "#333" },
+  container: { marginBottom: 17 },
+  label: { fontSize: 13, fontWeight: "600", marginBottom: 8, color: colors.secondary },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 6,
-    padding: 10,
-    fontSize: 16,
+    borderColor: colors.border,
+    borderRadius: 13,
+    paddingHorizontal: 15,
+    paddingVertical: 14,
+    minHeight: 52,
+    fontSize: 15,
+    color: colors.text,
+    backgroundColor: colors.background,
   },
+  focused: { borderColor: colors.primary, backgroundColor: colors.surface },
 });

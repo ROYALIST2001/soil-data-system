@@ -1,11 +1,15 @@
+import { colors, ui } from "../theme";
 import React, { useState } from "react";
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
-  ActivityIndicator, KeyboardAvoidingView, Platform,
+  KeyboardAvoidingView, Platform,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import InputField from "../components/InputField";
+import AppButton from "../components/AppButton";
+import Icon from "../components/Icon";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "../hooks/useAuth";
 
 export default function SignupScreen() {
@@ -52,19 +56,23 @@ export default function SignupScreen() {
   const message = localError ?? errorMessage;
 
   return (
-    <KeyboardAvoidingView
+    <SafeAreaView style={styles.flex} edges={["top", "bottom"]}><KeyboardAvoidingView
       style={styles.flex}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView style={ui.screen} contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
 
-        <Text style={styles.title}>Create your account</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.back} accessibilityRole="button" accessibilityLabel="Back to login">
+          <View style={{ transform: [{ rotate: "180deg" }] }}><Icon name="arrow" size={22} /></View><Text style={styles.backLabel}>Back to log in</Text>
+        </TouchableOpacity>
+        <Text style={ui.eyebrow}>LET’S GROW TOGETHER</Text>
+        <Text style={styles.title}>Your next chapter{`\n`}starts here.</Text>
         <Text style={styles.subtitle}>
           Your details let the system keep your soil tests together and
           give advice for your own land.
         </Text>
 
-        <InputField
+        <View style={ui.card}><InputField
           label="Full Name"
           value={fullName}
           onChangeText={setFullName}
@@ -130,17 +138,7 @@ export default function SignupScreen() {
           </View>
         )}
 
-        <TouchableOpacity
-          style={[styles.button, busy && styles.buttonDisabled]}
-          onPress={handleSignup}
-          disabled={busy}
-        >
-          {busy ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Create Account</Text>
-          )}
-        </TouchableOpacity>
+        <AppButton title="Create account" onPress={handleSignup} loading={busy} icon="arrow" /></View>
 
         <TouchableOpacity
           style={styles.linkRow}
@@ -153,41 +151,43 @@ export default function SignupScreen() {
         </TouchableOpacity>
 
       </ScrollView>
-    </KeyboardAvoidingView>
+    </KeyboardAvoidingView></SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: "#fff" },
+  back: { flexDirection: "row", alignItems: "center", gap: 8, minHeight: 44, marginBottom: 24 },
+  backLabel: { color: colors.primary, fontSize: 13, fontWeight: "600" },
+  flex: { flex: 1, backgroundColor: colors.background },
   container: { padding: 24, paddingTop: 30, paddingBottom: 40 },
 
   title: {
-    fontSize: 24, fontWeight: "bold",
-    color: "#1b4332", marginBottom: 6,
+    fontSize: 30, fontWeight: "700",
+    color: colors.forest, marginBottom: 6,
   },
   subtitle: {
-    fontSize: 14, color: "#495057",
+    fontSize: 14, color: colors.secondary,
     marginBottom: 22, lineHeight: 20,
   },
 
   hint: {
-    fontSize: 12, color: "#868e96",
+    fontSize: 12, color: colors.muted,
     marginTop: -8, marginBottom: 12,
   },
 
   button: {
-    backgroundColor: "#1b4332", paddingVertical: 14,
-    borderRadius: 8, alignItems: "center", marginTop: 10,
+    backgroundColor: colors.forest, paddingVertical: 14,
+    borderRadius: 14, alignItems: "center", marginTop: 10,
   },
-  buttonDisabled: { backgroundColor: "#adb5bd" },
-  buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+  buttonDisabled: { backgroundColor: colors.disabled },
+  buttonText: { color: colors.surface, fontSize: 16, fontWeight: "700" },
 
   linkRow: { alignItems: "center", paddingVertical: 16 },
-  linkText: { color: "#40916c", fontSize: 14, fontWeight: "bold" },
+  linkText: { color: colors.primary, fontSize: 14, fontWeight: "700" },
 
   errorBox: {
-    backgroundColor: "#ffe8cc", padding: 11, borderRadius: 8,
-    borderLeftWidth: 4, borderLeftColor: "#e8842c", marginBottom: 6,
+    backgroundColor: colors.warningSurface, padding: 11, borderRadius: 14,
+    borderLeftWidth: 4, borderLeftColor: colors.warning, marginBottom: 6,
   },
-  errorText: { color: "#495057", fontSize: 13, lineHeight: 19 },
+  errorText: { color: colors.secondary, fontSize: 13, lineHeight: 19 },
 });

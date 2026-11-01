@@ -1,6 +1,9 @@
+import { colors, ui } from "../theme";
+import Icon from "../components/Icon";
+import AppButton from "../components/AppButton";
 import React from "react";
 import {
-  View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert,
+  View, Text, ScrollView, StyleSheet, Alert,
 } from "react-native";
 
 import { useAuth } from "../hooks/useAuth";
@@ -42,10 +45,14 @@ export default function ProfileScreen() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView style={ui.screen} contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
 
-      <Text style={styles.name}>{farmer.full_name}</Text>
-      <Text style={styles.caption}>Farmer #{farmer.farmer_id}</Text>
+      <View style={styles.profileHeader}>
+        <View style={styles.avatar}><Text style={styles.initials}>{farmer.full_name.split(" ").filter(Boolean).slice(0, 2).map((part) => part[0]).join("")}</Text></View>
+        <Text style={styles.name}>{farmer.full_name}</Text>
+        <View style={styles.farmerBadge}><Icon name="sprout" size={14} /><Text style={styles.caption}>Farmer · {farmer.gn_division}</Text></View>
+      </View>
+      <Text style={ui.section}>Personal details</Text>
 
       <View style={styles.card}>
         <DetailRow label="NIC Number" value={farmer.nic} />
@@ -55,45 +62,46 @@ export default function ProfileScreen() {
       </View>
 
       <Text style={styles.note}>
-        Farmer #{farmer.farmer_id} is the id the database created for you.
-        Your land, soil tests and harvests will all be linked to it.
+        Your details help connect your land, soil tests, and farmer support services.
       </Text>
 
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutText}>Log Out</Text>
-      </TouchableOpacity>
+      <AppButton title="Log out" onPress={handleLogout} variant="secondary" icon="logout" />
 
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  profileHeader: { alignItems: "center", paddingVertical: 18, marginBottom: 26 },
+  avatar: { width: 84, height: 84, borderRadius: 28, backgroundColor: colors.forest, alignItems: "center", justifyContent: "center", marginBottom: 18 },
+  initials: { color: colors.lime, fontSize: 29, fontWeight: "700" },
+  farmerBadge: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: colors.sage, borderRadius: 20, paddingVertical: 8, paddingHorizontal: 13, marginTop: 13 },
   container: { padding: 20, paddingTop: 24 },
   centre: { flex: 1, justifyContent: "center", alignItems: "center" },
 
-  name: { fontSize: 22, fontWeight: "bold", color: "#1b4332" },
-  caption: { fontSize: 13, color: "#868e96", marginTop: 2, marginBottom: 18 },
+  name: { fontSize: 26, fontWeight: "700", color: colors.forest },
+  caption: { fontSize: 11, color: colors.primary, flexShrink: 1 },
 
   card: {
-    backgroundColor: "#f8f9fa", borderRadius: 10,
-    padding: 4, marginBottom: 16,
+    backgroundColor: colors.surface, borderRadius: 20, borderWidth: 1, borderColor: colors.border,
+    padding: 8, marginBottom: 16,
   },
 
   row: {
-    paddingVertical: 11, paddingHorizontal: 12,
-    borderBottomWidth: 1, borderBottomColor: "#e9ecef",
+    paddingVertical: 16, paddingHorizontal: 12,
+    borderBottomWidth: 1, borderBottomColor: colors.border,
   },
-  rowLabel: { fontSize: 12, color: "#868e96", marginBottom: 3 },
-  rowValue: { fontSize: 15, color: "#212529" },
+  rowLabel: { fontSize: 12, color: colors.muted, marginBottom: 3 },
+  rowValue: { fontSize: 15, color: colors.text },
 
   note: {
-    fontSize: 12, color: "#868e96",
+    fontSize: 12, color: colors.muted,
     lineHeight: 18, marginBottom: 24,
   },
 
   logoutButton: {
-    borderWidth: 1, borderColor: "#e8842c", borderRadius: 8,
+    borderWidth: 1, borderColor: colors.warning, borderRadius: 14,
     paddingVertical: 13, alignItems: "center",
   },
-  logoutText: { color: "#e8842c", fontSize: 15, fontWeight: "bold" },
+  logoutText: { color: colors.warning, fontSize: 15, fontWeight: "700" },
 });

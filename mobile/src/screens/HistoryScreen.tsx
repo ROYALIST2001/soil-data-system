@@ -1,3 +1,4 @@
+import { colors, ui } from "../theme";
 import React, { useState, useCallback } from "react";
 import {
   View, Text, ScrollView, StyleSheet,
@@ -61,7 +62,7 @@ export default function HistoryScreen() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView style={ui.screen} contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
       <Text style={styles.title}>Soil Trends</Text>
 
       {/* ---------- The three zoom levels ---------- */}
@@ -80,7 +81,7 @@ export default function HistoryScreen() {
       </View>
 
       {status === "loading" && (
-        <ActivityIndicator size="large" color="#40916c" style={{ marginTop: 30 }} />
+        <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 30 }} />
       )}
 
       {status === "error" && <Text style={styles.error}>{error}</Text>}
@@ -88,7 +89,7 @@ export default function HistoryScreen() {
       {status === "success" && history && (
         <>
           <View style={styles.infoBox}>
-            <Text style={styles.infoLabel}>{history.label}</Text>
+            <Text style={styles.infoLabel}>{level === "field" ? "Your field" : history.label}</Text>
             {/* ALWAYS show the count. An average of 200 readings is
                 trustworthy. An average of 1 is not. */}
             <Text style={styles.infoCount}>
@@ -112,19 +113,19 @@ export default function HistoryScreen() {
                   pH line would be a FLAT LINE at the bottom. */}
               <SoilChart
                 title="Soil pH" unit="pH scale"
-                points={history.points} valueKey="ph" color="#e8842c"
+                points={history.points} valueKey="ph" color={colors.warning}
               />
               <SoilChart
                 title="Nitrogen" unit="mg/kg"
-                points={history.points} valueKey="n" color="#40916c"
+                points={history.points} valueKey="n" color={colors.primary}
               />
               <SoilChart
                 title="Phosphorus" unit="mg/kg"
-                points={history.points} valueKey="p" color="#1b4332"
+                points={history.points} valueKey="p" color={colors.forest}
               />
               <SoilChart
                 title="Potassium" unit="mg/kg"
-                points={history.points} valueKey="k" color="#2d6a4f"
+                points={history.points} valueKey="k" color={colors.primary}
               />
             </>
           )}
@@ -135,33 +136,32 @@ export default function HistoryScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 20, paddingTop: 50, paddingBottom: 40 },
+  container: { padding: 20, paddingTop: 20, paddingBottom: 40 },
   centre: { flex: 1, justifyContent: "center", alignItems: "center", padding: 30 },
 
-  title: { fontSize: 22, fontWeight: "bold", color: "#1b4332", marginBottom: 16 },
+  title: { fontSize: 26, fontWeight: "700", color: colors.forest, marginBottom: 16 },
 
-  tabRow: { flexDirection: "row", marginBottom: 16 },
+  tabRow: { flexDirection: "row", marginBottom: 20, backgroundColor: colors.sage, padding: 4, borderRadius: 15 },
   tab: {
-    flex: 1, paddingVertical: 9, alignItems: "center",
-    borderBottomWidth: 2, borderBottomColor: "#dee2e6",
+    flex: 1, paddingVertical: 12, alignItems: "center", borderRadius: 11,
   },
-  tabActive: { borderBottomColor: "#40916c" },
-  tabText: { fontSize: 13, color: "#868e96" },
-  tabTextActive: { color: "#1b4332", fontWeight: "bold" },
+  tabActive: { backgroundColor: colors.surface },
+  tabText: { fontSize: 13, color: colors.muted },
+  tabTextActive: { color: colors.forest, fontWeight: "700" },
 
   infoBox: {
-    backgroundColor: "#f1f3f5", padding: 10,
-    borderRadius: 8, marginBottom: 18,
+    backgroundColor: colors.sage, padding: 10,
+    borderRadius: 14, marginBottom: 18,
   },
-  infoLabel: { fontSize: 14, fontWeight: "bold", color: "#1b4332" },
-  infoCount: { fontSize: 12, color: "#495057", marginTop: 2 },
+  infoLabel: { fontSize: 14, fontWeight: "700", color: colors.forest },
+  infoCount: { fontSize: 12, color: colors.secondary, marginTop: 2 },
 
   emptyBox: {
-    padding: 24, backgroundColor: "#f8f9fa",
-    borderRadius: 8, alignItems: "center",
+    padding: 24, backgroundColor: colors.surface,
+    borderRadius: 14, alignItems: "center",
   },
-  emptyTitle: { fontSize: 17, fontWeight: "bold", color: "#1b4332", marginBottom: 8 },
-  emptyText: { color: "#868e96", fontSize: 13, textAlign: "center", lineHeight: 19 },
+  emptyTitle: { fontSize: 17, fontWeight: "700", color: colors.forest, marginBottom: 8 },
+  emptyText: { color: colors.muted, fontSize: 13, textAlign: "center", lineHeight: 19 },
 
-  error: { color: "red", marginTop: 20, fontSize: 13 },
+  error: { color: colors.danger, marginTop: 20, fontSize: 13 },
 });
