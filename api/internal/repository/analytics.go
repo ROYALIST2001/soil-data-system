@@ -24,22 +24,37 @@ func NewAnalyticsRepository(db *pgxpool.Pool) *AnalyticsRepository {
 // A field has few readings, maybe 4 or 10. We plot them directly.
 // Averaging 4 readings into 1 point would destroy the detail.
 //
+// ---------- CORRECTED VALUES, FROM PHASE 10 ----------
+//
+// Every query below reads COALESCE(corrected_n, n) rather than n, and
+// COALESCE(officer_flag, quality_flag) rather than quality_flag.
+//
+// WHY. An officer can correct a reading a farmer entered wrongly, and can
+// overrule the quality rules. Those decisions have to reach the analytics,
+// or the graphs would keep showing the wrong number that everybody already
+// agreed was wrong.
+//
+// The farmer's original values are still in the table, untouched. COALESCE
+// simply picks the correction when one exists. See migration 010.
+
 // RULE: aggregate only when you have too many points to show.
 func (repo *AnalyticsRepository) FieldHistory(anchorID int) ([]model.HistoryPoint, error) {
 
 	// Read every line of this SQL. Every part matters:
 	//
 	//   anchor_id = $1        -> only THIS field
-	//   quality_flag = 'OK'   -> EXCLUDE flagged readings.
+	//   COALESCE(officer_flag, quality_flag) = 'OK'   -> EXCLUDE flagged readings.
 	//                            We promised this in Phase 4.
 	//                            Without it, one bad reading with
 	//                            N = 430 would put a huge fake spike
 	//                            in the graph.
 	//   ORDER BY ... ASC      -> oldest first. A graph needs time order.
 	query := `
-		SELECT created_at, n, p, k, ph
+		SELECT created_at,
+		       COALESCE(corrected_n, n), COALESCE(corrected_p, p),
+		       COALESCE(corrected_k, k), COALESCE(corrected_ph, ph)
 		FROM readings
-		WHERE anchor_id = $1 AND quality_flag = 'OK'
+		WHERE anchor_id = $1 AND COALESCE(officer_flag, quality_flag) = 'OK'
 		ORDER BY created_at ASC
 	`
 
@@ -84,7 +99,7 @@ func (repo *AnalyticsRepository) AreaHistory(
 	//   2026-07-28 16:02  ->  2026-07-01 00:00
 	// Both become the SAME value, so GROUP BY puts them together.
 	//
-	// COALESCE(AVG(n), 0): AVG returns NULL if there are no rows,
+	// COALESCE(AVG(COALESCE(corrected_n, n)), 0): AVG returns NULL if there are no rows,
 	// and Go cannot read NULL into a float64. COALESCE says
 	// "if it is NULL, use 0 instead".
 	//
@@ -98,13 +113,13 @@ func (repo *AnalyticsRepository) AreaHistory(
 	query := `
 		SELECT
 			DATE_TRUNC('month', created_at) AS period,
-			COALESCE(AVG(n), 0)  AS avg_n,
-			COALESCE(AVG(p), 0)  AS avg_p,
-			COALESCE(AVG(k), 0)  AS avg_k,
-			COALESCE(AVG(ph), 0) AS avg_ph,
+			COALESCE(AVG(COALESCE(corrected_n, n)), 0)  AS avg_n,
+			COALESCE(AVG(COALESCE(corrected_p, p)), 0)  AS avg_p,
+			COALESCE(AVG(COALESCE(corrected_k, k)), 0)  AS avg_k,
+			COALESCE(AVG(COALESCE(corrected_ph, ph)), 0) AS avg_ph,
 			COUNT(*)             AS reading_count
 		FROM readings
-		WHERE quality_flag = 'OK'
+		WHERE COALESCE(officer_flag, quality_flag) = 'OK'
 		  AND raw_lat BETWEEN $1::float8 - $3::float8 AND $1::float8 + $3::float8
 		  AND raw_lng BETWEEN $2::float8 - $3::float8 AND $2::float8 + $3::float8
 		GROUP BY period
@@ -126,13 +141,13 @@ func (repo *AnalyticsRepository) DistrictHistory(districtID int) ([]model.Histor
 	query := `
 		SELECT
 			DATE_TRUNC('month', created_at) AS period,
-			COALESCE(AVG(n), 0)  AS avg_n,
-			COALESCE(AVG(p), 0)  AS avg_p,
-			COALESCE(AVG(k), 0)  AS avg_k,
-			COALESCE(AVG(ph), 0) AS avg_ph,
+			COALESCE(AVG(COALESCE(corrected_n, n)), 0)  AS avg_n,
+			COALESCE(AVG(COALESCE(corrected_p, p)), 0)  AS avg_p,
+			COALESCE(AVG(COALESCE(corrected_k, k)), 0)  AS avg_k,
+			COALESCE(AVG(COALESCE(corrected_ph, ph)), 0) AS avg_ph,
 			COUNT(*)             AS reading_count
 		FROM readings
-		WHERE district_id = $1 AND quality_flag = 'OK'
+		WHERE district_id = $1 AND COALESCE(officer_flag, quality_flag) = 'OK'
 		GROUP BY period
 		ORDER BY period ASC
 	`
@@ -206,14 +221,14 @@ func (repo *AnalyticsRepository) DistrictAverages() ([]model.DistrictSoil, error
 		SELECT
 			d.district_id,
 			d.name,
-			COALESCE(AVG(r.n), 0)  AS avg_n,
-			COALESCE(AVG(r.p), 0)  AS avg_p,
-			COALESCE(AVG(r.k), 0)  AS avg_k,
-			COALESCE(AVG(r.ph), 0) AS avg_ph,
+			COALESCE(AVG(COALESCE(r.corrected_n, r.n)), 0)  AS avg_n,
+			COALESCE(AVG(COALESCE(r.corrected_p, r.p)), 0)  AS avg_p,
+			COALESCE(AVG(COALESCE(r.corrected_k, r.k)), 0)  AS avg_k,
+			COALESCE(AVG(COALESCE(r.corrected_ph, r.ph)), 0) AS avg_ph,
 			COUNT(*)               AS reading_count
 		FROM readings r
 		JOIN districts d ON d.district_id = r.district_id
-		WHERE r.quality_flag = 'OK'
+		WHERE COALESCE(r.officer_flag, r.quality_flag) = 'OK'
 		GROUP BY d.district_id, d.name
 		HAVING COUNT(*) >= 1
 		ORDER BY d.name

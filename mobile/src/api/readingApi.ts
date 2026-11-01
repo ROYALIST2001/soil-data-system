@@ -1,59 +1,46 @@
 import { API_BASE_URL } from "../config";
+import { postJson, requestJson } from "./http";
 import { NewReading, Reading, CreateReadingResponse } from "../types/reading";
-
-// Read the error message that the server sent.
-//
-// Our Go API sends helpful messages like:
-//   {"error": "pH must be between 0 and 14 (you sent 99.00)"}
-//
-// We want to show THAT to the farmer, not just "status 400".
-async function readServerError(response: Response): Promise<string> {
-  try {
-    const body = await response.json();
-
-    // Does the body have an "error" field with text in it?
-    if (body && typeof body.error === "string") {
-      return body.error;
-    }
-  } catch (e) {
-    // The reply was not valid JSON. Maybe the server crashed badly.
-    // Do not let this second error hide the first one. Fall through.
-  }
-
-  // Fallback, if we could not read a proper message.
-  return "Server returned status " + response.status;
-}
 
 // Send a new reading to the API. Returns the new reading id.
 export async function createReading(
   reading: NewReading
 ): Promise<CreateReadingResponse> {
+  return requestJson<CreateReadingResponse>(
+    `${API_BASE_URL}/readings`,
+    postJson(reading)
+  );
+}
 
-  const response = await fetch(`${API_BASE_URL}/readings`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(reading),
-  });
-
-  // Remember: fetch does NOT throw for 400 or 500. We must check.
-  if (!response.ok) {
-    // CHANGED: read the real message instead of throwing it away.
-    const message = await readServerError(response);
-    throw new Error(message);
+// The farmer's most recent reading, or null if they have never submitted one.
+//
+// WHY THE APP NEEDS THIS.
+// Trends draws the history of ONE field and has to know which. It used to
+// learn that only from a reading submitted during the current session, so a
+// farmer with months of history who had just logged in was told "No
+// readings yet" - the data existed, the screen just could not find it.
+//
+// A 404 here is NORMAL: it means somebody who has not tested their soil
+// yet. That is why it returns null rather than throwing.
+export async function getLatestReading(
+  farmerId: number
+): Promise<Reading | null> {
+  try {
+    return await requestJson<Reading>(
+      `${API_BASE_URL}/farmers/${farmerId}/readings/latest`
+    );
+  } catch (e) {
+    const status = (e as { status?: number }).status;
+    if (status === 404) {
+      return null;
+    }
+    // A real failure - no network, server down - is not the same as "none
+    // yet", so it travels on rather than being swallowed.
+    throw e;
   }
-
-  return response.json();
 }
 
 // Read one full reading from the API, using its id.
 export async function getReading(id: number): Promise<Reading> {
-
-  const response = await fetch(`${API_BASE_URL}/readings/${id}`);
-
-  if (!response.ok) {
-    const message = await readServerError(response);
-    throw new Error(message);
-  }
-
-  return response.json();
+  return requestJson<Reading>(`${API_BASE_URL}/readings/${id}`);
 }

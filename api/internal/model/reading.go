@@ -9,6 +9,16 @@ type Reading struct {
 	RawLng      float64   `json:"raw_lng"`
 	AnchorID    *int      `json:"anchor_id"`    // *int = can be empty (null)
 	DistrictID  *int      `json:"district_id"`  // *int = can be empty (null)
+
+	// NEW in Phase 10: WHO sent this reading, and from WHICH land and crop.
+	//
+	// All three are *int because they CAN be empty. The 27 readings created
+	// while testing, before accounts existed, have no owner and never will.
+	// The officer dashboards show those honestly as unassigned rather than
+	// pretending they belong to somebody.
+	FarmerID   *int `json:"farmer_id"`
+	LandID     *int `json:"land_id"`
+	LandCropID *int `json:"land_crop_id"`
 	N           float64   `json:"n"`
 	P           float64   `json:"p"`
 	K           float64   `json:"k"`

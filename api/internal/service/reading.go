@@ -16,6 +16,10 @@ type ReadingService struct {
 	validation *ValidationService
 	aiClient   *client.AIClient
 	fertilizer *FertilizerService
+
+	// NEW in Phase 10: used only to confirm a reading's land really belongs
+	// to the farmer who sent it.
+	landRepo *repository.LandRepository
 }
 
 // NewReadingService builds the service.
@@ -25,6 +29,7 @@ func NewReadingService(
 	validation *ValidationService,
 	aiClient *client.AIClient,
 	fertilizer *FertilizerService,
+	landRepo *repository.LandRepository,
 ) *ReadingService {
 	return &ReadingService{
 		repo:       repo,
@@ -32,6 +37,7 @@ func NewReadingService(
 		validation: validation,
 		aiClient:   aiClient,
 		fertilizer: fertilizer,
+		landRepo:   landRepo,
 	}
 }
 
@@ -44,6 +50,19 @@ func (s *ReadingService) CreateReading(reading model.Reading) (int, error) {
 
 	// STEP 0b: hard rules. Refuse impossible values.
 	if err := s.validation.Validate(reading); err != nil {
+		return 0, err
+	}
+
+	// ---------- STEP 0c: is this land really theirs? ---------- NEW Phase 10
+	//
+	// The app sends farmer_id and land_id, which means a caller could send
+	// SOMEBODY ELSE'S land id and attach their reading to another farmer's
+	// field. That would corrupt that farmer's history and, once the officer
+	// dashboards exist, show the reading under the wrong person.
+	//
+	// So we check. A link the server has not verified is not a link worth
+	// having, and both dashboards are built on this one being true.
+	if err := s.checkLandBelongsToFarmer(reading); err != nil {
 		return 0, err
 	}
 
@@ -85,6 +104,25 @@ func (s *ReadingService) GetReading(id int) (model.Reading, error) {
 		return reading, err
 	}
 
+	reading.Zone = s.location.ZoneForDistrict(reading.DistrictID)
+	return reading, nil
+}
+
+// LatestForFarmer returns the last reading this farmer submitted.
+//
+// The app calls this right after login so the Trends and Map screens know
+// which field to draw, without making the farmer submit a new test first.
+func (s *ReadingService) LatestForFarmer(
+	farmerID int,
+) (model.Reading, error) {
+
+	reading, err := s.repo.FindLatestByFarmer(farmerID)
+	if err != nil {
+		return reading, err
+	}
+
+	// Zone is DERIVED, not stored - the same as GetReading does. Without
+	// this the screen would show an empty zone for a reading that has one.
 	reading.Zone = s.location.ZoneForDistrict(reading.DistrictID)
 	return reading, nil
 }
@@ -207,4 +245,53 @@ func (s *ReadingService) attachAgentNote(reading *model.Reading) {
 	// THE RULES DECIDE. THE LLM ONLY EXPLAINS.
 	reading.AgentNote = &result.Explanation
 	reading.AgentVerdict = &result.AgentVerdict
+}
+
+// checkLandBelongsToFarmer refuses a reading pointing at another farmer's land.
+//
+// Both ids are OPTIONAL. A reading with neither is still allowed, because the
+// 27 readings made while testing have no owner and the farmer app worked that
+// way for three phases. We only check what we were actually given.
+func (s *ReadingService) checkLandBelongsToFarmer(reading model.Reading) error {
+
+	// No land claimed, nothing to check.
+	if reading.LandID == nil {
+		return nil
+	}
+
+	// A land was named but no farmer. We cannot verify that, and an
+	// unverifiable claim is worse than no claim.
+	if reading.FarmerID == nil {
+		return fmt.Errorf(
+			"Field area is linked to a land but no farmer was given")
+	}
+
+	// FindLandForFarmer has the farmer id in its WHERE clause, so a land
+	// belonging to somebody else simply is not found. There is no code path
+	// here that can forget to compare them.
+	if _, err := s.landRepo.FindLandForFarmer(
+		*reading.LandID, *reading.FarmerID,
+	); err != nil {
+		return fmt.Errorf("Field area does not match a land you registered")
+	}
+
+	// The crop, if given, must be on THAT land.
+	//
+	// FindLandIDForCrop is also scoped to the farmer, so it answers both
+	// "is this crop theirs" and "which land is it on" in one query. We then
+	// only have to check the two land ids agree.
+	if reading.LandCropID != nil {
+		landID, err := s.landRepo.FindLandIDForCrop(
+			*reading.LandCropID, *reading.FarmerID,
+		)
+		if err != nil {
+			return fmt.Errorf("Crop does not match a crop you registered")
+		}
+
+		if landID != *reading.LandID {
+			return fmt.Errorf("Crop is not one of the crops on that land")
+		}
+	}
+
+	return nil
 }
