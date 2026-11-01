@@ -18,9 +18,11 @@ import httpx
 
 
 # All settings come from the environment. Never hard-coded.
-LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://api.groq.com/openai/v1")
-LLM_API_KEY = os.getenv("LLM_API_KEY", "")
-LLM_MODEL = os.getenv("LLM_MODEL", "llama-3.1-8b-instant")
+LLM_BASE_URL = (
+    os.getenv("LLM_BASE_URL", "").strip() or "https://api.groq.com/openai/v1"
+).rstrip("/")
+LLM_API_KEY = os.getenv("LLM_API_KEY", "").strip()
+LLM_MODEL = os.getenv("LLM_MODEL", "").strip() or "llama-3.1-8b-instant"
 
 # LLMs are slower than our own model, so we allow more time.
 # But we ALWAYS set a timeout. Without one, a hanging API would
@@ -44,6 +46,52 @@ def is_available() -> bool:
     return bool(LLM_API_KEY and LLM_API_KEY.strip())
 
 
+def _request_completion(body: dict) -> dict:
+    """Send a completion request without exposing provider secrets in errors."""
+    if not is_available():
+        raise LLMError(
+            "No LLM API key is configured. Set LLM_API_KEY in your .env file."
+        )
+
+    try:
+        with httpx.Client(timeout=TIMEOUT_SECONDS) as client:
+            response = client.post(
+                f"{LLM_BASE_URL}/chat/completions",
+                json=body,
+                headers={
+                    "Authorization": f"Bearer {LLM_API_KEY}",
+                    "Content-Type": "application/json",
+                },
+            )
+    except httpx.TimeoutException:
+        raise LLMError("The LLM took too long to answer.") from None
+    except httpx.RequestError:
+        raise LLMError("Could not reach the LLM service.") from None
+
+    if response.status_code != 200:
+        # Provider error bodies can contain part of the API key. Use only
+        # known messages, including in the Go server's diagnostic logs.
+        hints = {
+            401: "The LLM API key was rejected or expired. Replace LLM_API_KEY "
+                 "in .env and recreate the AI service.",
+            403: "The LLM API key does not have access to this model.",
+            404: "The LLM model or endpoint was not found. Check LLM_MODEL "
+                 "and LLM_BASE_URL.",
+            429: "The LLM usage limit was reached. Check API billing and "
+                 "rate limits before retrying.",
+        }
+        hint = hints.get(response.status_code, "Please try again shortly.")
+        raise LLMError(f"LLM service returned status {response.status_code}. {hint}")
+
+    try:
+        message = response.json()["choices"][0]["message"]
+        if not isinstance(message, dict):
+            raise ValueError("Invalid completion message")
+        return message
+    except (KeyError, IndexError, TypeError, ValueError):
+        raise LLMError("The LLM reply was not in the expected format.") from None
+
+
 def chat(
     system_prompt: str,
     user_prompt: str,
@@ -60,12 +108,6 @@ def chat(
     json_mode     : ask the provider to ENFORCE valid JSON output
     """
 
-    if not is_available():
-        raise LLMError(
-            "No LLM API key is configured. "
-            "Set LLM_API_KEY in your .env file."
-        )
-
     # The OpenAI chat-completions format. Every provider above uses this.
     body = {
         "model": LLM_MODEL,
@@ -81,36 +123,10 @@ def chat(
     if json_mode:
         body["response_format"] = {"type": "json_object"}
 
-    headers = {
-        "Authorization": f"Bearer {LLM_API_KEY}",
-        "Content-Type": "application/json",
-    }
-
-    try:
-        with httpx.Client(timeout=TIMEOUT_SECONDS) as client:
-            response = client.post(
-                f"{LLM_BASE_URL}/chat/completions",
-                json=body,
-                headers=headers,
-            )
-    except httpx.TimeoutException:
-        raise LLMError("The LLM took too long to answer.")
-
-    except httpx.RequestError as e:
-        raise LLMError(f"Could not reach the LLM service: {e}")
-
-    if response.status_code != 200:
-        # Do NOT include the API key in any error message.
-        raise LLMError(
-            f"The LLM service returned status {response.status_code}."
-        )
-
-    try:
-        data = response.json()
-        # The answer sits at choices[0].message.content
-        return data["choices"][0]["message"]["content"]
-    except (KeyError, IndexError, ValueError):
+    message = _request_completion(body)
+    if not isinstance(message.get("content"), str):
         raise LLMError("The LLM reply was not in the expected format.")
+    return message["content"]
 
 
 def chat_with_tools(
@@ -131,11 +147,6 @@ def chat_with_tools(
       {"role": "assistant", "content": "...", "tool_calls": [...]}
     """
 
-    if not is_available():
-        raise LLMError(
-            "No LLM API key is configured. Set LLM_API_KEY in your .env file."
-        )
-
     body = {
         "model": LLM_MODEL,
         "messages": messages,
@@ -150,31 +161,7 @@ def chat_with_tools(
         # We do NOT force it. Sometimes plain text is the right answer.
         body["tool_choice"] = "auto"
 
-    headers = {
-        "Authorization": f"Bearer {LLM_API_KEY}",
-        "Content-Type": "application/json",
-    }
-
-    try:
-        with httpx.Client(timeout=TIMEOUT_SECONDS) as client:
-            response = client.post(
-                f"{LLM_BASE_URL}/chat/completions",
-                json=body,
-                headers=headers,
-            )
-    except httpx.TimeoutException:
-        raise LLMError("The LLM took too long to answer.")
-    except httpx.RequestError as e:
-        raise LLMError(f"Could not reach the LLM service: {e}")
-
-    if response.status_code != 200:
-        raise LLMError(f"The LLM service returned status {response.status_code}.")
-
-    try:
-        data = response.json()
-        return data["choices"][0]["message"]
-    except (KeyError, IndexError, ValueError):
-        raise LLMError("The LLM reply was not in the expected format.")
+    return _request_completion(body)
 
 
 def parse_json_reply(text: str) -> dict:

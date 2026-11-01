@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strings"
 
@@ -43,6 +44,7 @@ func (c *ChatController) Chat(w http.ResponseWriter, r *http.Request) {
 	result, err := c.service.Chat(req)
 
 	if err != nil {
+		log.Printf("Soil advisor request failed: %v", err)
 		msg := err.Error()
 
 		// No reading selected yet.
