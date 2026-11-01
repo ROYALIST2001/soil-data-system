@@ -1,2 +1,17 @@
 fastapi==0.115.0
 uvicorn==0.30.6
+numpy==2.5.3
+scikit-learn==1.9.1
+joblib==1.6.0
+httpx==0.27.2
+
+# PyTorch, CPU-only version (about 200 MB instead of 2.5 GB).
+#
+# IF YOUR WINNER IS random_forest, DELETE THIS LINE.
+# You do not need PyTorch, and removing it saves about 800 MB
+# of Docker image size. Important on an 8GB laptop.
+#
+# NOTE: these versions must MATCH the notebook that produced
+# ai/artifacts/. A different scikit-learn or numpy may refuse
+# to load the .pkl files.
+torch==2.14.1

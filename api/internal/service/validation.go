@@ -23,9 +23,6 @@ const (
 	minArea = 0.0001
 	maxArea = 1000.0
 
-	minYield = 0.0001
-	maxYield = 100.0
-
 	minLat = -90.0
 	maxLat = 90.0
 	minLng = -180.0
@@ -78,6 +75,18 @@ func NewValidationService(readingRepo *repository.ReadingRepository) *Validation
 	return &ValidationService{readingRepo: readingRepo}
 }
 
+// Normalize cleans up the text fields BEFORE we judge them.
+//
+// Why? Because "Rice", "rice" and " RICE " all mean the same thing.
+// It would be unfair to refuse a farmer for using a capital letter.
+//
+// GENERAL RULE: normalize first, then judge.
+func (s *ValidationService) Normalize(reading model.Reading) model.Reading {
+	reading.Crop = strings.ToLower(strings.TrimSpace(reading.Crop))
+	reading.Stage = strings.ToLower(strings.TrimSpace(reading.Stage))
+	return reading
+}
+
 // checkRange is a small helper for the hard rules. Unchanged.
 func checkRange(fieldName string, value float64, min float64, max float64) error {
 	if value < min || value > max {
@@ -112,15 +121,49 @@ func (s *ValidationService) Validate(reading model.Reading) error {
 	if err := checkRange("Field area", reading.Area, minArea, maxArea); err != nil {
 		return err
 	}
-	if err := checkRange("Target yield", reading.TargetYield, minYield, maxYield); err != nil {
-		return err
-	}
 
-	if strings.TrimSpace(reading.Crop) == "" {
+	// ---------- CHECK 4: crop must be one we know ----------
+	//
+	// The model was trained on exactly 10 crop words.
+	// Anything else would give a meaningless prediction.
+	if reading.Crop == "" {
 		return fmt.Errorf("Crop is required")
 	}
-	if strings.TrimSpace(reading.Stage) == "" {
+
+	// Look it up. "found" is false if the crop is not in our list.
+	_, found := model.AllowedCrops[reading.Crop]
+	if !found {
+		return fmt.Errorf("Crop '%s' is not supported. Choose one of: %s",
+			reading.Crop, strings.Join(model.CropNames(), ", "))
+	}
+
+	// ---------- CHECK 5: stage must be one we know ----------
+	if reading.Stage == "" {
 		return fmt.Errorf("Growth stage is required")
+	}
+
+	_, found = model.AllowedStages[reading.Stage]
+	if !found {
+		return fmt.Errorf("Growth stage '%s' is not supported. Choose one of: %s",
+			reading.Stage, strings.Join(model.StageNames(), ", "))
+	}
+
+	// ---------- CHECK 6: target yield must be realistic FOR THIS CROP ----------
+	//
+	// This MUST come after the crop check, because we need to know
+	// WHICH crop it is before we know its maximum.
+	//
+	// A generic "under 100 tonnes" check is useless: it would allow
+	// 50 tonnes of rice per hectare, which is physically impossible.
+	cropInfo := model.AllowedCrops[reading.Crop]
+
+	if reading.TargetYield <= 0 {
+		return fmt.Errorf("Target yield must be more than 0")
+	}
+
+	if reading.TargetYield > cropInfo.MaxYield {
+		return fmt.Errorf("Target yield for %s cannot be more than %g tonnes per hectare (you sent %.2f)",
+			cropInfo.Label, cropInfo.MaxYield, reading.TargetYield)
 	}
 
 	return nil

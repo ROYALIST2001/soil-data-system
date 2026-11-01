@@ -108,3 +108,53 @@ func (c *ReadingController) GetReading(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK) // 200
 	json.NewEncoder(w).Encode(reading)
 }
+
+// GetRecommendation handles GET /readings/{id}/recommendation.
+// NEW in Phase 6.
+func (c *ReadingController) GetRecommendation(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Read the {id} from the URL.
+	idText := r.PathValue("id")
+	id, err := strconv.Atoi(idText)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest) // 400
+		json.NewEncoder(w).Encode(map[string]string{"error": "id must be a number"})
+		return
+	}
+
+	recommendation, err := c.service.GetRecommendation(id)
+
+	if err != nil {
+		msg := err.Error()
+
+		// The reading was flagged during the quality check.
+		//
+		// 409 CONFLICT means: "your request is valid, but the current
+		// state of the data does not allow it." That is exactly right
+		// here: the reading exists, but its quality flag blocks advice.
+		if strings.Contains(msg, "quality check") {
+			w.WriteHeader(http.StatusConflict) // 409
+			json.NewEncoder(w).Encode(map[string]string{"error": msg})
+			return
+		}
+
+		// The AI service is down or unreachable.
+		// 503 means "Service Unavailable - try again shortly".
+		if strings.Contains(msg, "prediction") {
+			w.WriteHeader(http.StatusServiceUnavailable) // 503
+			json.NewEncoder(w).Encode(map[string]string{
+				"error": "The recommendation service is not available. Please try again shortly.",
+			})
+			return
+		}
+
+		// Anything else: probably the reading does not exist.
+		w.WriteHeader(http.StatusNotFound) // 404
+		json.NewEncoder(w).Encode(map[string]string{"error": "reading not found"})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK) // 200
+	json.NewEncoder(w).Encode(recommendation)
+}

@@ -1,0 +1,14 @@
+# Docker does NOT read .gitignore, so these must be listed again here.
+#
+# The training virtualenv lives at notebooks/venv (over 1 GB, 46,000+ files).
+# "COPY . ." in the Dockerfile would bake all of it into the image.
+# Nothing in the running service reads anything under notebooks/ — the
+# FastAPI app needs only main.py, app/ and artifacts/.
+notebooks/
+
+# Python bytecode caches.
+__pycache__/
+*.pyc
+
+# Git metadata, if the context ever contains any.
+.git/

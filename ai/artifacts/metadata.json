@@ -1,0 +1,91 @@
+{
+  "winner": "neural_network",
+  "feature_columns": [
+    "soil_n",
+    "soil_p",
+    "soil_k",
+    "soil_ph",
+    "target_yield",
+    "crop_banana",
+    "crop_bigonion",
+    "crop_cabbage",
+    "crop_chilli",
+    "crop_coconut",
+    "crop_maize",
+    "crop_potato",
+    "crop_rice",
+    "crop_tea",
+    "crop_tomato",
+    "stage_flowering",
+    "stage_maturity",
+    "stage_seedling",
+    "stage_vegetative",
+    "zone_dry",
+    "zone_intermediate",
+    "zone_wet"
+  ],
+  "label_columns": [
+    "need_n",
+    "need_p",
+    "need_k"
+  ],
+  "n_features": 22,
+  "neural_network": {
+    "architecture": [
+      22,
+      64,
+      32,
+      3
+    ],
+    "dropout": 0.15,
+    "learning_rate": 0.001,
+    "batch_size": 32,
+    "epochs_run": 265,
+    "results": {
+      "need_n": {
+        "MAE": 2.2764,
+        "RMSE": 3.743,
+        "R2": 0.9721
+      },
+      "need_p": {
+        "MAE": 0.7723,
+        "RMSE": 1.0327,
+        "R2": 0.9784
+      },
+      "need_k": {
+        "MAE": 1.9721,
+        "RMSE": 2.8372,
+        "R2": 0.9873
+      }
+    },
+    "overall_r2": 0.9793
+  },
+  "random_forest": {
+    "n_estimators": 100,
+    "max_depth": 20,
+    "results": {
+      "need_n": {
+        "MAE": 3.3625,
+        "RMSE": 5.0288,
+        "R2": 0.9497
+      },
+      "need_p": {
+        "MAE": 0.9514,
+        "RMSE": 1.4141,
+        "R2": 0.9595
+      },
+      "need_k": {
+        "MAE": 2.2254,
+        "RMSE": 3.482,
+        "R2": 0.9808
+      }
+    },
+    "overall_r2": 0.9633
+  },
+  "data": {
+    "source": "GENERATED from Sri Lankan agronomic requirement values",
+    "total_rows": 3000,
+    "train_rows": 2400,
+    "test_rows": 600
+  }
+}

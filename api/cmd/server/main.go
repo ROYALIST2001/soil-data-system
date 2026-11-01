@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"soil-data-system/api/internal/client"
 	"soil-data-system/api/internal/controller"
 	"soil-data-system/api/internal/database"
 	"soil-data-system/api/internal/repository"
@@ -21,38 +22,72 @@ func main() {
 	readingRepo := repository.NewReadingRepository(db)
 	anchorRepo := repository.NewAnchorRepository(db)
 	districtRepo := repository.NewDistrictRepository(db)
+	analyticsRepo := repository.NewAnalyticsRepository(db) // NEW
 
-	// ---------- STEP 3: load the district shapes ONCE ----------
+	// ---------- STEP 3: build the client (talks to other services) ----------
+	aiClient := client.NewAIClient()
+
+	// ---------- STEP 4: load the district shapes ONCE ----------
 	boundaries, err := districtRepo.LoadBoundaries("data/districts.geojson")
 	if err != nil {
 		log.Fatal("Cannot load district boundaries: ", err)
 	}
 	log.Printf("Loaded %d district boundaries.", len(boundaries))
 
-	// ---------- STEP 4: build the services (the thinking layer) ----------
-
-	// CHANGED: validation now needs the reading repository,
-	// so it can look up a field's history.
+	// ---------- STEP 5: build the services (the thinking layer) ----------
 	validationService := service.NewValidationService(readingRepo)
-
 	locationService := service.NewLocationService(anchorRepo, boundaries)
+	fertilizerService := service.NewFertilizerService()
+	analyticsService := service.NewAnalyticsService(analyticsRepo, aiClient) // CHANGED
+
+	// NEW: the chat service drives the agent loop and executes the tools.
+	// It needs the OTHER services, so it is built LAST.
 
 	readingService := service.NewReadingService(
 		readingRepo,
 		locationService,
 		validationService,
+		aiClient,
+		fertilizerService,
 	)
 
-	// ---------- STEP 5: build the controllers (the front door) ----------
-	readingController := controller.NewReadingController(readingService)
+	chatService := service.NewChatService(
+		readingRepo,
+		readingService,
+		analyticsService,
+		locationService,
+		aiClient,
+	)
 
-	// ---------- STEP 6: connect the routes ----------
+	// ---------- STEP 6: build the controllers (the front door) ----------
+	readingController := controller.NewReadingController(readingService)
+	analyticsController := controller.NewAnalyticsController(analyticsService) // NEW
+	chatController := controller.NewChatController(chatService)                // NEW
+
+	// ---------- STEP 7: connect the routes ----------
 	mux := http.NewServeMux()
+
 	mux.HandleFunc("GET /health", controller.HealthCheck)
 	mux.HandleFunc("POST /readings", readingController.CreateReading)
 	mux.HandleFunc("GET /readings/{id}", readingController.GetReading)
+	mux.HandleFunc("GET /readings/{id}/recommendation",
+		readingController.GetRecommendation)
 
-	// ---------- STEP 7: start the server ----------
+	// NEW: the three zoom levels.
+	mux.HandleFunc("GET /history/field/{anchorId}",
+		analyticsController.FieldHistory)
+	mux.HandleFunc("GET /history/area",
+		analyticsController.AreaHistory)
+	mux.HandleFunc("GET /history/district/{districtId}",
+		analyticsController.DistrictHistory)
+
+	// NEW in Part 2: the clustering endpoint.
+	mux.HandleFunc("GET /clusters", analyticsController.Clusters)
+
+	// NEW: the farmer advisory chatbot.
+	mux.HandleFunc("POST /chat", chatController.Chat)
+
+	// ---------- STEP 8: start the server ----------
 	log.Println("API server starting on port 8080...")
 	if err := http.ListenAndServe(":8080", mux); err != nil {
 		log.Fatal(err)

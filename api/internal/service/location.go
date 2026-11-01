@@ -18,6 +18,10 @@ const anchorRadiusMeters = 100.0
 type LocationService struct {
 	anchorRepo *repository.AnchorRepository
 	boundaries []model.DistrictBoundary // loaded once at startup, kept in memory
+
+	// A fast lookup: district id -> zone.
+	// Built ONCE at startup, so lookups cost nothing at request time.
+	zoneByDistrict map[int]string
 }
 
 // NewLocationService builds the service.
@@ -26,9 +30,18 @@ func NewLocationService(
 	anchorRepo *repository.AnchorRepository,
 	boundaries []model.DistrictBoundary,
 ) *LocationService {
+
+	// Build the district -> zone lookup ONCE, here at startup.
+	// Doing it now means every request later is instant.
+	zoneByDistrict := make(map[int]string)
+	for _, b := range boundaries {
+		zoneByDistrict[b.DistrictID] = b.Zone
+	}
+
 	return &LocationService{
-		anchorRepo: anchorRepo,
-		boundaries: boundaries,
+		anchorRepo:     anchorRepo,
+		boundaries:     boundaries,
+		zoneByDistrict: zoneByDistrict,
 	}
 }
 
@@ -159,4 +172,30 @@ func (s *LocationService) FindDistrictID(lat, lng float64) *int {
 	// Checked them all. The point is outside every district.
 	// For example, a point in the sea.
 	return nil
+}
+
+// DefaultZone is used when we cannot work out the real zone.
+// We choose "intermediate" because it sits between the other two,
+// so a wrong guess is never as bad as picking an extreme.
+const DefaultZone = "intermediate"
+
+// ZoneForDistrict turns a district id into its agro-ecological zone.
+//
+// It returns the default when:
+//   - the district is empty (the point was outside all districts)
+//   - the district id is unknown
+//
+// We never return an empty string, because the model must always
+// receive a valid zone word.
+func (s *LocationService) ZoneForDistrict(districtID *int) string {
+	if districtID == nil {
+		return DefaultZone
+	}
+
+	zone, found := s.zoneByDistrict[*districtID]
+	if !found {
+		return DefaultZone
+	}
+
+	return zone
 }
