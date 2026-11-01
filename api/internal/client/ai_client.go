@@ -35,8 +35,9 @@ type PredictResponse struct {
 
 // AIClient talks to the FastAPI service.
 type AIClient struct {
-	baseURL    string
-	httpClient *http.Client
+	baseURL        string
+	httpClient     *http.Client
+	chatHTTPClient *http.Client
 }
 
 // NewAIClient builds the client.
@@ -62,6 +63,9 @@ func NewAIClient() *AIClient {
 			// startup can be slower.
 			Timeout: 10 * time.Second,
 		},
+		// The Python LLM client allows 30 seconds for a provider reply.
+		// Chat requests must allow that time plus the service overhead.
+		chatHTTPClient: &http.Client{Timeout: 35 * time.Second},
 	}
 }
 
@@ -251,12 +255,18 @@ type AgentChatResponse struct {
 // Chat runs one round of the agent loop.
 func (c *AIClient) Chat(req AgentChatRequest) (*AgentChatResponse, error) {
 
+	// A nil Go slice becomes JSON null, which FastAPI rejects for a list.
+	// The first agent round has no tool results yet, so send an empty list.
+	if req.ToolResults == nil {
+		req.ToolResults = []AgentToolResult{}
+	}
+
 	body, err := json.Marshal(req)
 	if err != nil {
 		return nil, fmt.Errorf("could not build the request: %w", err)
 	}
 
-	resp, err := c.httpClient.Post(
+	resp, err := c.chatHTTPClient.Post(
 		c.baseURL+"/agent/chat",
 		"application/json",
 		bytes.NewBuffer(body),

@@ -12,10 +12,7 @@ Go for every tool, which is slow and creates a circular dependency.
 So: Go drives the loop. We decide what should happen next.
 """
 
-import json
-
 from app.client import llm_client
-from app.client.llm_client import LLMError
 from app.service.tools import TOOL_DEFINITIONS, VALID_TOOL_NAMES
 from app.schema.agent import (
     ChatRequest, ChatResponse, ChatMessage, ToolCallRequest,
@@ -64,14 +61,25 @@ def _trim_history(messages: list) -> list:
     """
     Keep the conversation from growing forever.
 
-    We always keep the system prompt (first message), then the most
-    recent MAX_HISTORY messages.
+    Keep the system prompt and complete recent user turns. Tool results
+    must stay with the assistant tool calls that requested them.
     """
     if len(messages) <= MAX_HISTORY + 1:
         return messages
 
-    # Keep the first (system) message, then the last MAX_HISTORY.
-    return [messages[0]] + messages[-MAX_HISTORY:]
+    user_turns = [i for i, message in enumerate(messages)
+                  if i > 0 and message.get("role") == "user"]
+    if not user_turns:
+        return messages
+
+    # Keep at least the entire current turn, even if its tool exchanges
+    # alone exceed the budget. Never leave an orphaned tool result.
+    start = user_turns[-1]
+    for index in reversed(user_turns):
+        if len(messages) - index > MAX_HISTORY:
+            break
+        start = index
+    return [messages[0]] + messages[start:]
 
 
 def _to_dict(message: ChatMessage) -> dict:
