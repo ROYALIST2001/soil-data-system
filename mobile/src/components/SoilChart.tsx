@@ -1,5 +1,6 @@
-import React from "react";
-import { View, Text, StyleSheet, Dimensions } from "react-native";
+import { colors } from "../theme";
+import React, { useState } from "react";
+import { View, Text, StyleSheet } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 
 import { HistoryPoint } from "../types/analytics";
@@ -50,6 +51,7 @@ export default function SoilChart({
   valueKey,
   color,
 }: SoilChartProps) {
+  const [chartWidth, setChartWidth] = useState(0);
 
   // No data. Show a MESSAGE, not an empty chart.
   // An empty chart looks BROKEN. A message explains.
@@ -77,16 +79,13 @@ export default function SoilChart({
 
   const trend = getTrend(points, valueKey);
 
-  // Chart width: the screen, minus the page padding.
-  const chartWidth = Dimensions.get("window").width - 40;
-
   return (
-    <View style={styles.container}>
+    <View style={styles.container} onLayout={(event) => setChartWidth(event.nativeEvent.layout.width)}>
       <Text style={styles.title}>
         {title} <Text style={styles.unit}>({unit})</Text>
       </Text>
 
-      <LineChart
+      {chartWidth > 0 && <LineChart
         data={{
           labels: shownLabels,
           datasets: [{ data: values, color: () => color, strokeWidth: 2 }],
@@ -101,12 +100,12 @@ export default function SoilChart({
           backgroundGradientTo: "#ffffff",
           decimalPlaces: 1,
           color: (opacity = 1) => `rgba(64, 145, 108, ${opacity})`,
-          labelColor: () => "#495057",
+          labelColor: () => colors.secondary,
           propsForDots: { r: "4", strokeWidth: "2", stroke: color },
         }}
         bezier={false}   // straight lines. Curves can HIDE a sharp change.
         style={styles.chart}
-      />
+      />}
 
       <Text style={styles.trend}>{trend}</Text>
     </View>
@@ -114,18 +113,18 @@ export default function SoilChart({
 }
 
 const styles = StyleSheet.create({
-  container: { marginBottom: 20 },
-  title: { fontSize: 15, fontWeight: "bold", color: "#1b4332", marginBottom: 6 },
-  unit: { fontSize: 12, fontWeight: "normal", color: "#868e96" },
-  chart: { borderRadius: 8 },
-  trend: { fontSize: 12, color: "#495057", marginTop: 4, fontStyle: "italic" },
+  container: { marginBottom: 18, paddingVertical: 16, backgroundColor: colors.surface, borderRadius: 20 },
+  title: { fontSize: 15, fontWeight: "700", color: colors.forest, marginBottom: 12, marginHorizontal: 16 },
+  unit: { fontSize: 12, fontWeight: "normal", color: colors.muted },
+  chart: { borderRadius: 14 },
+  trend: { fontSize: 12, color: colors.secondary, marginTop: 8, marginHorizontal: 16, lineHeight: 19 },
 
   emptyBox: {
     padding: 20,
-    backgroundColor: "#f8f9fa",
-    borderRadius: 8,
+    backgroundColor: colors.surface,
+    borderRadius: 14,
     marginBottom: 16,
     alignItems: "center",
   },
-  emptyText: { color: "#868e96", fontSize: 13 },
+  emptyText: { color: colors.muted, fontSize: 13 },
 });

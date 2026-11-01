@@ -1,6 +1,7 @@
 import React from "react";
 import { StatusBar } from "expo-status-bar";
 import { Provider } from "react-redux";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { store } from "./src/store";
 import AppNavigator from "./src/navigation/AppNavigator";
@@ -13,9 +14,9 @@ import AppNavigator from "./src/navigation/AppNavigator";
 // This is what happens when you move a job into the right place.
 export default function App() {
   return (
-    <Provider store={store}>
+    <SafeAreaProvider><Provider store={store}>
       <AppNavigator />
-      <StatusBar style="light" />
-    </Provider>
+      <StatusBar style="dark" />
+    </Provider></SafeAreaProvider>
   );
 }

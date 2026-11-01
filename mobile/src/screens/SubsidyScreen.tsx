@@ -1,3 +1,4 @@
+import { colors } from "../theme";
 import React, { useState } from "react";
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert,
@@ -63,8 +64,8 @@ const STATUS_COLOUR: Record<string, string> = {
   SENT: "#5f3dc4",
   RECEIVED: "#2b8a3e",
   DISPUTED: "#c92a2a",
-  RESOLVED: "#1b4332",
-  REJECTED: "#495057",
+  RESOLVED: colors.forest,
+  REJECTED: colors.secondary,
 };
 
 export default function SubsidyScreen() {
@@ -166,7 +167,7 @@ export default function SubsidyScreen() {
   if (loading) {
     return (
       <View style={styles.centre}>
-        <ActivityIndicator size="large" color="#1b4332" />
+        <ActivityIndicator size="large" color={colors.forest} />
       </View>
     );
   }
@@ -257,7 +258,7 @@ export default function SubsidyScreen() {
                           disabled={saving}
                         >
                           {saving ? (
-                            <ActivityIndicator color="#fff" />
+                            <ActivityIndicator color={colors.surface} />
                           ) : (
                             <Text style={styles.primaryText}>
                               Send my application
@@ -310,7 +311,7 @@ export default function SubsidyScreen() {
                 <Text
                   style={[
                     styles.appStatus,
-                    { color: STATUS_COLOUR[a.status] ?? "#495057" },
+                    { color: STATUS_COLOUR[a.status] ?? colors.secondary },
                   ]}
                 >
                   {meaning.title}
@@ -369,7 +370,7 @@ export default function SubsidyScreen() {
                           disabled={saving}
                         >
                           {saving ? (
-                            <ActivityIndicator color="#fff" />
+                            <ActivityIndicator color={colors.surface} />
                           ) : (
                             <Text style={styles.noText}>
                               Report to the department
@@ -410,110 +411,111 @@ export default function SubsidyScreen() {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: "#fff" },
+  flex: { flex: 1, backgroundColor: colors.background },
   container: { padding: 18, paddingTop: 22, paddingBottom: 46 },
   centre: { flex: 1, justifyContent: "center", alignItems: "center" },
 
-  title: { fontSize: 22, fontWeight: "bold", color: "#1b4332" },
+  title: { fontSize: 26, fontWeight: "700", color: colors.forest },
   subtitle: {
-    fontSize: 13, color: "#495057",
+    fontSize: 13, color: colors.secondary,
     marginTop: 4, marginBottom: 20, lineHeight: 19,
   },
 
   sectionTitle: {
-    fontSize: 16, fontWeight: "bold",
-    color: "#1b4332", marginBottom: 10,
+    fontSize: 16, fontWeight: "700",
+    color: colors.forest, marginBottom: 10,
   },
   empty: {
-    fontSize: 13, color: "#868e96",
+    fontSize: 13, color: colors.muted,
     fontStyle: "italic", marginBottom: 12, lineHeight: 19,
   },
   hint: {
-    fontSize: 12, color: "#868e96",
+    fontSize: 12, color: colors.muted,
     marginTop: -8, marginBottom: 12,
   },
 
   roundCard: {
-    borderWidth: 1, borderColor: "#dee2e6",
-    borderRadius: 10, padding: 14, marginBottom: 12,
+    backgroundColor: colors.surface,
+    borderWidth: 1, borderColor: colors.border,
+    borderRadius: 18, padding: 14, marginBottom: 12,
   },
-  roundName: { fontSize: 16, fontWeight: "bold", color: "#212529" },
-  roundMeta: { fontSize: 12, color: "#868e96", marginTop: 3 },
-  roundDesc: { fontSize: 13, color: "#495057", marginTop: 8, lineHeight: 19 },
-  rates: { fontSize: 12, color: "#40916c", marginTop: 8, lineHeight: 18 },
+  roundName: { fontSize: 16, fontWeight: "700", color: colors.text },
+  roundMeta: { fontSize: 12, color: colors.muted, marginTop: 3 },
+  roundDesc: { fontSize: 13, color: colors.secondary, marginTop: 8, lineHeight: 19 },
+  rates: { fontSize: 12, color: colors.primary, marginTop: 8, lineHeight: 18 },
 
-  applyButton: {
-    backgroundColor: "#1b4332", borderRadius: 8,
+  applyButton: { minHeight: 52,
+    backgroundColor: colors.forest, borderRadius: 14,
     paddingVertical: 12, alignItems: "center", marginTop: 12,
   },
-  applyButtonText: { color: "#fff", fontSize: 14, fontWeight: "bold" },
+  applyButtonText: { color: colors.surface, fontSize: 14, fontWeight: "700" },
 
   form: {
     marginTop: 14, paddingTop: 14,
-    borderTopWidth: 1, borderTopColor: "#dee2e6",
+    borderTopWidth: 1, borderTopColor: colors.border,
   },
-  primaryButton: {
-    backgroundColor: "#1b4332", borderRadius: 8,
+  primaryButton: { minHeight: 52,
+    backgroundColor: colors.forest, borderRadius: 14,
     paddingVertical: 13, alignItems: "center", marginTop: 4,
   },
-  primaryText: { color: "#fff", fontSize: 15, fontWeight: "bold" },
-  disabled: { backgroundColor: "#adb5bd" },
+  primaryText: { color: colors.surface, fontSize: 15, fontWeight: "700" },
+  disabled: { backgroundColor: colors.disabled },
   cancel: { alignItems: "center", paddingVertical: 12 },
-  cancelText: { color: "#868e96", fontSize: 13 },
+  cancelText: { color: colors.muted, fontSize: 13 },
 
   appCard: {
-    backgroundColor: "#f8f9fa", borderRadius: 10,
+    backgroundColor: colors.surface, borderRadius: 18,
     padding: 14, marginBottom: 12,
   },
-  appRound: { fontSize: 13, color: "#868e96", marginBottom: 6 },
-  appStatus: { fontSize: 16, fontWeight: "bold" },
+  appRound: { fontSize: 13, color: colors.muted, marginBottom: 6 },
+  appStatus: { fontSize: 16, fontWeight: "700" },
   appDetail: {
-    fontSize: 13, color: "#495057",
+    fontSize: 13, color: colors.secondary,
     marginTop: 3, marginBottom: 12, lineHeight: 19,
   },
   appRow: {
     flexDirection: "row", justifyContent: "space-between",
     paddingVertical: 5,
   },
-  appKey: { fontSize: 13, color: "#868e96" },
-  appValue: { fontSize: 14, color: "#212529", fontWeight: "500" },
+  appKey: { fontSize: 13, color: colors.muted },
+  appValue: { fontSize: 14, color: colors.text, fontWeight: "500" },
 
   amountBox: {
-    backgroundColor: "#d8f3dc", borderRadius: 8,
+    backgroundColor: colors.sage, borderRadius: 14,
     padding: 12, marginTop: 10, alignItems: "center",
   },
-  amountLabel: { fontSize: 12, color: "#1b4332" },
+  amountLabel: { fontSize: 12, color: colors.forest },
   amountValue: {
-    fontSize: 22, fontWeight: "bold",
-    color: "#1b4332", marginTop: 2,
+    fontSize: 26, fontWeight: "700",
+    color: colors.forest, marginTop: 2,
   },
 
   actionBox: {
     marginTop: 14, paddingTop: 14,
-    borderTopWidth: 1, borderTopColor: "#dee2e6",
+    borderTopWidth: 1, borderTopColor: colors.border,
   },
   actionPrompt: {
-    fontSize: 14, fontWeight: "bold",
-    color: "#212529", marginBottom: 10,
+    fontSize: 14, fontWeight: "700",
+    color: colors.text, marginBottom: 10,
   },
-  yesButton: {
-    backgroundColor: "#2b8a3e", borderRadius: 8,
+  yesButton: { minHeight: 52,
+    backgroundColor: "#2b8a3e", borderRadius: 14,
     paddingVertical: 13, alignItems: "center",
   },
-  yesText: { color: "#fff", fontSize: 15, fontWeight: "bold" },
+  yesText: { color: colors.surface, fontSize: 15, fontWeight: "700" },
 
   noLink: { alignItems: "center", paddingVertical: 12 },
-  noLinkText: { color: "#c92a2a", fontSize: 14, fontWeight: "bold" },
+  noLinkText: { color: "#c92a2a", fontSize: 14, fontWeight: "700" },
 
-  noButton: {
-    backgroundColor: "#c92a2a", borderRadius: 8,
+  noButton: { minHeight: 52,
+    backgroundColor: "#c92a2a", borderRadius: 14,
     paddingVertical: 13, alignItems: "center",
   },
-  noText: { color: "#fff", fontSize: 15, fontWeight: "bold" },
+  noText: { color: colors.surface, fontSize: 15, fontWeight: "700" },
 
   errorBox: {
-    backgroundColor: "#ffe8cc", padding: 11, borderRadius: 8,
-    borderLeftWidth: 4, borderLeftColor: "#e8842c", marginBottom: 14,
+    backgroundColor: colors.warningSurface, padding: 11, borderRadius: 14,
+    borderLeftWidth: 4, borderLeftColor: colors.warning, marginBottom: 14,
   },
-  errorText: { color: "#495057", fontSize: 13, lineHeight: 19 },
+  errorText: { color: colors.secondary, fontSize: 13, lineHeight: 19 },
 });

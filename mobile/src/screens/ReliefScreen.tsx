@@ -1,3 +1,4 @@
+import { colors } from "../theme";
 import React, { useState } from "react";
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
@@ -51,7 +52,7 @@ const STATUS_TEXT: Record<string, { title: string; detail: string }> = {
 
 const STATUS_COLOUR: Record<string, string> = {
   SUBMITTED: "#1864ab",
-  VERIFIED: "#1b4332",
+  VERIFIED: colors.forest,
   APPROVED: "#a07800",
   PAID: "#2b8a3e",
   REJECTED: "#c92a2a",
@@ -75,7 +76,7 @@ function ClaimCard({ claim }: { claim: Claim }) {
       <Text
         style={[
           styles.claimStatus,
-          { color: STATUS_COLOUR[claim.status] ?? "#495057" },
+          { color: STATUS_COLOUR[claim.status] ?? colors.secondary },
         ]}
       >
         {meaning.title}
@@ -98,7 +99,7 @@ function ClaimCard({ claim }: { claim: Claim }) {
         <View style={styles.claimRow}>
           <Text style={styles.claimKey}>Officer confirmed</Text>
           <Text
-            style={[styles.claimValue, reduced && { color: "#e8842c" }]}
+            style={[styles.claimValue, reduced && { color: colors.warning }]}
           >
             {claim.verified_area_ha.toFixed(2)} ha
           </Text>
@@ -199,7 +200,7 @@ export default function ReliefScreen() {
   if (loading) {
     return (
       <View style={styles.centre}>
-        <ActivityIndicator size="large" color="#1b4332" />
+        <ActivityIndicator size="large" color={colors.forest} />
       </View>
     );
   }
@@ -304,7 +305,7 @@ export default function ReliefScreen() {
                           disabled={saving}
                         >
                           {saving ? (
-                            <ActivityIndicator color="#fff" />
+                            <ActivityIndicator color={colors.surface} />
                           ) : (
                             <Text style={styles.primaryText}>
                               Send my claim
@@ -352,87 +353,88 @@ export default function ReliefScreen() {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: "#fff" },
+  flex: { flex: 1, backgroundColor: colors.background },
   container: { padding: 18, paddingTop: 22, paddingBottom: 46 },
   centre: { flex: 1, justifyContent: "center", alignItems: "center" },
 
-  title: { fontSize: 22, fontWeight: "bold", color: "#1b4332" },
+  title: { fontSize: 26, fontWeight: "700", color: colors.forest },
   subtitle: {
-    fontSize: 13, color: "#495057",
+    fontSize: 13, color: colors.secondary,
     marginTop: 4, marginBottom: 20, lineHeight: 19,
   },
 
   sectionTitle: {
-    fontSize: 16, fontWeight: "bold",
-    color: "#1b4332", marginBottom: 10,
+    fontSize: 16, fontWeight: "700",
+    color: colors.forest, marginBottom: 10,
   },
   empty: {
-    fontSize: 13, color: "#868e96",
+    fontSize: 13, color: colors.muted,
     fontStyle: "italic", marginBottom: 12, lineHeight: 19,
   },
   hint: {
-    fontSize: 12, color: "#868e96",
+    fontSize: 12, color: colors.muted,
     marginTop: -8, marginBottom: 12,
   },
 
   eventCard: {
-    borderWidth: 1, borderColor: "#dee2e6",
-    borderRadius: 10, padding: 14, marginBottom: 12,
+    backgroundColor: colors.surface,
+    borderWidth: 1, borderColor: colors.border,
+    borderRadius: 18, padding: 14, marginBottom: 12,
   },
-  eventName: { fontSize: 16, fontWeight: "bold", color: "#212529" },
-  eventMeta: { fontSize: 12, color: "#868e96", marginTop: 3 },
-  eventDesc: { fontSize: 13, color: "#495057", marginTop: 8, lineHeight: 19 },
-  rates: { fontSize: 12, color: "#40916c", marginTop: 8, lineHeight: 18 },
+  eventName: { fontSize: 16, fontWeight: "700", color: colors.text },
+  eventMeta: { fontSize: 12, color: colors.muted, marginTop: 3 },
+  eventDesc: { fontSize: 13, color: colors.secondary, marginTop: 8, lineHeight: 19 },
+  rates: { fontSize: 12, color: colors.primary, marginTop: 8, lineHeight: 18 },
 
-  claimButton: {
-    backgroundColor: "#1b4332", borderRadius: 8,
+  claimButton: { minHeight: 52,
+    backgroundColor: colors.forest, borderRadius: 14,
     paddingVertical: 12, alignItems: "center", marginTop: 12,
   },
-  claimButtonText: { color: "#fff", fontSize: 14, fontWeight: "bold" },
+  claimButtonText: { color: colors.surface, fontSize: 14, fontWeight: "700" },
 
   form: {
     marginTop: 14, paddingTop: 14,
-    borderTopWidth: 1, borderTopColor: "#dee2e6",
+    borderTopWidth: 1, borderTopColor: colors.border,
   },
-  primaryButton: {
-    backgroundColor: "#1b4332", borderRadius: 8,
+  primaryButton: { minHeight: 52,
+    backgroundColor: colors.forest, borderRadius: 14,
     paddingVertical: 13, alignItems: "center", marginTop: 4,
   },
-  primaryText: { color: "#fff", fontSize: 15, fontWeight: "bold" },
-  disabled: { backgroundColor: "#adb5bd" },
+  primaryText: { color: colors.surface, fontSize: 15, fontWeight: "700" },
+  disabled: { backgroundColor: colors.disabled },
   cancel: { alignItems: "center", paddingVertical: 12 },
-  cancelText: { color: "#868e96", fontSize: 13 },
+  cancelText: { color: colors.muted, fontSize: 13 },
 
   claimCard: {
-    backgroundColor: "#f8f9fa", borderRadius: 10,
+    backgroundColor: colors.surface, borderRadius: 18,
     padding: 14, marginBottom: 12,
   },
-  claimEvent: { fontSize: 13, color: "#868e96", marginBottom: 6 },
-  claimStatus: { fontSize: 16, fontWeight: "bold" },
+  claimEvent: { fontSize: 13, color: colors.muted, marginBottom: 6 },
+  claimStatus: { fontSize: 16, fontWeight: "700" },
   claimDetail: {
-    fontSize: 13, color: "#495057",
+    fontSize: 13, color: colors.secondary,
     marginTop: 3, marginBottom: 12, lineHeight: 19,
   },
   claimRow: {
     flexDirection: "row", justifyContent: "space-between",
     paddingVertical: 5,
   },
-  claimKey: { fontSize: 13, color: "#868e96" },
-  claimValue: { fontSize: 14, color: "#212529", fontWeight: "500" },
+  claimKey: { fontSize: 13, color: colors.muted },
+  claimValue: { fontSize: 14, color: colors.text, fontWeight: "500" },
 
   amountBox: {
-    backgroundColor: "#d8f3dc", borderRadius: 8,
+    backgroundColor: colors.sage, borderRadius: 14,
     padding: 12, marginTop: 10, alignItems: "center",
   },
-  amountLabel: { fontSize: 12, color: "#1b4332" },
+  amountLabel: { fontSize: 12, color: colors.forest },
   amountValue: {
-    fontSize: 22, fontWeight: "bold",
-    color: "#1b4332", marginTop: 2,
+    fontSize: 26, fontWeight: "700",
+    color: colors.forest, marginTop: 2,
   },
 
   errorBox: {
-    backgroundColor: "#ffe8cc", padding: 11, borderRadius: 8,
-    borderLeftWidth: 4, borderLeftColor: "#e8842c", marginBottom: 14,
+    backgroundColor: colors.warningSurface, padding: 11, borderRadius: 14,
+    borderLeftWidth: 4, borderLeftColor: colors.warning, marginBottom: 14,
   },
-  errorText: { color: "#495057", fontSize: 13, lineHeight: 19 },
+  errorText: { color: colors.secondary, fontSize: 13, lineHeight: 19 },
 });

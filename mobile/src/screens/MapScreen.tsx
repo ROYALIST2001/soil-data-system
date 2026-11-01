@@ -1,3 +1,4 @@
+import { colors } from "../theme";
 import React, { useCallback } from "react";
 import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 import MapView, { Marker } from "react-native-maps";
@@ -12,8 +13,8 @@ import { useAppSelector } from "../store";
 // INSTANTLY. A table of 25 districts takes a minute to read.
 // A coloured map takes one second.
 const CLUSTER_COLORS = [
-  "#e8842c", // orange
-  "#40916c", // green
+  colors.warning, // orange
+  colors.primary, // green
   "#c92a2a", // red
   "#1971c2", // blue
   "#9c36b5", // purple
@@ -60,7 +61,7 @@ export default function MapScreen() {
             }}
             title="My field"
             description={`pH ${lastReading.ph} · ${lastReading.crop}`}
-            pinColor="#1b4332"
+            pinColor={colors.forest}
           />
         )}
       </MapView>
@@ -70,7 +71,7 @@ export default function MapScreen() {
         <Text style={styles.legendTitle}>Soil Groups</Text>
 
         {status === "loading" && (
-          <ActivityIndicator size="small" color="#40916c" />
+          <ActivityIndicator size="small" color={colors.primary} />
         )}
 
         {status === "not_enough_data" && (
@@ -113,15 +114,15 @@ const styles = StyleSheet.create({
     left: 12,
     right: 12,
     backgroundColor: "rgba(255,255,255,0.95)",
-    borderRadius: 10,
+    borderRadius: 18,
     padding: 12,
   },
   legendTitle: {
-    fontSize: 14, fontWeight: "bold",
-    color: "#1b4332", marginBottom: 6,
+    fontSize: 14, fontWeight: "700",
+    color: colors.forest, marginBottom: 6,
   },
   legendRow: { flexDirection: "row", alignItems: "center", marginBottom: 4 },
   swatch: { width: 14, height: 14, borderRadius: 3, marginRight: 8 },
-  legendText: { fontSize: 12, color: "#495057", flex: 1 },
-  legendNote: { fontSize: 12, color: "#868e96" },
+  legendText: { fontSize: 12, color: colors.secondary, flex: 1 },
+  legendNote: { fontSize: 12, color: colors.muted },
 });

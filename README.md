@@ -25,6 +25,12 @@ npx expo start
 
 Connect the phone and computer to the same Wi-Fi, then scan the Expo QR code.
 
+The mobile app has five tabs: **Test** for soil readings, **Insights** for
+trends, maps and regional patterns, **Advisor** for the soil chatbot,
+**Lands** for registered fields and crops, and **Services** for subsidies,
+disaster relief and account details. Run `npm run typecheck` from `mobile`
+to check the app's TypeScript.
+
 ## Soil advisor chatbot
 
 The mobile app's **Ask** tab calls the Go API, which runs the advisory agent

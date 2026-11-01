@@ -1,8 +1,11 @@
 import React, { useState } from "react";
-import { View, Text, Button, ScrollView, StyleSheet, Alert } from "react-native";
+import { View, Text, ScrollView, StyleSheet, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import InputField from "../components/InputField";
+import AppButton from "../components/AppButton";
+import Icon from "../components/Icon";
+import { colors, ui } from "../theme";
 import SelectField from "../components/SelectField";
 import { CROPS, STAGES, MAX_YIELD, Option } from "../constants/vocabulary";
 import { useLocation } from "../hooks/useLocation";
@@ -150,12 +153,12 @@ export default function SoilEntryScreen() {
       land_crop_id: selectedCrop.land_crop_id,
     };
 
-    await submit(reading);
+    const saved = await submit(reading);
 
     // Move to the result screen.
     // With React Navigation we NAVIGATE, instead of relying
     // on the store status to swap screens.
-    navigation.navigate("Result");
+    if (saved) navigation.navigate("Result");
   }
 
   // ---------- No land registered ----------
@@ -176,106 +179,77 @@ export default function SoilEntryScreen() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Soil Data Entry</Text>
-
-      {/* NEW in Phase 9: which land, and which crop on it. */}
-      <SelectField
-        label="Land"
-        value={String(selectedLand?.land_id ?? "")}
-        options={lands.map((l) => ({
-          value: String(l.land_id),
-          label: `${l.name} — ${l.size_ha.toFixed(2)} ha`,
-        }))}
-        onSelect={handleLandChange}
-      />
-
-      {cropOptions.length > 0 ? (
-        <>
-          <SelectField
-            label="Crop on this land"
-            value={landCropId}
-            options={cropOptions}
-            onSelect={setLandCropId}
-          />
-          <Text style={styles.hint}>
-            Area used for the recommendation: {area.toFixed(2)} hectares
-          </Text>
-        </>
-      ) : (
-        <Text style={styles.error}>
-          This land has no crops yet. Add one in the My Lands tab.
-        </Text>
-      )}
-
-      {/* CHANGED: units are now shown on every number field. */}
-      <InputField label="Nitrogen (N) — mg/kg" value={n} onChangeText={setN} numeric />
-      <InputField label="Phosphorus (P) — mg/kg" value={p} onChangeText={setP} numeric />
-      <InputField label="Potassium (K) — mg/kg" value={k} onChangeText={setK} numeric />
-      <InputField label="pH" value={ph} onChangeText={setPh} numeric />
-
-      <SelectField label="Growth Stage" value={stage} options={STAGES} onSelect={setStage} />
-
-      <InputField
-        label="Target Yield — tonnes per hectare"
-        value={targetYield}
-        onChangeText={setTargetYield}
-        numeric
-      />
-      {/* A helpful hint. The Go server enforces the real limit. */}
-      {maxYieldForCrop !== undefined && (
-        <Text style={styles.hint}>
-          Maximum for this crop: {maxYieldForCrop} tonnes per hectare
-        </Text>
-      )}
-
-      <View style={styles.buttonRow}>
-        <Button
-          title={locating ? "Getting location..." : "Get My Location"}
-          onPress={handleGetLocation}
-        />
+    <ScrollView style={ui.screen} contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+      <Text style={styles.greeting}>Hello, {farmer?.full_name.split(" ")[0] ?? "farmer"}</Text>
+      <View style={styles.hero}>
+        <View style={styles.heroArt}><Icon name="sprout" size={120} color="#729875" strokeWidth={1.2} /></View>
+        <View style={styles.heroBadge}><View style={styles.dot} /><Text style={styles.heroBadgeText}>A HEALTHIER HARVEST</Text></View>
+        <Text style={styles.heroTitle}>Good soil.{`\n`}Great possibilities.</Text>
+        <Text style={styles.heroText}>A few readings today. Better decisions{`\n`}for your next growing season.</Text>
       </View>
-
-      {lat !== null && lng !== null && (
-        <Text style={styles.info}>
-          Location captured: {lat.toFixed(5)}, {lng.toFixed(5)}
-        </Text>
-      )}
-
-      {locationError && <Text style={styles.error}>{locationError}</Text>}
-
-      <View style={styles.buttonRow}>
-        <Button
-          title={status === "loading" ? "Saving..." : "Submit Reading"}
-          onPress={handleSubmit}
-          disabled={status === "loading" || cropOptions.length === 0}
-        />
+      <View style={styles.intro}><Text style={ui.section}>Start a soil test</Text><Text style={styles.introNote}>Three simple steps</Text></View>
+      <View style={ui.card}>
+        <View style={styles.sectionHead}><Text style={styles.step}>01</Text><Text style={styles.sectionTitle}>Choose your field</Text><Icon name="field" size={21} /></View>
+        <SelectField label="Land" value={String(selectedLand?.land_id ?? "")} options={lands.map((l) => ({ value: String(l.land_id), label: `${l.name} · ${l.size_ha.toFixed(2)} ha` }))} onSelect={handleLandChange} />
+        {cropOptions.length > 0 ? <>
+          <SelectField label="Crop on this land" value={landCropId} options={cropOptions} onSelect={setLandCropId} />
+          <View style={styles.areaNote}><Icon name="sprout" size={16} /><Text style={styles.areaText}>Advice for your {area.toFixed(2)} hectare crop area</Text></View>
+        </> : <Text style={styles.error}>This land has no crops yet. Add one in the Lands tab.</Text>}
       </View>
-
-      {submitError && <Text style={styles.error}>{submitError}</Text>}
-
+      <View style={ui.card}>
+        <View style={styles.sectionHead}><Text style={styles.step}>02</Text><Text style={styles.sectionTitle}>Your soil readings</Text><Icon name="flask" size={21} /></View>
+        <Text style={styles.sectionHint}>Enter the values from your soil test.</Text>
+        <View style={styles.inputRow}>
+          <View style={styles.inputColumn}><InputField label="Nitrogen (mg/kg)" value={n} onChangeText={setN} numeric placeholder="e.g. 40" /></View>
+          <View style={styles.inputColumn}><InputField label="Phosphorus (mg/kg)" value={p} onChangeText={setP} numeric placeholder="e.g. 20" /></View>
+        </View>
+        <View style={styles.inputRow}>
+          <View style={styles.inputColumn}><InputField label="Potassium (mg/kg)" value={k} onChangeText={setK} numeric placeholder="e.g. 80" /></View>
+          <View style={styles.inputColumn}><InputField label="Soil pH (0–14)" value={ph} onChangeText={setPh} numeric placeholder="e.g. 6.5" /></View>
+        </View>
+      </View>
+      <View style={ui.card}>
+        <View style={styles.sectionHead}><Text style={styles.step}>03</Text><Text style={styles.sectionTitle}>Growth & location</Text><Icon name="location" size={21} /></View>
+        <SelectField label="Growth stage" value={stage} options={STAGES} onSelect={setStage} />
+        <InputField label="Target yield (tonnes per hectare)" value={targetYield} onChangeText={setTargetYield} numeric placeholder="Your expected yield" />
+        {maxYieldForCrop !== undefined && <Text style={styles.hint}>Up to {maxYieldForCrop} tonnes per hectare for this crop.</Text>}
+        <AppButton title={locating ? "Finding your field..." : lat !== null ? "Update field location" : "Capture field location"} onPress={handleGetLocation} loading={locating} variant="secondary" icon="location" />
+        {lat !== null && lng !== null && <View style={styles.locationNote}><Icon name="check" size={17} /><Text style={styles.areaText}>Location captured · {lat.toFixed(4)}, {lng.toFixed(4)}</Text></View>}
+        {locationError && <Text style={styles.error}>{locationError}</Text>}
+      </View>
+      {submitError && <View style={styles.errorBox}><Text style={styles.error}>{submitError}</Text></View>}
+      <AppButton title="Save soil test" onPress={handleSubmit} loading={status === "loading"} disabled={cropOptions.length === 0} icon="arrow" />
+      <Text style={styles.footer}>Your reading helps you understand and care for your land.</Text>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 20, paddingTop: 60 },
-  title: { fontSize: 22, fontWeight: "bold", marginBottom: 20 },
-  buttonRow: { marginVertical: 10 },
-  info: { color: "green", marginVertical: 6 },
-  error: { color: "red", marginVertical: 6 },
-  hint: { fontSize: 12, color: "#666", marginTop: -6, marginBottom: 12 },
-
-  centre: {
-    flex: 1, justifyContent: "center",
-    alignItems: "center", padding: 30,
-  },
-  emptyTitle: {
-    fontSize: 18, fontWeight: "bold",
-    color: "#1b4332", marginBottom: 8,
-  },
-  emptyText: {
-    color: "#868e96", fontSize: 14,
-    textAlign: "center", lineHeight: 20,
-  },
+  container: { padding: 20, paddingTop: 8, paddingBottom: 32 },
+  greeting: { fontSize: 13, color: colors.secondary, marginBottom: 14 },
+  hero: { backgroundColor: colors.forest, borderRadius: 25, padding: 23, marginBottom: 26, overflow: "hidden" },
+  heroArt: { position: "absolute", right: -18, bottom: 8, opacity: 0.35 },
+  heroBadge: { flexDirection: "row", alignItems: "center", gap: 7, marginBottom: 14 },
+  dot: { width: 6, height: 6, backgroundColor: colors.lime, borderRadius: 3 },
+  heroBadgeText: { color: colors.lime, fontSize: 9, letterSpacing: 1.5, fontWeight: "700" },
+  heroTitle: { fontSize: 31, lineHeight: 37, fontWeight: "700", color: colors.surface, letterSpacing: -0.9 },
+  heroText: { color: "#D2E1CE", fontSize: 12, lineHeight: 20, marginTop: 13 },
+  intro: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between" },
+  introNote: { fontSize: 11, color: colors.muted },
+  sectionHead: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 20 },
+  step: { fontSize: 11, fontWeight: "700", color: colors.primary, backgroundColor: colors.sage, padding: 8, borderRadius: 10, overflow: "hidden" },
+  sectionTitle: { flex: 1, fontSize: 16, fontWeight: "700", color: colors.forest },
+  sectionHint: { fontSize: 12, color: colors.secondary, marginTop: -8, marginBottom: 18 },
+  inputRow: { flexDirection: "row", flexWrap: "wrap", columnGap: 12 },
+  inputColumn: { flexGrow: 1, flexBasis: 130 },
+  areaNote: { flexDirection: "row", alignItems: "center", gap: 7, backgroundColor: colors.sage, padding: 11, borderRadius: 10 },
+  areaText: { fontSize: 11, color: colors.primary, flexShrink: 1, lineHeight: 17 },
+  locationNote: { flexDirection: "row", alignItems: "center", gap: 7, paddingTop: 12 },
+  hint: { fontSize: 11, color: colors.muted, marginTop: -7, marginBottom: 18, lineHeight: 17 },
+  error: { color: colors.danger, fontSize: 13, lineHeight: 20, marginTop: 5 },
+  errorBox: { backgroundColor: colors.dangerSurface, padding: 14, borderRadius: 14, marginBottom: 14 },
+  footer: { color: colors.muted, fontSize: 11, lineHeight: 17, textAlign: "center", marginTop: 16 },
+  centre: { flex: 1, justifyContent: "center", alignItems: "center", padding: 30, backgroundColor: colors.background },
+  emptyTitle: { fontSize: 22, fontWeight: "700", color: colors.forest, marginBottom: 8 },
+  emptyText: { color: colors.secondary, fontSize: 14, textAlign: "center", lineHeight: 22 },
 });

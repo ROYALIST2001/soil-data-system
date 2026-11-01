@@ -1,5 +1,9 @@
+import { colors, ui } from "../theme";
+import AppButton from "../components/AppButton";
+import Icon from "../components/Icon";
+import SoilMetrics from "../components/SoilMetrics";
 import React from "react";
-import { View, Text, Button, ScrollView, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import { useAppSelector, useAppDispatch } from "../store";
@@ -24,8 +28,8 @@ function getQualityMessage(flag: string) {
   if (flag === "FLAGGED") {
     return {
       show: true,
-      color: "#e8842c",
-      background: "#ffe8cc",
+      color: colors.warning,
+      background: colors.warningSurface,
       title: "This reading looks unusual",
       text:
         "The values changed more than expected since your last test at this field. " +
@@ -48,138 +52,57 @@ export default function ResultScreen() {
   const { fetchRecommendation } = useRecommendation();
 
   if (!reading) {
-    return null;
+    return <View style={styles.empty}><Text style={styles.title}>Start with a soil test.</Text><AppButton title="Enter soil readings" onPress={() => navigation.navigate("SoilEntry")} /></View>;
   }
 
   const quality = getQualityMessage(reading.quality_flag);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Reading Saved</Text>
-
-      <Text style={styles.row}>Reading ID: {reading.reading_id}</Text>
-      <Text style={styles.row}>
-        Location: {reading.raw_lat.toFixed(5)}, {reading.raw_lng.toFixed(5)}
-      </Text>
-      <Text style={styles.row}>
-        Field (anchor): {reading.anchor_id ?? "not matched"}
-      </Text>
-      <Text style={styles.row}>
-        District ID: {reading.district_id ?? "outside all districts"}
-      </Text>
-      <Text style={styles.row}>Zone: {reading.zone}</Text>
-      <Text style={styles.row}>
-        Soil: N {reading.n} | P {reading.p} | K {reading.k} | pH {reading.ph}
-      </Text>
-      <Text style={styles.row}>Crop: {reading.crop}</Text>
-
-      {/* Quality warning, if any. */}
-      {quality.show && (
-        <View
-          style={[
-            styles.warningBox,
-            { backgroundColor: quality.background, borderColor: quality.color },
-          ]}
-        >
-          <Text style={[styles.warningTitle, { color: quality.color }]}>
-            {quality.title}
-          </Text>
-          <Text style={styles.warningText}>{quality.text}</Text>
-
-          {/* NEW: the agent's explanation, if we have one.
-              The agent is OPTIONAL, so this can be empty. */}
-          {reading.agent_note && (
-            <View style={styles.agentBox}>
-              <Text style={styles.agentLabel}>What our review found:</Text>
-              <Text style={styles.agentText}>{reading.agent_note}</Text>
-            </View>
-          )}
-        </View>
-      )}
-
-      {/* ---------- NEW: the recommendation button ----------
-          ONLY shown if the reading passed the quality check.
-          Showing a button that ALWAYS fails is bad design. */}
-      {reading.quality_flag === "OK" && (
-        <View style={styles.buttonRow}>
-          <Button
-            title={
-              recStatus === "loading"
-                ? "Getting advice..."
-                : "Get Fertilizer Recommendation"
-            }
-            onPress={async () => {
-              await fetchRecommendation(reading.reading_id);
-              navigation.navigate("Recommendation");
-            }}
-            disabled={recStatus === "loading"}
-          />
-        </View>
-      )}
-
-      {/* The reading was flagged. Calm ORANGE, not a red crash. */}
-      {recStatus === "flagged" && (
-        <View style={styles.flaggedBox}>
-          <Text style={styles.flaggedText}>{recMessage}</Text>
-        </View>
-      )}
-
-      {/* A real error. Red. */}
-      {recStatus === "error" && (
-        <Text style={styles.error}>{recMessage}</Text>
-      )}
-
-      <View style={styles.buttonRow}>
-        <Button
-          title="Enter Another Reading"
-          onPress={() => {
-            dispatch(resetReading());
-            navigation.navigate("SoilEntry");
-          }}
-        />
+    <ScrollView style={ui.screen} contentContainerStyle={ui.content}>
+      <View style={styles.successIcon}><Icon name={quality.show ? "flask" : "check"} size={32} /></View>
+      <Text style={ui.eyebrow}>{quality.show ? "SAVED FOR REVIEW" : "A STEP TOWARD HEALTHIER SOIL"}</Text>
+      <Text style={styles.title}>Your soil story,{`\n`}one test richer.</Text>
+      <Text style={ui.subtitle}>Your reading is saved. Here’s a look at your field.</Text>
+      <View style={ui.card}>
+        <View style={styles.cardHeader}><Icon name="sprout" size={23} /><Text style={styles.crop}>{reading.crop}</Text><Text style={styles.area}>{reading.area.toFixed(2)} ha</Text></View>
+        <SoilMetrics reading={reading} />
+        <View style={styles.details}><Text style={styles.detail}>{reading.stage} stage</Text><Text style={styles.detail}>{reading.zone || "Unassigned"} zone</Text></View>
+        <View style={styles.location}><Icon name="location" size={15} /><Text style={styles.locationText}>{reading.raw_lat.toFixed(4)}, {reading.raw_lng.toFixed(4)}</Text></View>
       </View>
+      {quality.show && (
+        <View style={[styles.warningBox, { backgroundColor: quality.background, borderColor: quality.color }]}>
+          <Text style={[styles.warningTitle, { color: quality.color }]}>{quality.title}</Text>
+          <Text style={styles.warningText}>{quality.text}</Text>
+          {reading.agent_note && <View style={styles.agentBox}><Text style={styles.agentLabel}>A note about your reading</Text><Text style={styles.warningText}>{reading.agent_note}</Text></View>}
+        </View>
+      )}
+      {reading.quality_flag === "OK" && <AppButton title="See my fertilizer advice" icon="arrow" loading={recStatus === "loading"} onPress={async () => {
+        await fetchRecommendation(reading.reading_id);
+        navigation.navigate("Recommendation");
+      }} />}
+      {(recStatus === "flagged" || recStatus === "error") && <Text style={styles.error}>{recMessage}</Text>}
+      <AppButton title="Take another soil test" variant="secondary" icon="plus" style={{ marginTop: 12 }} onPress={() => {
+        dispatch(resetReading()); navigation.navigate("SoilEntry");
+      }} />
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 20, paddingTop: 60, paddingBottom: 40 },
-  title: { fontSize: 22, fontWeight: "bold", marginBottom: 20 },
-  row: { fontSize: 16, marginBottom: 8 },
-  buttonRow: { marginTop: 16 },
-
-  warningBox: {
-    marginTop: 16,
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: 2,
-  },
-  warningTitle: { fontSize: 15, fontWeight: "bold", marginBottom: 6 },
-  warningText: { fontSize: 13, color: "#333", lineHeight: 19 },
-
-  flaggedBox: {
-    marginTop: 14,
-    padding: 12,
-    borderRadius: 8,
-    backgroundColor: "#ffe8cc",
-    borderLeftWidth: 4,
-    borderLeftColor: "#e8842c",
-  },
-  flaggedText: { fontSize: 13, color: "#495057", lineHeight: 19 },
-
-  error: { color: "red", marginTop: 14, fontSize: 13 },
-
-  agentBox: {
-    marginTop: 10,
-    paddingTop: 10,
-    borderTopWidth: 1,
-    borderTopColor: "rgba(0,0,0,0.12)",
-  },
-  agentLabel: {
-    fontSize: 12,
-    fontWeight: "bold",
-    color: "#495057",
-    marginBottom: 3,
-  },
-  agentText: { fontSize: 13, color: "#333", lineHeight: 19 },
+  empty: { ...ui.screen, padding: 28, justifyContent: "center", gap: 24 },
+  successIcon: { width: 66, height: 66, backgroundColor: colors.sage, borderRadius: 23, justifyContent: "center", alignItems: "center", marginBottom: 25 },
+  title: { color: colors.forest, fontSize: 30, lineHeight: 37, fontWeight: "700", letterSpacing: -0.8 },
+  cardHeader: { flexDirection: "row", alignItems: "center", gap: 10 },
+  crop: { flex: 1, fontSize: 19, fontWeight: "700", color: colors.forest, textTransform: "capitalize" },
+  area: { fontSize: 12, color: colors.primary, backgroundColor: colors.sage, borderRadius: 8, padding: 7, overflow: "hidden" },
+  details: { flexDirection: "row", justifyContent: "space-between", marginTop: 12 },
+  detail: { fontSize: 11, color: colors.secondary, textTransform: "capitalize" },
+  location: { flexDirection: "row", alignItems: "center", gap: 7, borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 15, marginTop: 16 },
+  locationText: { fontSize: 11, color: colors.muted },
+  warningBox: { borderRadius: 17, borderWidth: 1, padding: 18, marginBottom: 18 },
+  warningTitle: { fontSize: 16, fontWeight: "700", marginBottom: 9 },
+  warningText: { color: colors.secondary, fontSize: 13, lineHeight: 22 },
+  agentBox: { borderTopWidth: 1, borderTopColor: colors.border, marginTop: 14, paddingTop: 14 },
+  agentLabel: { color: colors.forest, fontSize: 12, fontWeight: "700", marginBottom: 6 },
+  error: { color: colors.danger, fontSize: 13, lineHeight: 20, marginTop: 14 },
 });

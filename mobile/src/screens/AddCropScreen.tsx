@@ -1,3 +1,4 @@
+import { colors, ui } from "../theme";
 import React, { useState } from "react";
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
@@ -90,7 +91,7 @@ export default function AddCropScreen() {
       style={styles.flex}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView style={ui.screen} contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
 
         <Text style={styles.title}>Add a crop</Text>
         <Text style={styles.subtitle}>
@@ -124,7 +125,7 @@ export default function AddCropScreen() {
           disabled={saving}
         >
           {saving ? (
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator color={colors.surface} />
           ) : (
             <Text style={styles.buttonText}>Add Crop</Text>
           )}
@@ -136,30 +137,30 @@ export default function AddCropScreen() {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: "#fff" },
+  flex: { flex: 1, backgroundColor: colors.background },
   container: { padding: 20, paddingTop: 24 },
   centre: {
     flex: 1, justifyContent: "center",
     alignItems: "center", padding: 30,
   },
 
-  title: { fontSize: 20, fontWeight: "bold", color: "#1b4332" },
+  title: { fontSize: 20, fontWeight: "700", color: colors.forest },
   subtitle: {
-    fontSize: 13, color: "#868e96",
+    fontSize: 13, color: colors.muted,
     marginTop: 4, marginBottom: 20, lineHeight: 19,
   },
-  note: { fontSize: 14, color: "#868e96", textAlign: "center" },
+  note: { fontSize: 14, color: colors.muted, textAlign: "center" },
 
-  button: {
-    backgroundColor: "#1b4332", paddingVertical: 14,
-    borderRadius: 8, alignItems: "center", marginTop: 6,
+  button: { minHeight: 52,
+    backgroundColor: colors.forest, paddingVertical: 14,
+    borderRadius: 14, alignItems: "center", marginTop: 6,
   },
-  buttonDisabled: { backgroundColor: "#adb5bd" },
-  buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+  buttonDisabled: { backgroundColor: colors.disabled },
+  buttonText: { color: colors.surface, fontSize: 16, fontWeight: "700" },
 
   errorBox: {
-    backgroundColor: "#ffe8cc", padding: 11, borderRadius: 8,
-    borderLeftWidth: 4, borderLeftColor: "#e8842c", marginBottom: 10,
+    backgroundColor: colors.warningSurface, padding: 11, borderRadius: 14,
+    borderLeftWidth: 4, borderLeftColor: colors.warning, marginBottom: 10,
   },
-  errorText: { color: "#495057", fontSize: 13, lineHeight: 19 },
+  errorText: { color: colors.secondary, fontSize: 13, lineHeight: 19 },
 });

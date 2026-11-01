@@ -1,10 +1,9 @@
 import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
+import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import {
-  Text, View, ActivityIndicator, StyleSheet, TouchableOpacity,
-} from "react-native";
+import { Text, View, ActivityIndicator, StyleSheet } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import SoilEntryScreen from "../screens/SoilEntryScreen";
 import ResultScreen from "../screens/ResultScreen";
@@ -22,7 +21,11 @@ import AddLandScreen from "../screens/AddLandScreen";
 import AddCropScreen from "../screens/AddCropScreen";
 import ReliefScreen from "../screens/ReliefScreen";
 import SubsidyScreen from "../screens/SubsidyScreen";
-
+import InsightsScreen from "../screens/InsightsScreen";
+import ServicesScreen from "../screens/ServicesScreen";
+import AppButton from "../components/AppButton";
+import Icon from "../components/Icon";
+import { colors } from "../theme";
 import { useAuth, useSessionRestore } from "../hooks/useAuth";
 import { useLands, useLandsBootstrap } from "../hooks/useLands";
 import { useAppSelector } from "../store";
@@ -31,43 +34,33 @@ const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
 const LandStack = createNativeStackNavigator();
+const InsightStack = createNativeStackNavigator();
+const ServiceStack = createNativeStackNavigator();
 
-// ---------- THE TEST STACK ----------
-//
-// A STACK is for going DEEPER into one topic.
-//   Entry -> Result -> Recommendation
-// Each screen LEADS TO the next, and back works.
+const navigationTheme = {
+  ...DefaultTheme,
+  colors: { ...DefaultTheme.colors, primary: colors.primary, background: colors.background,
+    card: colors.background, text: colors.text, border: colors.border },
+};
+
+const headerOptions = {
+  headerStyle: { backgroundColor: colors.background },
+  headerTintColor: colors.forest,
+  headerTitleStyle: { fontSize: 17, fontWeight: "700" as const },
+  headerShadowVisible: false,
+  contentStyle: { backgroundColor: colors.background },
+};
+
 function TestStack() {
   return (
-    <Stack.Navigator
-      screenOptions={{
-        headerStyle: { backgroundColor: "#1b4332" },
-        headerTintColor: "#fff",
-      }}
-    >
-      <Stack.Screen
-        name="SoilEntry"
-        component={SoilEntryScreen}
-        options={{ title: "New Soil Test" }}
-      />
-      <Stack.Screen
-        name="Result"
-        component={ResultScreen}
-        options={{ title: "Reading Saved" }}
-      />
-      <Stack.Screen
-        name="Recommendation"
-        component={RecommendationScreen}
-        options={{ title: "Fertilizer Advice" }}
-      />
+    <Stack.Navigator screenOptions={headerOptions}>
+      <Stack.Screen name="SoilEntry" component={SoilEntryScreen} options={{ title: "Soil Data System" }} />
+      <Stack.Screen name="Result" component={ResultScreen} options={{ title: "Your soil test" }} />
+      <Stack.Screen name="Recommendation" component={RecommendationScreen} options={{ title: "Fertilizer advice" }} />
     </Stack.Navigator>
   );
 }
 
-// ---------- THE LOGIN STACK ----------
-//
-// Shown when nobody is logged in. Two screens, and the header is hidden
-// because each one already has its own big title.
 function LoginFlow() {
   return (
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
@@ -77,177 +70,75 @@ function LoginFlow() {
   );
 }
 
-// ---------- THE LANDS STACK ----------
-//
-// My Lands -> Add Land -> Add Crop. Going DEEPER into one topic, so a stack,
-// not tabs. Same reasoning as the Test stack above.
 function LandsStack() {
   return (
-    <LandStack.Navigator
-      screenOptions={{
-        headerStyle: { backgroundColor: "#1b4332" },
-        headerTintColor: "#fff",
-      }}
-    >
-      <LandStack.Screen
-        name="MyLands"
-        component={MyLandsScreen}
-        options={{ title: "My Lands" }}
-      />
-      <LandStack.Screen
-        name="AddLand"
-        component={AddLandScreen}
-        options={{ title: "Register Land" }}
-      />
-      <LandStack.Screen
-        name="AddCrop"
-        component={AddCropScreen}
-        options={{ title: "Add Crop" }}
-      />
+    <LandStack.Navigator screenOptions={headerOptions}>
+      <LandStack.Screen name="MyLands" component={MyLandsScreen} options={{ title: "My lands" }} />
+      <LandStack.Screen name="AddLand" component={AddLandScreen} options={{ title: "Register land" }} />
+      <LandStack.Screen name="AddCrop" component={AddCropScreen} options={{ title: "Add a crop" }} />
     </LandStack.Navigator>
   );
 }
 
-// ---------- THE MAIN TABS ----------
-//
-// TABS are for switching between SEPARATE areas that are
-// equally important and not related to each other.
-function MainTabs() {
+function InsightsStack() {
   return (
-    <Tab.Navigator
-      screenOptions={{
-        tabBarActiveTintColor: "#1b4332",
-        tabBarInactiveTintColor: "#868e96",
-        headerStyle: { backgroundColor: "#1b4332" },
-        headerTintColor: "#fff",
-      }}
-    >
-      <Tab.Screen
-        name="Test"
-        component={TestStack}
-        options={{
-          // The STACK inside already has a header.
-          // Two headers would look wrong.
-          headerShown: false,
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color, fontSize: 18 }}>🌱</Text>
-          ),
-        }}
-      />
+    <InsightStack.Navigator screenOptions={headerOptions}>
+      <InsightStack.Screen name="InsightsHome" component={InsightsScreen} options={{ title: "Soil insights" }} />
+      <InsightStack.Screen name="Trends" component={HistoryScreen} options={{ title: "Soil trends" }} />
+      <InsightStack.Screen name="Map" component={MapScreen} options={{ title: "Soil map" }} />
+      <InsightStack.Screen name="Regions" component={ClustersScreen} options={{ title: "Regional patterns" }} />
+    </InsightStack.Navigator>
+  );
+}
 
-      <Tab.Screen
-        name="Trends"
-        component={HistoryScreen}
-        options={{
-          headerShown: false,
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color, fontSize: 18 }}>📈</Text>
-          ),
-        }}
-      />
+function ServicesStack() {
+  return (
+    <ServiceStack.Navigator screenOptions={headerOptions}>
+      <ServiceStack.Screen name="ServicesHome" component={ServicesScreen} options={{ title: "Farmer services" }} />
+      <ServiceStack.Screen name="Relief" component={ReliefScreen} options={{ title: "Disaster relief" }} />
+      <ServiceStack.Screen name="Subsidy" component={SubsidyScreen} options={{ title: "Fertilizer subsidy" }} />
+      <ServiceStack.Screen name="Profile" component={ProfileScreen} options={{ title: "My account" }} />
+    </ServiceStack.Navigator>
+  );
+}
 
-      <Tab.Screen
-        name="Map"
-        component={MapScreen}
-        options={{
-          title: "Soil Map",
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color, fontSize: 18 }}>🗺️</Text>
-          ),
-        }}
-      />
+const tabs = [
+  { name: "Test", label: "Test", icon: "sprout", component: TestStack },
+  { name: "Insights", label: "Insights", icon: "chart", component: InsightsStack },
+  { name: "Ask", label: "Advisor", icon: "chat", component: ChatScreen },
+  { name: "Lands", label: "Lands", icon: "field", component: LandsStack },
+  { name: "Services", label: "Services", icon: "grid", component: ServicesStack },
+] as const;
 
-      <Tab.Screen
-        name="Regions"
-        component={ClustersScreen}
-        options={{
-          headerShown: false,
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color, fontSize: 18 }}>🏞️</Text>
+function MainTabs() {
+  const insets = useSafeAreaInsets();
+  return (
+    <Tab.Navigator screenOptions={{
+      ...headerOptions,
+      tabBarActiveTintColor: colors.primary,
+      tabBarInactiveTintColor: colors.muted,
+      tabBarHideOnKeyboard: true,
+      tabBarLabelStyle: { fontSize: 10, fontWeight: "600", marginTop: 3 },
+      tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.border,
+        height: 64 + Math.max(insets.bottom, 10), paddingTop: 8, paddingBottom: Math.max(insets.bottom, 10), elevation: 0 },
+    }}>
+      {tabs.map((tab) => (
+        <Tab.Screen key={tab.name} name={tab.name} component={tab.component} options={{
+          title: tab.name === "Ask" ? "Soil advisor" : tab.label,
+          tabBarLabel: tab.label,
+          headerShown: tab.name === "Ask",
+          tabBarIcon: ({ color, focused }) => (
+            <View style={[styles.tabIcon, focused && styles.tabIconActive]}><Icon name={tab.icon} size={22} color={color} /></View>
           ),
-        }}
-      />
-
-      <Tab.Screen
-        name="Ask"
-        component={ChatScreen}
-        options={{
-          title: "Soil Advisor",
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color, fontSize: 18 }}>💬</Text>
-          ),
-        }}
-      />
-
-      {/* NEW in Phase 9: the farmer's own land and crops. */}
-      <Tab.Screen
-        name="Lands"
-        component={LandsStack}
-        options={{
-          // The stack inside has its own header.
-          headerShown: false,
-          tabBarLabel: "My Lands",
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color, fontSize: 18 }}>🌾</Text>
-          ),
-        }}
-      />
-
-      {/* NEW in Phase 11: disaster relief claims. */}
-      <Tab.Screen
-        name="Relief"
-        component={ReliefScreen}
-        options={{
-          title: "Disaster Relief",
-          tabBarLabel: "Relief",
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color, fontSize: 18 }}>🌧️</Text>
-          ),
-        }}
-      />
-
-      {/* NEW in Phase 12: the fertilizer subsidy. */}
-      <Tab.Screen
-        name="Subsidy"
-        component={SubsidyScreen}
-        options={{
-          title: "Fertilizer Subsidy",
-          tabBarLabel: "Subsidy",
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color, fontSize: 18 }}>💰</Text>
-          ),
-        }}
-      />
-
-      {/* NEW in Phase 9: the farmer's own account. */}
-      <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{
-          title: "My Account",
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color, fontSize: 18 }}>👤</Text>
-          ),
-        }}
-      />
+        }} />
+      ))}
     </Tab.Navigator>
   );
 }
 
-// ---------- THE GATE ----------
-//
-// This is the whole of Phase 9's navigation change.
-//
-// Three states, not two. The third one matters: while we are still reading
-// the phone's storage we must show NEITHER screen. If we treated "do not
-// know yet" as "logged out", a farmer who IS logged in would see the login
-// screen flash up and vanish every time they opened the app. That looks
-// broken even though nothing is wrong.
 export default function AppNavigator() {
   const { checking } = useSessionRestore();
   const status = useAppSelector((s) => s.auth.status);
-
-  // NEW in Phase 9: load this farmer's lands as soon as we know who they are.
   const { checking: loadingLands } = useLandsBootstrap();
   const setupDone = useAppSelector((s) => s.land.setupDone);
   const landStatus = useAppSelector((s) => s.land.status);
@@ -255,85 +146,47 @@ export default function AppNavigator() {
   const { reload } = useLands();
   const { logout } = useAuth();
 
-  const loggedIn = status === "loggedIn";
-
-  if (checking) {
+  if (checking || (status === "loggedIn" && loadingLands && landStatus !== "error")) {
     return (
       <View style={styles.loading}>
-        <ActivityIndicator size="large" color="#1b4332" />
+        <View style={styles.loadingMark}><Icon name="sprout" size={40} color={colors.lime} /></View>
+        <Text style={styles.loadingTitle}>Good things take root.</Text>
+        <ActivityIndicator color={colors.primary} style={{ marginTop: 24 }} />
+        <Text style={styles.loadingText}>{checking ? "Getting things ready..." : "Loading your land..."}</Text>
       </View>
     );
   }
 
-  if (!loggedIn) {
-    return (
-      <NavigationContainer>
-        <LoginFlow />
-      </NavigationContainer>
-    );
+  if (status !== "loggedIn") {
+    return <NavigationContainer theme={navigationTheme}><LoginFlow /></NavigationContainer>;
   }
 
-  // Could not load the lands at all.
-  //
-  // NEVER leave the farmer on a spinner with no way out. Before this, a
-  // failed load meant an endless spinner and no explanation - the app simply
-  // looked broken. Now they see what went wrong and can retry or log out.
   if (landStatus === "error") {
     return (
       <View style={styles.loading}>
-        <Text style={styles.errorTitle}>Cannot reach the server</Text>
+        <Icon name="refresh" size={36} />
+        <Text style={styles.errorTitle}>Let’s reconnect</Text>
         <Text style={styles.errorText}>{landError}</Text>
-
-        <TouchableOpacity style={styles.retryButton} onPress={reload}>
-          <Text style={styles.retryText}>Try again</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.logoutLink} onPress={logout}>
-          <Text style={styles.logoutLinkText}>Log out</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  // Logged in, but we do not yet know whether they have any land. Showing
-  // either screen now would be a guess, and a wrong guess means the farmer
-  // watches the land registration form appear and vanish.
-  if (loadingLands) {
-    return (
-      <View style={styles.loading}>
-        <ActivityIndicator size="large" color="#1b4332" />
-        <Text style={styles.loadingText}>Loading your land...</Text>
+        <AppButton title="Try again" onPress={reload} icon="refresh" />
+        <AppButton title="Log out" onPress={logout} variant="secondary" style={{ marginTop: 12 }} />
       </View>
     );
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={navigationTheme}>
       {setupDone ? <MainTabs /> : <LandSetupScreen />}
     </NavigationContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  loading: {
-    flex: 1, justifyContent: "center",
-    alignItems: "center", backgroundColor: "#fff", padding: 30,
-  },
-  loadingText: { marginTop: 14, fontSize: 13, color: "#868e96" },
-
-  errorTitle: {
-    fontSize: 18, fontWeight: "bold",
-    color: "#1b4332", marginBottom: 10, textAlign: "center",
-  },
-  errorText: {
-    fontSize: 14, color: "#868e96",
-    textAlign: "center", lineHeight: 20, marginBottom: 22,
-  },
-  retryButton: {
-    backgroundColor: "#1b4332", borderRadius: 8,
-    paddingVertical: 12, paddingHorizontal: 30,
-  },
-  retryText: { color: "#fff", fontSize: 15, fontWeight: "bold" },
-  logoutLink: { paddingVertical: 16 },
-  logoutLinkText: { color: "#868e96", fontSize: 13 },
+  loading: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: colors.background, padding: 30 },
+  loadingMark: { width: 86, height: 86, borderRadius: 28, backgroundColor: colors.forest, justifyContent: "center", alignItems: "center", marginBottom: 24 },
+  loadingTitle: { fontSize: 24, fontWeight: "700", color: colors.forest, textAlign: "center" },
+  loadingText: { marginTop: 14, fontSize: 13, color: colors.muted },
+  errorTitle: { fontSize: 24, fontWeight: "700", color: colors.forest, marginTop: 20, marginBottom: 10, textAlign: "center" },
+  errorText: { fontSize: 14, color: colors.secondary, textAlign: "center", lineHeight: 22, marginBottom: 24 },
+  tabIcon: { width: 46, height: 30, borderRadius: 12, alignItems: "center", justifyContent: "center" },
+  tabIconActive: { backgroundColor: colors.sage },
 });

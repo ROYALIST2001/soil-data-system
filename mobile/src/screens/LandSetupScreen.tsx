@@ -1,3 +1,4 @@
+import { colors, ui } from "../theme";
 import React, { useState } from "react";
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
@@ -5,6 +6,7 @@ import {
 } from "react-native";
 
 import LandForm from "../components/LandForm";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "../hooks/useAuth";
 import { useLands } from "../hooks/useLands";
 import { useAppDispatch } from "../store";
@@ -51,13 +53,14 @@ export default function LandSetupScreen() {
   }
 
   return (
-    <KeyboardAvoidingView
+    <SafeAreaView style={styles.flex} edges={["top", "bottom"]}><KeyboardAvoidingView
       style={styles.flex}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView style={ui.screen} contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
 
-        <Text style={styles.title}>Register your land</Text>
+        <Text style={ui.eyebrow}>MAKE YOURSELF AT HOME</Text>
+        <Text style={styles.title}>Tell us about your land.</Text>
         <Text style={styles.subtitle}>
           Before you can get fertilizer advice, the system needs to know
           about your land and what you grow on it. You can add more land
@@ -125,57 +128,57 @@ export default function LandSetupScreen() {
         )}
 
       </ScrollView>
-    </KeyboardAvoidingView>
+    </KeyboardAvoidingView></SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: "#fff" },
-  container: { padding: 22, paddingTop: 50, paddingBottom: 40 },
+  flex: { flex: 1, backgroundColor: colors.background },
+  container: { padding: 22, paddingTop: 20, paddingBottom: 40 },
 
   title: {
-    fontSize: 24, fontWeight: "bold",
-    color: "#1b4332", marginBottom: 6,
+    fontSize: 24, fontWeight: "700",
+    color: colors.forest, marginBottom: 6,
   },
   subtitle: {
-    fontSize: 14, color: "#495057",
+    fontSize: 14, color: colors.secondary,
     marginBottom: 20, lineHeight: 20,
   },
 
   savedBox: {
-    backgroundColor: "#d8f3dc", borderRadius: 10,
+    backgroundColor: colors.sage, borderRadius: 18,
     padding: 14, marginBottom: 18,
   },
   savedTitle: {
-    fontSize: 14, fontWeight: "bold",
-    color: "#1b4332", marginBottom: 8,
+    fontSize: 14, fontWeight: "700",
+    color: colors.forest, marginBottom: 8,
   },
   savedRow: { marginBottom: 8 },
-  savedName: { fontSize: 14, color: "#212529" },
-  savedCrops: { fontSize: 12, color: "#40916c", marginTop: 2 },
+  savedName: { fontSize: 14, color: colors.text },
+  savedCrops: { fontSize: 12, color: colors.primary, marginTop: 2 },
 
   choiceBox: {
-    borderWidth: 1, borderColor: "#40916c", borderRadius: 10,
+    borderWidth: 1, borderColor: colors.primary, borderRadius: 18,
     padding: 16, marginBottom: 20,
   },
   choiceTitle: {
-    fontSize: 17, fontWeight: "bold",
-    color: "#1b4332", marginBottom: 4,
+    fontSize: 17, fontWeight: "700",
+    color: colors.forest, marginBottom: 4,
   },
   choiceText: {
-    fontSize: 14, color: "#495057",
+    fontSize: 14, color: colors.secondary,
     marginBottom: 14, lineHeight: 20,
   },
 
   secondaryButton: {
-    borderWidth: 1, borderColor: "#40916c", borderRadius: 8,
+    borderWidth: 1, borderColor: colors.primary, borderRadius: 14,
     paddingVertical: 12, alignItems: "center", marginBottom: 10,
   },
-  secondaryText: { color: "#40916c", fontSize: 15, fontWeight: "bold" },
+  secondaryText: { color: colors.primary, fontSize: 15, fontWeight: "700" },
 
-  primaryButton: {
-    backgroundColor: "#1b4332", borderRadius: 8,
+  primaryButton: { minHeight: 52,
+    backgroundColor: colors.forest, borderRadius: 14,
     paddingVertical: 13, alignItems: "center",
   },
-  primaryText: { color: "#fff", fontSize: 15, fontWeight: "bold" },
+  primaryText: { color: colors.surface, fontSize: 15, fontWeight: "700" },
 });
