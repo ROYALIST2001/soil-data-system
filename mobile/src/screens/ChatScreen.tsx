@@ -5,6 +5,7 @@ import {
 } from "react-native";
 
 import Icon from "../components/Icon";
+import ChatMessageText from "../components/ChatMessageText";
 import { colors } from "../theme";
 
 import { useChat } from "../hooks/useChat";
@@ -39,11 +40,13 @@ const SUGGESTIONS = [
 ];
 
 const MESSAGE_LIST_PADDING = 20;
+const BUBBLE_PADDING = 16;
 const MIN_INPUT_HEIGHT = 52;
 
 // One message bubble.
 function MessageBubble({ message, maxWidth }: { message: DisplayMessage; maxWidth: number }) {
   const isFarmer = message.from === "farmer";
+  const textWidth = Math.max(1, maxWidth - BUBBLE_PADDING * 2 - (isFarmer ? 0 : 2));
 
   // Turn the tool names into a readable list.
   const toolText =
@@ -56,10 +59,12 @@ function MessageBubble({ message, maxWidth }: { message: DisplayMessage; maxWidt
 
   return (
     <View style={[styles.row, isFarmer ? styles.rowRight : styles.rowLeft]}>
-      <View style={[styles.bubble, { maxWidth }, isFarmer ? styles.bubbleFarmer : styles.bubbleAdvisor]}>
-        <Text style={[styles.messageText, isFarmer ? styles.textFarmer : styles.textAdvisor]}>
-          {message.text}
-        </Text>
+      <View style={[styles.bubble, { width: maxWidth }, isFarmer ? styles.bubbleFarmer : styles.bubbleAdvisor]}>
+        <ChatMessageText
+          text={message.text}
+          width={textWidth}
+          color={isFarmer ? colors.surface : colors.text}
+        />
 
         {/* Show which tools were used.
             WHY? So the farmer can SEE the answer came from THEIR data.
@@ -108,9 +113,8 @@ export default function ChatScreen() {
   const scrollRef = useRef<ScrollView>(null);
 
   const isThinking = status === "thinking";
-  // Measure the actual chat viewport, including in split-screen/landscape. A
-  // numeric bound lets native Text measure all wrapped lines inside the padding.
-  const messageMaxWidth = Math.max(1, (listWidth || windowWidth) - MESSAGE_LIST_PADDING * 2) * 0.9;
+  // Give the renderer a definite width, with room for the bubble's padding.
+  const messageMaxWidth = Math.max(1, Math.floor(((listWidth || windowWidth) - MESSAGE_LIST_PADDING * 2) * 0.9));
   const maxInputHeight = Math.max(MIN_INPUT_HEIGHT, Math.min(160, Math.floor(windowHeight / 4)));
   const inputHeight = Math.min(maxInputHeight, Math.max(MIN_INPUT_HEIGHT, inputContentHeight));
 
@@ -258,14 +262,9 @@ const styles = StyleSheet.create({
   row: { width: "100%", marginBottom: 15 },
   rowLeft: { alignItems: "flex-start" },
   rowRight: { alignItems: "flex-end" },
-  bubble: { minWidth: 0, flexShrink: 1, padding: 16, borderRadius: 20 },
+  bubble: { minWidth: 0, flexShrink: 0, padding: BUBBLE_PADDING, borderRadius: 20 },
   bubbleFarmer: { backgroundColor: colors.primary, borderBottomRightRadius: 5 },
   bubbleAdvisor: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderBottomLeftRadius: 5 },
-  // Natural font metrics preserve Sinhala marks and accessibility text sizes.
-  // No fixed line height or line limit: bubbles expand to contain the full text.
-  messageText: { fontSize: 15, flexShrink: 1, minWidth: 0, alignSelf: "stretch", includeFontPadding: true, paddingVertical: 2 },
-  textFarmer: { color: colors.surface },
-  textAdvisor: { color: colors.text },
   toolNote: { fontSize: 11, color: colors.primary, marginTop: 13, paddingTop: 10, borderTopWidth: 1, borderTopColor: colors.border, includeFontPadding: true },
   thinking: { flexDirection: "row", alignItems: "center" },
   thinkingText: { marginLeft: 9, color: colors.secondary, fontSize: 12, flexShrink: 1 },
