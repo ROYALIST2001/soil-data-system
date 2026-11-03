@@ -31,6 +31,26 @@ trends, maps and regional patterns, **Advisor** for the soil chatbot,
 disaster relief and account details. Run `npm run typecheck` from `mobile`
 to check the app's TypeScript.
 
+## District and GN division selection
+
+Signup, land registration and officer selection forms use **District → Grama
+Niladhari Division**, with no Divisional Secretariat selector. The GN dropdown
+contains only the selected district's entries. Typing even one letter narrows the
+list immediately by its starting letters; names and official census codes are
+searchable. Changing the district clears a single GN selection; multi-select relief/subsidy forms retain
+explicitly chosen divisions across districts.
+
+The API imports 14,008 coded entries across 25 districts from the official DCS
+workbook into PostgreSQL at startup. Existing database volumes are updated without
+deleting farmer accounts or resetting data. Rebuild/restart the API after updating
+the project: `docker compose up -d --build --no-deps api`.
+
+Public catalog endpoints are `/locations/districts`,
+`/locations/gn-divisions?district=11&q=a` and
+`/locations/gn-divisions/resolve?value=6154165`.
+See `api/internal/locationcatalog/data/README.md` for provenance, version details,
+refresh instructions and legacy-name handling.
+
 ## Soil advisor chatbot
 
 The advisor now follows an enforced research order: local PDF RAG, Sri Lankan

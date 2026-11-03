@@ -3,6 +3,7 @@ import * as api from "./api";
 import SortableTable, { FlagPill, type Column } from "./SortableTable";
 import SoilMap from "./SoilMap";
 import type { DivisionSummary, FarmerSummary, MapPoint } from "./types";
+import GNDivisionPicker from "./GNDivisionPicker";
 
 // THE DEPARTMENT DASHBOARD.
 //
@@ -145,12 +146,8 @@ export default function DepartmentPage({
   const totalHectares = farmers.reduce((sum, f) => sum + f.total_hectare, 0);
   const totalFlagged = farmers.reduce((sum, f) => sum + f.flagged_count, 0);
 
-  if (loading) {
-    return <div className="loading">Loading...</div>;
-  }
-
   return (
-    <div className="page">
+    <div className="page" aria-busy={loading}>
       {error && <div className="error">{error}</div>}
 
       <div className="stats">
@@ -182,7 +179,7 @@ export default function DepartmentPage({
         </p>
 
         <div className="controls">
-          <div className="field">
+          {lockedDivision === null ? <GNDivisionPicker values={division ? [division] : []} onChange={(values) => setDivision(values[0] ?? "")} /> : <div className="field">
             <label htmlFor="division">Grama Niladhari division</label>
             <select
               id="division"
@@ -199,10 +196,10 @@ export default function DepartmentPage({
                 </option>
               ))}
             </select>
-          </div>
+          </div>}
         </div>
 
-        <SortableTable
+        {loading ? <div className="loading">Loading farmers...</div> : <SortableTable
           columns={columns}
           rows={farmers}
           rowKey={(f) => f.farmer_id}
@@ -214,7 +211,7 @@ export default function DepartmentPage({
               ? `No farmers registered in ${division} yet.`
               : "No farmers have registered yet."
           }
-        />
+        />}
       </div>
 
       <div className="card">
