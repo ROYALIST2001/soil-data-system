@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"soil-data-system/api/internal/client"
@@ -19,6 +20,29 @@ import (
 //
 // EVERY AGENT LOOP MUST HAVE A LIMIT. This is not optional.
 const maxAgentRounds = 5
+
+var referencePattern = regexp.MustCompile(`\[(?:B|W)\d+\]`)
+
+// Only server-returned references may appear in the answer and source cards.
+func citedSources(answer string, sources []model.ChatSource) (string, []model.ChatSource) {
+	allowed := make(map[string]bool)
+	for _, source := range sources {
+		allowed["["+source.ID+"]"] = true
+	}
+	answer = referencePattern.ReplaceAllStringFunc(answer, func(citation string) string {
+		if allowed[citation] {
+			return citation
+		}
+		return ""
+	})
+	selected := make([]model.ChatSource, 0)
+	for _, source := range sources {
+		if strings.Contains(answer, "["+source.ID+"]") {
+			selected = append(selected, source)
+		}
+	}
+	return strings.TrimSpace(answer), selected
+}
 
 // ChatService drives the agent loop and executes the tools.
 type ChatService struct {
@@ -52,14 +76,13 @@ func (s *ChatService) Chat(req model.ChatRequest) (model.ChatResponse, error) {
 	var empty model.ChatResponse
 
 	// ---------- Work out which reading we are talking about ----------
-	if req.ReadingID == nil {
-		return empty, fmt.Errorf(
-			"no reading selected. Please submit a soil test first")
-	}
-
-	reading, err := s.readingSvc.GetReading(*req.ReadingID)
-	if err != nil {
-		return empty, fmt.Errorf("could not find that reading")
+	var reading model.Reading
+	if req.ReadingID != nil {
+		var err error
+		reading, err = s.readingSvc.GetReading(*req.ReadingID)
+		if err != nil {
+			return empty, fmt.Errorf("could not find that reading")
+		}
 	}
 
 	// ---------- Build the message list ----------
@@ -82,6 +105,8 @@ func (s *ChatService) Chat(req model.ChatRequest) (model.ChatResponse, error) {
 
 	var toolResults []client.AgentToolResult
 	var toolsUsed []string
+	var sources []model.ChatSource
+	var researchSteps []model.ResearchStep
 
 	// ---------- THE AGENT LOOP ----------
 	//
@@ -100,6 +125,9 @@ func (s *ChatService) Chat(req model.ChatRequest) (model.ChatResponse, error) {
 		}
 
 		// Keep the updated conversation for the next round.
+		sources = append(sources, resp.Sources...)
+		researchSteps = append(researchSteps, resp.ResearchSteps...)
+		toolsUsed = append(toolsUsed, resp.ToolsUsed...)
 		messages = resp.Messages
 		toolResults = nil // clear, so we do not send them twice
 
@@ -109,11 +137,14 @@ func (s *ChatService) Chat(req model.ChatRequest) (model.ChatResponse, error) {
 			if resp.Answer != nil {
 				answer = *resp.Answer
 			}
+			answer, sources = citedSources(answer, sources)
 
 			return model.ChatResponse{
-				Answer:    answer,
-				History:   toModelMessages(messages),
-				ToolsUsed: toolsUsed,
+				Answer:        answer,
+				History:       toModelMessages(messages),
+				ToolsUsed:     toolsUsed,
+				Sources:       sources,
+				ResearchSteps: researchSteps,
 			}, nil
 		}
 
@@ -147,6 +178,9 @@ func (s *ChatService) Chat(req model.ChatRequest) (model.ChatResponse, error) {
 // NOTE: every tool calls a service we ALREADY BUILT in Phase 6 and 7.
 // Nothing new. The agent just uses what exists.
 func (s *ChatService) runTool(name string, reading model.Reading) string {
+	if reading.ReadingID == 0 && (name == "get_soil_history" || name == "get_fertilizer_advice" || name == "get_region_info") {
+		return "No soil test is selected. Ask the farmer to submit a soil test for advice about their own field. You may still explain general information from reference sources."
+	}
 
 	switch name {
 
@@ -223,8 +257,7 @@ func (s *ChatService) runTool(name string, reading model.Reading) string {
 		}
 
 		// Which cluster is this farmer's district in?
-		clusterID, found := result.Assignments[
-			fmt.Sprintf("%d", *reading.DistrictID)]
+		clusterID, found := result.Assignments[fmt.Sprintf("%d", *reading.DistrictID)]
 		if !found {
 			return "This district has not been grouped yet."
 		}

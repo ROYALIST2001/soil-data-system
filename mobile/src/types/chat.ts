@@ -14,7 +14,7 @@ export interface ChatMessage {
 // What we SEND to the Go API.
 export interface ChatRequest {
   message: string;
-  reading_id: number;
+  reading_id?: number;
 
   // The conversation so far.
   //
@@ -31,6 +31,17 @@ export interface ChatResponse {
   // Which tools the agent used. We show this to the farmer,
   // so they can see the answer came from THEIR data.
   tools_used: string[];
+  sources?: ChatSource[];
+  research_steps?: { stage: string; status: string; detail: string }[];
+}
+
+export interface ChatSource {
+  id: string;
+  kind: "book" | "web";
+  title: string;
+  page?: number;
+  url?: string;
+  tier: string;
 }
 
 // One bubble on the screen.
@@ -41,4 +52,5 @@ export interface DisplayMessage {
   from: "farmer" | "advisor";
   text: string;
   toolsUsed?: string[];
+  sources?: ChatSource[];
 }

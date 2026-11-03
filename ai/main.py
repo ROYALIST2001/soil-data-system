@@ -6,6 +6,8 @@ from fastapi import FastAPI
 # CHANGED: added agent.
 from app.controller import health, predict, cluster, agent
 from app.repository.model_loader import store
+import threading
+from app.service.book_index import book_index
 
 
 @asynccontextmanager
@@ -35,6 +37,8 @@ async def lifespan(app: FastAPI):
         print("The service will run, but /predict will return 503.")
         print("=" * 60)
 
+    # Reference ingestion is independent of fertilizer-model availability.
+    threading.Thread(target=book_index.ensure, daemon=True, name="book-index").start()
     yield   # ---- the app serves requests here ----
 
     print("AI service shutting down.")

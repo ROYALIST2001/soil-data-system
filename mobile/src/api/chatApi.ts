@@ -8,7 +8,7 @@ export class NoReadingError extends Error {}
 
 // The agent loop can run several rounds, each one a call to the LLM, so this
 // is the slowest request in the app by far. It needs its own, longer wait.
-const CHAT_TIMEOUT_MS = 60000;
+const CHAT_TIMEOUT_MS = 240000;
 
 // Send one message to the advisor.
 export async function sendChatMessage(

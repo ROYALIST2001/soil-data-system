@@ -52,6 +52,16 @@ services:
       LLM_BASE_URL: "${LLM_BASE_URL}"
       LLM_API_KEY: "${LLM_API_KEY}"
       LLM_MODEL: "${LLM_MODEL}"
+      EMBEDDING_MODEL: "${EMBEDDING_MODEL:-text-embedding-3-small}"
+      WEB_SEARCH_MODEL: "${WEB_SEARCH_MODEL:-gpt-5-mini}"
+      BOOKS_DIR: /code/books
+      RAG_INDEX_DIR: /code/data
+      SL_AGRICULTURE_DOMAINS: "${SL_AGRICULTURE_DOMAINS:-doa.gov.lk}"
+      AGRICULTURE_DOMAINS: "${AGRICULTURE_DOMAINS:-fao.org,irri.org,cimmyt.org,icrisat.org,cabi.org}"
+    volumes:
+      - ./ai/books:/code/books:ro
+      - rag_data:/code/data
 
 volumes:
   db_data:
+  rag_data:

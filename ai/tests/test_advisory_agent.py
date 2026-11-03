@@ -31,6 +31,9 @@ class AdvisoryAgentTests(unittest.TestCase):
         configured = patch("app.controller.agent.is_available", return_value=True)
         configured.start()
         self.addCleanup(configured.stop)
+        retrieval = patch("app.service.advisory_agent.research", return_value={"sources": [], "steps": [], "context": ""})
+        retrieval.start()
+        self.addCleanup(retrieval.stop)
 
     def test_chat_request_tool_round_and_followup(self):
         tool_message = soil_turn(1)[1]
