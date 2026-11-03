@@ -1,5 +1,6 @@
 import { useState } from "react";
 import * as Location from "expo-location";
+import { ENABLE_FIELD_LOCATION_CAPTURE } from "../constants/features";
 
 // The shape of the answer this hook gives.
 interface Coordinates {
@@ -16,6 +17,7 @@ export function useLocation() {
 
   // Ask the phone for the current position.
   async function getCurrentLocation(): Promise<Coordinates | null> {
+    if (!ENABLE_FIELD_LOCATION_CAPTURE) return null;
     setLoading(true);
     setError(null); // clear any old error
 

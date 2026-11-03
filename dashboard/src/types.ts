@@ -54,8 +54,8 @@ export interface ReadingRow {
   area: number;
   quality_flag: string;
   agent_note: string | null;
-  raw_lat: number;
-  raw_lng: number;
+  raw_lat: number | null;
+  raw_lng: number | null;
   created_at: string;
 }
 

@@ -1,128 +1,66 @@
-import { colors } from "../theme";
-import React, { useCallback } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
-import MapView, { Marker } from "react-native-maps";
+import { WebView } from "react-native-webview";
 import { useFocusEffect } from "@react-navigation/native";
-
-import { useAnalytics } from "../hooks/useAnalytics";
+import { API_BASE_URL } from "../config";
+import { colors } from "../theme";
+import AppButton from "../components/AppButton";
+import SelectField from "../components/SelectField";
 import { useAppSelector } from "../store";
 
-// One colour per cluster.
-//
-// WHY COLOUR? Because the human eye finds patterns in colour
-// INSTANTLY. A table of 25 districts takes a minute to read.
-// A coloured map takes one second.
-const CLUSTER_COLORS = [
-  colors.warning, // orange
-  colors.primary, // green
-  "#c92a2a", // red
-  "#1971c2", // blue
-  "#9c36b5", // purple
-  "#f59f00", // yellow
-];
-
-// Sri Lanka, centred.
-//
-// DELTA = how much of the world to show.
-//   0.05 is about 5.5 km
-//   3.5  is about 385 km  <-- all of Sri Lanka
-// SMALLER delta means MORE zoomed in.
-const SRI_LANKA = {
-  latitude: 7.8731,
-  longitude: 80.7718,
-  latitudeDelta: 3.5,
-  longitudeDelta: 3.0,
-};
-
 export default function MapScreen() {
-  const { fetchClusters } = useAnalytics();
-
-  const status = useAppSelector((s) => s.analytics.clusterStatus);
-  const clusters = useAppSelector((s) => s.analytics.clusters);
+  const lands = useAppSelector((s) => s.land.lands);
   const lastReading = useAppSelector((s) => s.reading.result);
+  const [landId, setLandId] = useState(lastReading?.land_id ?? lands[0]?.land_id);
+  const [failed, setFailed] = useState(false);
+  const webRef = useRef<WebView>(null);
+  const hasFocused = useRef(false);
+  const land = lands.find((item) => item.land_id === landId) ?? lands[0];
+  const division = land?.gn_division ?? lastReading?.gn_division_code ?? "";
+  const uri = `${API_BASE_URL}/soil-map/?division=${encodeURIComponent(division)}`;
 
-  // Refresh every time you switch to this tab.
-  useFocusEffect(
-    useCallback(() => {
-      fetchClusters();
-    }, [])
-  );
+  useFocusEffect(useCallback(() => {
+    // Refresh averages after another test, including when this tab stays mounted.
+    if (hasFocused.current) webRef.current?.reload();
+    hasFocused.current = true;
+  }, []));
 
   return (
     <View style={styles.container}>
-      <MapView style={styles.map} initialRegion={SRI_LANKA}>
-
-        {/* The farmer's own reading, if there is one. */}
-        {lastReading && (
-          <Marker
-            coordinate={{
-              latitude: lastReading.raw_lat,
-              longitude: lastReading.raw_lng,
-            }}
-            title="My field"
-            description={`pH ${lastReading.ph} · ${lastReading.crop}`}
-            pinColor={colors.forest}
-          />
-        )}
-      </MapView>
-
-      {/* ---------- The legend, floating over the map ---------- */}
-      <View style={styles.legend}>
-        <Text style={styles.legendTitle}>Soil Groups</Text>
-
-        {status === "loading" && (
-          <ActivityIndicator size="small" color={colors.primary} />
-        )}
-
-        {status === "not_enough_data" && (
-          <Text style={styles.legendNote}>
-            Not enough districts have data yet for grouping.
-          </Text>
-        )}
-
-        {status === "success" && clusters && (
-          <>
-            {clusters.clusters.map((c) => (
-              <View key={c.cluster_id} style={styles.legendRow}>
-                <View
-                  style={[
-                    styles.swatch,
-                    { backgroundColor: CLUSTER_COLORS[c.cluster_id % CLUSTER_COLORS.length] },
-                  ]}
-                />
-                <Text style={styles.legendText} numberOfLines={1}>
-                  {c.description} ({c.district_count})
-                </Text>
-              </View>
-            ))}
-          </>
-        )}
-      </View>
+      {lands.length > 0 && <View style={styles.landPicker}>
+        <SelectField label="Focus on your land's division" value={String(land?.land_id ?? "")}
+          options={lands.map((item) => ({ value: String(item.land_id), label: item.name }))}
+          onSelect={(value) => { setFailed(false); setLandId(Number(value)); }} />
+      </View>}
+      {failed ? <View style={styles.error}>
+        <Text style={styles.title}>The map could not be loaded</Text>
+        <Text style={styles.message}>Check your connection to the soil server and try again.</Text>
+        <AppButton title="Retry map" onPress={() => setFailed(false)} />
+      </View> : <WebView
+        key={uri}
+        ref={webRef}
+        source={{ uri }}
+        style={styles.map}
+        originWhitelist={[API_BASE_URL]}
+        onShouldStartLoadWithRequest={(request) => request.url.startsWith(`${API_BASE_URL}/soil-map/`)}
+        javaScriptEnabled
+        domStorageEnabled
+        geolocationEnabled={false}
+        startInLoadingState
+        renderLoading={() => <View style={styles.loading}><ActivityIndicator size="large" color={colors.primary} /><Text style={styles.message}>Loading soil map…</Text></View>}
+        onError={() => setFailed(true)}
+        onHttpError={(event) => { if (event.nativeEvent.url === uri) setFailed(true); }}
+      />}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  map: { flex: 1 },
-
-  // The legend FLOATS over the map.
-  // position: "absolute" takes it out of the normal layout.
-  legend: {
-    position: "absolute",
-    bottom: 20,
-    left: 12,
-    right: 12,
-    backgroundColor: "rgba(255,255,255,0.95)",
-    borderRadius: 18,
-    padding: 12,
-  },
-  legendTitle: {
-    fontSize: 14, fontWeight: "700",
-    color: colors.forest, marginBottom: 6,
-  },
-  legendRow: { flexDirection: "row", alignItems: "center", marginBottom: 4 },
-  swatch: { width: 14, height: 14, borderRadius: 3, marginRight: 8 },
-  legendText: { fontSize: 12, color: colors.secondary, flex: 1 },
-  legendNote: { fontSize: 12, color: colors.muted },
+  container: { flex: 1, backgroundColor: colors.background },
+  landPicker: { paddingHorizontal: 14, paddingTop: 10, backgroundColor: colors.surface },
+  map: { flex: 1, backgroundColor: colors.background },
+  loading: { position: "absolute", top: 0, right: 0, bottom: 0, left: 0, alignItems: "center", justifyContent: "center", backgroundColor: colors.background },
+  error: { flex: 1, justifyContent: "center", padding: 25, gap: 14 },
+  title: { fontSize: 18, fontWeight: "700", color: colors.forest },
+  message: { fontSize: 13, color: colors.secondary, marginTop: 12, lineHeight: 21 },
 });

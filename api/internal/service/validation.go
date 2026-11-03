@@ -34,9 +34,9 @@ const (
 // like "FLAGED" becomes an error in the editor, not a silent bug.
 
 const (
-	FlagOK           = "OK"
-	FlagFlagged      = "FLAGGED"
-	FlagQuarantined  = "QUARANTINED"
+	FlagOK          = "OK"
+	FlagFlagged     = "FLAGGED"
+	FlagQuarantined = "QUARANTINED"
 )
 
 // ---------- PART 2: THE SOFT RULE LIMITS ----------
@@ -84,12 +84,15 @@ func NewValidationService(readingRepo *repository.ReadingRepository) *Validation
 func (s *ValidationService) Normalize(reading model.Reading) model.Reading {
 	reading.Crop = strings.ToLower(strings.TrimSpace(reading.Crop))
 	reading.Stage = strings.ToLower(strings.TrimSpace(reading.Stage))
+	if reading.LocationSource == "" {
+		reading.LocationSource = "gps"
+	}
 	return reading
 }
 
 // checkRange is a small helper for the hard rules. Unchanged.
 func checkRange(fieldName string, value float64, min float64, max float64) error {
-	if value < min || value > max {
+	if math.IsNaN(value) || math.IsInf(value, 0) || value < min || value > max {
 		return fmt.Errorf("%s must be between %g and %g (you sent %.2f)",
 			fieldName, min, max, value)
 	}
@@ -100,11 +103,25 @@ func checkRange(fieldName string, value float64, min float64, max float64) error
 // If this fails, the reading is REFUSED. Nothing is saved.
 func (s *ValidationService) Validate(reading model.Reading) error {
 
-	if err := checkRange("Latitude", reading.RawLat, minLat, maxLat); err != nil {
-		return err
-	}
-	if err := checkRange("Longitude", reading.RawLng, minLng, maxLng); err != nil {
-		return err
+	if reading.LocationSource == "gn_division" {
+		if reading.LandID == nil || reading.FarmerID == nil || *reading.LandID <= 0 || *reading.FarmerID <= 0 {
+			return fmt.Errorf("Field area must belong to a registered land when using its GN division")
+		}
+		if reading.RawLat != nil || reading.RawLng != nil {
+			return fmt.Errorf("Latitude and longitude must be empty when using the land's GN division")
+		}
+	} else if reading.LocationSource == "gps" || reading.LocationSource == "" {
+		if reading.RawLat == nil || reading.RawLng == nil {
+			return fmt.Errorf("Latitude and longitude are required for a GPS reading")
+		}
+		if err := checkRange("Latitude", *reading.RawLat, minLat, maxLat); err != nil {
+			return err
+		}
+		if err := checkRange("Longitude", *reading.RawLng, minLng, maxLng); err != nil {
+			return err
+		}
+	} else {
+		return fmt.Errorf("Field area location source is not supported")
 	}
 	if err := checkRange("pH", reading.PH, minPH, maxPH); err != nil {
 		return err
@@ -217,12 +234,18 @@ func (s *ValidationService) CheckQuality(reading model.Reading) (string, error) 
 	// ---------- STEP 1: is there an anchor? ----------
 	// Without one we cannot look up history.
 	// Phase 3 always sets it, but we check anyway. Defensive programming.
-	if reading.AnchorID == nil {
+	if reading.AnchorID == nil && reading.LandID == nil {
 		return FlagOK, nil
 	}
 
 	// ---------- STEP 2: fetch this field's recent GOOD readings ----------
-	history, err := s.readingRepo.FindRecentByAnchor(*reading.AnchorID, historyLimit)
+	var history []model.Reading
+	var err error
+	if reading.LandID != nil {
+		history, err = s.readingRepo.FindRecentByLand(*reading.LandID, historyLimit)
+	} else {
+		history, err = s.readingRepo.FindRecentByAnchor(*reading.AnchorID, historyLimit)
+	}
 	if err != nil {
 		// The DATABASE failed. This IS a real error.
 		return "", err

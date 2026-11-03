@@ -53,3 +53,10 @@ export async function getClusters(): Promise<ClusterResult> {
     throw e;
   }
 }
+
+export async function getLandHistory(landId: number): Promise<HistorySeries> {
+  return requestJson<HistorySeries>(`${API_BASE_URL}/history/land/${landId}`);
+}
+export async function getGNHistory(code: string): Promise<HistorySeries> {
+  return requestJson<HistorySeries>(`${API_BASE_URL}/history/gn-division/${encodeURIComponent(code)}`);
+}

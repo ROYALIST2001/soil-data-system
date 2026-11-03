@@ -33,10 +33,14 @@ export default function HistoryScreen() {
     useCallback(() => {
       if (!lastReading) return;
 
-      if (level === "field" && lastReading.anchor_id) {
+      if (level === "field" && lastReading.land_id) {
+        fetchHistory("land", { landId: lastReading.land_id });
+      } else if (level === "field" && lastReading.anchor_id) {
         fetchHistory("field", { anchorId: lastReading.anchor_id });
 
-      } else if (level === "area") {
+      } else if (level === "area" && lastReading.gn_division_code) {
+        fetchHistory("gn_division", { code: lastReading.gn_division_code });
+      } else if (level === "area" && lastReading.raw_lat !== null && lastReading.raw_lng !== null) {
         fetchHistory("area", {
           lat: lastReading.raw_lat,
           lng: lastReading.raw_lng,
@@ -44,6 +48,8 @@ export default function HistoryScreen() {
 
       } else if (level === "district" && lastReading.district_id) {
         fetchHistory("district", { districtId: lastReading.district_id });
+      } else {
+        fetchHistory("field", {});
       }
     }, [level, lastReading])
   );
@@ -74,7 +80,7 @@ export default function HistoryScreen() {
             onPress={() => setLevel(l)}
           >
             <Text style={[styles.tabText, level === l && styles.tabTextActive]}>
-              {l === "field" ? "My Field" : l === "area" ? "My Area" : "District"}
+              {l === "field" ? "My Land" : l === "area" ? (lastReading.gn_division_code ? "GN Division" : "My Area") : "District"}
             </Text>
           </TouchableOpacity>
         ))}
@@ -89,7 +95,7 @@ export default function HistoryScreen() {
       {status === "success" && history && (
         <>
           <View style={styles.infoBox}>
-            <Text style={styles.infoLabel}>{level === "field" ? "Your field" : history.label}</Text>
+            <Text style={styles.infoLabel}>{level === "field" ? "Your land" : history.label}</Text>
             {/* ALWAYS show the count. An average of 200 readings is
                 trustworthy. An average of 1 is not. */}
             <Text style={styles.infoCount}>

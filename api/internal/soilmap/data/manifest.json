@@ -1,0 +1,3995 @@
+{
+  "source": "https://gisapps.nsdi.gov.lk/server/rest/services/Srilanka/Boundaries/MapServer/1",
+  "retrieved_at": "2026-11-03T13:47:01.299819+00:00",
+  "simplification_degrees": 0.00015,
+  "coordinate_precision": 5,
+  "catalog_sha256": "ba86f963532f8c673ebaca83a0bfb81aa06c5eaf6295ce442344b119078d5f32",
+  "boundary_count": 14051,
+  "matched_boundaries": 13387,
+  "unmatched_boundaries": [
+    {
+      "objectid": 14056,
+      "gnd_name": "Rathmalana West",
+      "district_name": "COLOMBO",
+      "ds_division_name": "RATMALANA"
+    },
+    {
+      "objectid": 14079,
+      "gnd_name": "Pitawala",
+      "district_name": "KANDY",
+      "ds_division_name": "UDUDUMBARA"
+    },
+    {
+      "objectid": 14083,
+      "gnd_name": "Rambukwella East",
+      "district_name": "KANDY",
+      "ds_division_name": "UDUDUMBARA"
+    },
+    {
+      "objectid": 14109,
+      "gnd_name": "Wewathenna",
+      "district_name": "KANDY",
+      "ds_division_name": "GANGAWATA KORALE"
+    },
+    {
+      "objectid": 14126,
+      "gnd_name": "Hikgodawalpola",
+      "district_name": "KANDY",
+      "ds_division_name": "TUMPANE"
+    },
+    {
+      "objectid": 14136,
+      "gnd_name": "Ponnila",
+      "district_name": "KANDY",
+      "ds_division_name": "TUMPANE"
+    },
+    {
+      "objectid": 14200,
+      "gnd_name": "Geradigala",
+      "district_name": "KANDY",
+      "ds_division_name": "UDUDUMBARA"
+    },
+    {
+      "objectid": 14205,
+      "gnd_name": "Kandegama",
+      "district_name": "KANDY",
+      "ds_division_name": "UDUDUMBARA"
+    },
+    {
+      "objectid": 14210,
+      "gnd_name": "Welgala",
+      "district_name": "KANDY",
+      "ds_division_name": "POOJAPITIYA"
+    },
+    {
+      "objectid": 14250,
+      "gnd_name": "Maligathenna",
+      "district_name": "KANDY",
+      "ds_division_name": "GANGAWATA KORALE"
+    },
+    {
+      "objectid": 14379,
+      "gnd_name": "Naranwala",
+      "district_name": "KANDY",
+      "ds_division_name": "TUMPANE"
+    },
+    {
+      "objectid": 14382,
+      "gnd_name": "Halpe",
+      "district_name": "GAMPAHA",
+      "ds_division_name": "DIVULAPITIYA"
+    },
+    {
+      "objectid": 14387,
+      "gnd_name": "Muttakkarai",
+      "district_name": "GAMPAHA",
+      "ds_division_name": "NEGOMBO"
+    },
+    {
+      "objectid": 14388,
+      "gnd_name": "Muttakkarai  North",
+      "district_name": "GAMPAHA",
+      "ds_division_name": "NEGOMBO"
+    },
+    {
+      "objectid": 14444,
+      "gnd_name": " ",
+      "district_name": "GAMPAHA",
+      "ds_division_name": "KATANA"
+    },
+    {
+      "objectid": 14626,
+      "gnd_name": "Boowelikada",
+      "district_name": "KANDY",
+      "ds_division_name": "GANGAWATA KORALE"
+    },
+    {
+      "objectid": 14749,
+      "gnd_name": "Purana Meerigama",
+      "district_name": "GAMPAHA",
+      "ds_division_name": "MIRIGAMA"
+    },
+    {
+      "objectid": 14769,
+      "gnd_name": "Weligalla",
+      "district_name": "KANDY",
+      "ds_division_name": "POOJAPITIYA"
+    },
+    {
+      "objectid": 14783,
+      "gnd_name": "Dalupotha",
+      "district_name": "GAMPAHA",
+      "ds_division_name": "NEGOMBO"
+    },
+    {
+      "objectid": 14908,
+      "gnd_name": "Pabadeniya",
+      "district_name": "KANDY",
+      "ds_division_name": "DOLUWA"
+    },
+    {
+      "objectid": 15152,
+      "gnd_name": "Legumdeniya",
+      "district_name": "KANDY",
+      "ds_division_name": "DOLUWA"
+    },
+    {
+      "objectid": 15226,
+      "gnd_name": "Nikathenna",
+      "district_name": "KANDY",
+      "ds_division_name": "TUMPANE"
+    },
+    {
+      "objectid": 15248,
+      "gnd_name": "Gangoda",
+      "district_name": "KANDY",
+      "ds_division_name": "UDUDUMBARA"
+    },
+    {
+      "objectid": 15307,
+      "gnd_name": "Kandekumbura",
+      "district_name": "KANDY",
+      "ds_division_name": "TUMPANE"
+    },
+    {
+      "objectid": 15356,
+      "gnd_name": "Diyapalagoda",
+      "district_name": "KANDY",
+      "ds_division_name": "TUMPANE"
+    },
+    {
+      "objectid": 15359,
+      "gnd_name": "Bowala",
+      "district_name": "KANDY",
+      "ds_division_name": "GANGAWATA KORALE"
+    },
+    {
+      "objectid": 15380,
+      "gnd_name": "Getambe",
+      "district_name": "KANDY",
+      "ds_division_name": "GANGAWATA KORALE"
+    },
+    {
+      "objectid": 15408,
+      "gnd_name": "Udawela",
+      "district_name": "KANDY",
+      "ds_division_name": "UDUDUMBARA"
+    },
+    {
+      "objectid": 15558,
+      "gnd_name": "Paranagama",
+      "district_name": "KANDY",
+      "ds_division_name": "TUMPANE"
+    },
+    {
+      "objectid": 15606,
+      "gnd_name": "Gunembill",
+      "district_name": "KANDY",
+      "ds_division_name": "PATHADUMBARA"
+    },
+    {
+      "objectid": 15936,
+      "gnd_name": "Halpe",
+      "district_name": "GAMPAHA",
+      "ds_division_name": "DIVULAPITIYA"
+    },
+    {
+      "objectid": 16076,
+      "gnd_name": "Kurana Katunayaka West",
+      "district_name": "GAMPAHA",
+      "ds_division_name": "KATANA"
+    },
+    {
+      "objectid": 16238,
+      "gnd_name": "Meerigama",
+      "district_name": "GAMPAHA",
+      "ds_division_name": "MIRIGAMA"
+    },
+    {
+      "objectid": 16398,
+      "gnd_name": "Godapola",
+      "district_name": "MATALE",
+      "ds_division_name": "RATTOTA"
+    },
+    {
+      "objectid": 16666,
+      "gnd_name": "Miriswatta",
+      "district_name": "KALUTARA",
+      "ds_division_name": "WALALLAWITA"
+    },
+    {
+      "objectid": 16667,
+      "gnd_name": "Pannila",
+      "district_name": "KALUTARA",
+      "ds_division_name": "WALALLAWITA"
+    },
+    {
+      "objectid": 16682,
+      "gnd_name": "Henegama",
+      "district_name": "KALUTARA",
+      "ds_division_name": "MATUGAMA"
+    },
+    {
+      "objectid": 16831,
+      "gnd_name": "Dalupotha East",
+      "district_name": "GAMPAHA",
+      "ds_division_name": "NEGOMBO"
+    },
+    {
+      "objectid": 17030,
+      "gnd_name": "Muttakkarai East",
+      "district_name": "GAMPAHA",
+      "ds_division_name": "NEGOMBO"
+    },
+    {
+      "objectid": 17031,
+      "gnd_name": "Sapugasthenna",
+      "district_name": "GAMPAHA",
+      "ds_division_name": "ATTANAGALLA"
+    },
+    {
+      "objectid": 17032,
+      "gnd_name": "Sapugasthenna",
+      "district_name": "GAMPAHA",
+      "ds_division_name": "ATTANAGALLA"
+    },
+    {
+      "objectid": 17037,
+      "gnd_name": "Werullahena",
+      "district_name": "KALUTARA",
+      "ds_division_name": "HORANA"
+    },
+    {
+      "objectid": 17044,
+      "gnd_name": "Gorakadoowa",
+      "district_name": "KALUTARA",
+      "ds_division_name": "WALALLAWITA"
+    },
+    {
+      "objectid": 17048,
+      "gnd_name": "Gorakadoowa",
+      "district_name": "KALUTARA",
+      "ds_division_name": "WALALLAWITA"
+    },
+    {
+      "objectid": 17050,
+      "gnd_name": "Miriswatta",
+      "district_name": "KALUTARA",
+      "ds_division_name": "WALALLAWITA"
+    },
+    {
+      "objectid": 17187,
+      "gnd_name": "Adikarigoda",
+      "district_name": "KALUTARA",
+      "ds_division_name": "BERUWALA"
+    },
+    {
+      "objectid": 17232,
+      "gnd_name": "Bedipita",
+      "district_name": "GALLE",
+      "ds_division_name": "IMADUWA"
+    },
+    {
+      "objectid": 17260,
+      "gnd_name": "Kosgolla",
+      "district_name": "MATALE",
+      "ds_division_name": "AMBANGANGA"
+    },
+    {
+      "objectid": 17368,
+      "gnd_name": "Bearwell",
+      "district_name": "NUWARA ELIYA",
+      "ds_division_name": "THALAWAKELE"
+    },
+    {
+      "objectid": 17376,
+      "gnd_name": "Mathale North",
+      "district_name": "MATALE",
+      "ds_division_name": "YATAWATTA"
+    },
+    {
+      "objectid": 17425,
+      "gnd_name": "Kuda Waskaduwa South",
+      "district_name": "KALUTARA",
+      "ds_division_name": "KALUTARA"
+    },
+    {
+      "objectid": 17435,
+      "gnd_name": "Pothupitiya North",
+      "district_name": "KALUTARA",
+      "ds_division_name": "KALUTARA"
+    },
+    {
+      "objectid": 17494,
+      "gnd_name": "Kadawatha",
+      "district_name": "MATALE",
+      "ds_division_name": "NAULA"
+    },
+    {
+      "objectid": 17495,
+      "gnd_name": "Elagamuwa",
+      "district_name": "MATALE",
+      "ds_division_name": "NAULA"
+    },
+    {
+      "objectid": 17603,
+      "gnd_name": "Patabendimulla",
+      "district_name": "GALLE",
+      "ds_division_name": "AMBALANGODA"
+    },
+    {
+      "objectid": 17710,
+      "gnd_name": "Walasmulla Ihala",
+      "district_name": "HAMBANTOTA",
+      "ds_division_name": "WALASMULLA"
+    },
+    {
+      "objectid": 17711,
+      "gnd_name": "Walasmulla Pahala",
+      "district_name": "HAMBANTOTA",
+      "ds_division_name": "WALASMULLA"
+    },
+    {
+      "objectid": 17748,
+      "gnd_name": "Laggala Pallegama",
+      "district_name": "MATALE",
+      "ds_division_name": "LAGGALA"
+    },
+    {
+      "objectid": 17749,
+      "gnd_name": "Gonawala",
+      "district_name": "MATALE",
+      "ds_division_name": "LAGGALA"
+    },
+    {
+      "objectid": 17750,
+      "gnd_name": "Ganga Henwala",
+      "district_name": "MATALE",
+      "ds_division_name": "LAGGALA"
+    },
+    {
+      "objectid": 17752,
+      "gnd_name": "Miniranketiya",
+      "district_name": "MATALE",
+      "ds_division_name": "LAGGALA"
+    },
+    {
+      "objectid": 17756,
+      "gnd_name": "Halvitigala Colony 1",
+      "district_name": "GALLE",
+      "ds_division_name": "THAWALAMA"
+    },
+    {
+      "objectid": 17776,
+      "gnd_name": "Veedipola",
+      "district_name": "HAMBANTOTA",
+      "ds_division_name": "WALASMULLA"
+    },
+    {
+      "objectid": 17819,
+      "gnd_name": "Raigam Watta",
+      "district_name": "KALUTARA",
+      "ds_division_name": "INGIRIYA"
+    },
+    {
+      "objectid": 17844,
+      "gnd_name": "Mocha",
+      "district_name": "NUWARA ELIYA",
+      "ds_division_name": "NORWOOD"
+    },
+    {
+      "objectid": 17902,
+      "gnd_name": "Myliddythurai South",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM NORTH(THLLIPPALAI)"
+    },
+    {
+      "objectid": 17923,
+      "gnd_name": "Thirumurukandi",
+      "district_name": "MULLAITIVU",
+      "ds_division_name": "ODDUSUDDAN"
+    },
+    {
+      "objectid": 17924,
+      "gnd_name": "Kirimetiya",
+      "district_name": "NUWARA ELIYA",
+      "ds_division_name": "HANGURANKETA"
+    },
+    {
+      "objectid": 17929,
+      "gnd_name": "Liyanwala Pahalagama",
+      "district_name": "NUWARA ELIYA",
+      "ds_division_name": "WALAPANE"
+    },
+    {
+      "objectid": 18000,
+      "gnd_name": "Dambagalla",
+      "district_name": "NUWARA ELIYA",
+      "ds_division_name": "KOTHMALE WEST"
+    },
+    {
+      "objectid": 18032,
+      "gnd_name": "Maliyadda",
+      "district_name": "NUWARA ELIYA",
+      "ds_division_name": "HANGURANKETA"
+    },
+    {
+      "objectid": 18059,
+      "gnd_name": "Albion",
+      "district_name": "NUWARA ELIYA",
+      "ds_division_name": "THALAWAKELE"
+    },
+    {
+      "objectid": 18152,
+      "gnd_name": "Merrygoll",
+      "district_name": "NUWARA ELIYA",
+      "ds_division_name": "MATHURATA"
+    },
+    {
+      "objectid": 18204,
+      "gnd_name": "Madumana",
+      "district_name": "NUWARA ELIYA",
+      "ds_division_name": "HANGURANKETA"
+    },
+    {
+      "objectid": 18220,
+      "gnd_name": "Wattahena",
+      "district_name": "GALLE",
+      "ds_division_name": "NIYAGAMA"
+    },
+    {
+      "objectid": 18290,
+      "gnd_name": "Magalla",
+      "district_name": "GALLE",
+      "ds_division_name": "GALLE4GRAVETS"
+    },
+    {
+      "objectid": 18312,
+      "gnd_name": "Manampita",
+      "district_name": "GALLE",
+      "ds_division_name": "GONAPINUWALA"
+    },
+    {
+      "objectid": 18343,
+      "gnd_name": "Deliwala North",
+      "district_name": "NUWARA ELIYA",
+      "ds_division_name": "WALAPANE"
+    },
+    {
+      "objectid": 18375,
+      "gnd_name": "Etha Bendiwewa",
+      "district_name": "MATALE",
+      "ds_division_name": "DAMBULLA"
+    },
+    {
+      "objectid": 18382,
+      "gnd_name": "Boraluwahena",
+      "district_name": "GALLE",
+      "ds_division_name": "NIYAGAMA"
+    },
+    {
+      "objectid": 18384,
+      "gnd_name": "Koggala Athireka II",
+      "district_name": "GALLE",
+      "ds_division_name": "HABARADUWA"
+    },
+    {
+      "objectid": 18397,
+      "gnd_name": "Kaluwagaha Colony",
+      "district_name": "GALLE",
+      "ds_division_name": "GONAPINUWALA"
+    },
+    {
+      "objectid": 18404,
+      "gnd_name": "Udayarkattu South",
+      "district_name": "MULLAITIVU",
+      "ds_division_name": "PUTHUKKUDIYIRUPPU"
+    },
+    {
+      "objectid": 18421,
+      "gnd_name": "Ambaliyadda",
+      "district_name": "NUWARA ELIYA",
+      "ds_division_name": "HANGURANKETA"
+    },
+    {
+      "objectid": 18434,
+      "gnd_name": "Ambewela",
+      "district_name": "NUWARA ELIYA",
+      "ds_division_name": "HANGURANKETA"
+    },
+    {
+      "objectid": 18437,
+      "gnd_name": "Newvalleygama",
+      "district_name": "NUWARA ELIYA",
+      "ds_division_name": "NORWOOD"
+    },
+    {
+      "objectid": 18438,
+      "gnd_name": "Injuster",
+      "district_name": "NUWARA ELIYA",
+      "ds_division_name": "NORWOOD"
+    },
+    {
+      "objectid": 18456,
+      "gnd_name": "Keleweldeniya",
+      "district_name": "NUWARA ELIYA",
+      "ds_division_name": "AMBAGAMUWA KORALE"
+    },
+    {
+      "objectid": 18459,
+      "gnd_name": "Hitigama",
+      "district_name": "NUWARA ELIYA",
+      "ds_division_name": "AMBAGAMUWA KORALE"
+    },
+    {
+      "objectid": 18465,
+      "gnd_name": "Hambakanda",
+      "district_name": "NUWARA ELIYA",
+      "ds_division_name": "AMBAGAMUWA KORALE"
+    },
+    {
+      "objectid": 18477,
+      "gnd_name": "Kambarawa",
+      "district_name": "MATALE",
+      "ds_division_name": "NAULA"
+    },
+    {
+      "objectid": 18488,
+      "gnd_name": "Rambukoluwa",
+      "district_name": "MATALE",
+      "ds_division_name": "LAGGALA"
+    },
+    {
+      "objectid": 18490,
+      "gnd_name": "Imaduwa",
+      "district_name": "MATALE",
+      "ds_division_name": "LAGGALA"
+    },
+    {
+      "objectid": 18511,
+      "gnd_name": "Guralawela North",
+      "district_name": "MATALE",
+      "ds_division_name": "UKUWELA"
+    },
+    {
+      "objectid": 18520,
+      "gnd_name": "Narangamuwa",
+      "district_name": "MATALE",
+      "ds_division_name": "LAGGALA"
+    },
+    {
+      "objectid": 18524,
+      "gnd_name": "Rathninda",
+      "district_name": "MATALE",
+      "ds_division_name": "LAGGALA"
+    },
+    {
+      "objectid": 18554,
+      "gnd_name": "Vadducoddai North",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM WEST(CHANKANAI)"
+    },
+    {
+      "objectid": 18555,
+      "gnd_name": "Vadducoddai East",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM WEST(CHANKANAI)"
+    },
+    {
+      "objectid": 18573,
+      "gnd_name": "Ethgalamulla",
+      "district_name": "HAMBANTOTA",
+      "ds_division_name": "TANGALLE"
+    },
+    {
+      "objectid": 18583,
+      "gnd_name": "Kurumbasiddy East",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM NORTH(THLLIPPALAI)"
+    },
+    {
+      "objectid": 18596,
+      "gnd_name": "Wanduressa",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "POLPITIGAMA"
+    },
+    {
+      "objectid": 18739,
+      "gnd_name": "Galporugolla",
+      "district_name": "MATALE",
+      "ds_division_name": "NAULA"
+    },
+    {
+      "objectid": 18746,
+      "gnd_name": "Medapihilla",
+      "district_name": "MATALE",
+      "ds_division_name": "NAULA"
+    },
+    {
+      "objectid": 18752,
+      "gnd_name": "Rawanagama",
+      "district_name": "MATALE",
+      "ds_division_name": "LAGGALA"
+    },
+    {
+      "objectid": 18754,
+      "gnd_name": "Karadamulla",
+      "district_name": "MATALE",
+      "ds_division_name": "LAGGALA"
+    },
+    {
+      "objectid": 18768,
+      "gnd_name": "Kandepitawala",
+      "district_name": "MATALE",
+      "ds_division_name": "LAGGALA"
+    },
+    {
+      "objectid": 18819,
+      "gnd_name": "Pathegangoda",
+      "district_name": "GALLE",
+      "ds_division_name": "BALAPITIYA"
+    },
+    {
+      "objectid": 18849,
+      "gnd_name": "Waduwelivitiya",
+      "district_name": "GALLE",
+      "ds_division_name": "WELIVITIYA-DIVITURA"
+    },
+    {
+      "objectid": 18865,
+      "gnd_name": "Pathawelivitiya",
+      "district_name": "GALLE",
+      "ds_division_name": "WELIVITIYA-DIVITURA"
+    },
+    {
+      "objectid": 18866,
+      "gnd_name": "Keppitiyagoda",
+      "district_name": "GALLE",
+      "ds_division_name": "NAGODA"
+    },
+    {
+      "objectid": 18891,
+      "gnd_name": "Dodamkahavila",
+      "district_name": "GALLE",
+      "ds_division_name": "GONAPINUWALA"
+    },
+    {
+      "objectid": 18922,
+      "gnd_name": "Eriyagahamulla",
+      "district_name": "GALLE",
+      "ds_division_name": "GONAPINUWALA"
+    },
+    {
+      "objectid": 18943,
+      "gnd_name": "Miriswatta",
+      "district_name": "GALLE",
+      "ds_division_name": "WELIVITIYA-DIVITURA"
+    },
+    {
+      "objectid": 18977,
+      "gnd_name": "Ebalagedara North",
+      "district_name": "GALLE",
+      "ds_division_name": "NELUWA"
+    },
+    {
+      "objectid": 18984,
+      "gnd_name": "Deegoda Athireka 01",
+      "district_name": "GALLE",
+      "ds_division_name": "IMADUWA"
+    },
+    {
+      "objectid": 18988,
+      "gnd_name": "Berathuduwa",
+      "district_name": "GALLE",
+      "ds_division_name": "GONAPINUWALA"
+    },
+    {
+      "objectid": 18997,
+      "gnd_name": "Mahakachchakodiya",
+      "district_name": "VAVUNIYA",
+      "ds_division_name": "VAVUNIYA SOUTH"
+    },
+    {
+      "objectid": 19014,
+      "gnd_name": "Muththuaiyankaddukulam",
+      "district_name": "MULLAITIVU",
+      "ds_division_name": "ODDUSUDDAN"
+    },
+    {
+      "objectid": 19044,
+      "gnd_name": "Saliyapura",
+      "district_name": "HAMBANTOTA",
+      "ds_division_name": "LUNUGAMWEHERA"
+    },
+    {
+      "objectid": 19072,
+      "gnd_name": "Kurunduwatta",
+      "district_name": "GALLE",
+      "ds_division_name": "GALLE4GRAVETS"
+    },
+    {
+      "objectid": 19082,
+      "gnd_name": "Mihindupura",
+      "district_name": "HAMBANTOTA",
+      "ds_division_name": "LUNUGAMWEHERA"
+    },
+    {
+      "objectid": 19105,
+      "gnd_name": "Kallikattaikadu",
+      "district_name": "MANNAR",
+      "ds_division_name": "MANNAR TOWN"
+    },
+    {
+      "objectid": 19111,
+      "gnd_name": "Ganeshapuram",
+      "district_name": "KILINOCHCHI",
+      "ds_division_name": "KARACHCHI"
+    },
+    {
+      "objectid": 19113,
+      "gnd_name": "Urithirapuram East",
+      "district_name": "KILINOCHCHI",
+      "ds_division_name": "KARACHCHI"
+    },
+    {
+      "objectid": 19114,
+      "gnd_name": "Urithirapuram West",
+      "district_name": "KILINOCHCHI",
+      "ds_division_name": "KARACHCHI"
+    },
+    {
+      "objectid": 19115,
+      "gnd_name": "Vempodukeny",
+      "district_name": "KILINOCHCHI",
+      "ds_division_name": "PACHCHILAIPALLI"
+    },
+    {
+      "objectid": 19123,
+      "gnd_name": "Hewenpola",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "RIDEEGAMA"
+    },
+    {
+      "objectid": 19157,
+      "gnd_name": "Saveriyarpuram",
+      "district_name": "MANNAR",
+      "ds_division_name": "MUSALI"
+    },
+    {
+      "objectid": 19166,
+      "gnd_name": "Koggala Athireka I",
+      "district_name": "GALLE",
+      "ds_division_name": "HABARADUWA"
+    },
+    {
+      "objectid": 19273,
+      "gnd_name": "Polgahavila",
+      "district_name": "GALLE",
+      "ds_division_name": "WELIVITIYA-DIVITURA"
+    },
+    {
+      "objectid": 19274,
+      "gnd_name": "Horangalla (Akulavila)",
+      "district_name": "GALLE",
+      "ds_division_name": "NIYAGAMA"
+    },
+    {
+      "objectid": 19350,
+      "gnd_name": "Imaduwa Athireka 1",
+      "district_name": "GALLE",
+      "ds_division_name": "IMADUWA"
+    },
+    {
+      "objectid": 19401,
+      "gnd_name": "Kahadoowawatta",
+      "district_name": "GALLE",
+      "ds_division_name": "BOPE-PODDALA"
+    },
+    {
+      "objectid": 19430,
+      "gnd_name": "Bookandayaya",
+      "district_name": "HAMBANTOTA",
+      "ds_division_name": "KATUWANA"
+    },
+    {
+      "objectid": 19472,
+      "gnd_name": "Halvitigala Colony 2",
+      "district_name": "GALLE",
+      "ds_division_name": "THAWALAMA"
+    },
+    {
+      "objectid": 19518,
+      "gnd_name": "Kudaththanai Karaiyoor",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VADAMARADCHCHI EAST"
+    },
+    {
+      "objectid": 19520,
+      "gnd_name": "Allipalai",
+      "district_name": "KILINOCHCHI",
+      "ds_division_name": "PACHCHILAIPALLI"
+    },
+    {
+      "objectid": 19522,
+      "gnd_name": "Iranaithivu",
+      "district_name": "KILINOCHCHI",
+      "ds_division_name": "POONAKARY"
+    },
+    {
+      "objectid": 19523,
+      "gnd_name": "Jeyapuram North",
+      "district_name": "KILINOCHCHI",
+      "ds_division_name": "POONAKARY"
+    },
+    {
+      "objectid": 19571,
+      "gnd_name": "Kuttiyawatta",
+      "district_name": "GALLE",
+      "ds_division_name": "WELIVITIYA-DIVITURA"
+    },
+    {
+      "objectid": 19613,
+      "gnd_name": "Pathawelivitiya North",
+      "district_name": "GALLE",
+      "ds_division_name": "WELIVITIYA-DIVITURA"
+    },
+    {
+      "objectid": 19694,
+      "gnd_name": "Pannagam",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM WEST(CHANKANAI)"
+    },
+    {
+      "objectid": 19712,
+      "gnd_name": "Puthirarkandan",
+      "district_name": "MANNAR",
+      "ds_division_name": "NANADDAN"
+    },
+    {
+      "objectid": 19730,
+      "gnd_name": "Myliddythurai North",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM NORTH(THLLIPPALAI)"
+    },
+    {
+      "objectid": 19731,
+      "gnd_name": "Theiyiddy North",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM NORTH(THLLIPPALAI)"
+    },
+    {
+      "objectid": 19742,
+      "gnd_name": "Muruthawela Ihala",
+      "district_name": "HAMBANTOTA",
+      "ds_division_name": "WALASMULLA"
+    },
+    {
+      "objectid": 19765,
+      "gnd_name": "Meegaha Jadura",
+      "district_name": "HAMBANTOTA",
+      "ds_division_name": "SOORIYAWEWA"
+    },
+    {
+      "objectid": 19814,
+      "gnd_name": "Cheddipalayam South",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI SOUTH & ERUVIL PATTU"
+    },
+    {
+      "objectid": 19830,
+      "gnd_name": "Manayaveli",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "TOWN & GRAVETS"
+    },
+    {
+      "objectid": 19831,
+      "gnd_name": "Muthur East",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "MUTHUR"
+    },
+    {
+      "objectid": 19866,
+      "gnd_name": "Welipothewala",
+      "district_name": "HAMBANTOTA",
+      "ds_division_name": "THISSAMAHARAMA"
+    },
+    {
+      "objectid": 19908,
+      "gnd_name": "Senapura",
+      "district_name": "HAMBANTOTA",
+      "ds_division_name": "LUNUGAMWEHERA"
+    },
+    {
+      "objectid": 19946,
+      "gnd_name": "Suravanayadiyoottu",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "PORATIVU PATTU"
+    },
+    {
+      "objectid": 19947,
+      "gnd_name": "Thumpankerni",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "PORATIVU PATTU"
+    },
+    {
+      "objectid": 19961,
+      "gnd_name": "Thangavelauthapuram",
+      "district_name": "AMPARA",
+      "ds_division_name": "TIRUKKOVIL"
+    },
+    {
+      "objectid": 19965,
+      "gnd_name": "Vinayahapuram 3",
+      "district_name": "AMPARA",
+      "ds_division_name": "TIRUKKOVIL"
+    },
+    {
+      "objectid": 19971,
+      "gnd_name": "Bharathipuram",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "MUTHUR"
+    },
+    {
+      "objectid": 19972,
+      "gnd_name": "Azathnagar",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "MUTHUR"
+    },
+    {
+      "objectid": 20010,
+      "gnd_name": "Vadducoddai South",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM WEST(CHANKANAI)"
+    },
+    {
+      "objectid": 20011,
+      "gnd_name": "Vadducoddai  West",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM WEST(CHANKANAI)"
+    },
+    {
+      "objectid": 20030,
+      "gnd_name": "Ambalanthota North",
+      "district_name": "HAMBANTOTA",
+      "ds_division_name": "AMBALANTOTA"
+    },
+    {
+      "objectid": 20064,
+      "gnd_name": "Ambalanthota South",
+      "district_name": "HAMBANTOTA",
+      "ds_division_name": "AMBALANTOTA"
+    },
+    {
+      "objectid": 20076,
+      "gnd_name": "Udukirivala",
+      "district_name": "HAMBANTOTA",
+      "ds_division_name": "WEERAKETIYA"
+    },
+    {
+      "objectid": 20140,
+      "gnd_name": "New Kattankudy South",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KATTANKUDY"
+    },
+    {
+      "objectid": 20143,
+      "gnd_name": "New Kattankudy North",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KATTANKUDY"
+    },
+    {
+      "objectid": 20150,
+      "gnd_name": "Godakoggalla",
+      "district_name": "HAMBANTOTA",
+      "ds_division_name": "AMBALANTOTA"
+    },
+    {
+      "objectid": 20155,
+      "gnd_name": "Handapangalageaina",
+      "district_name": "HAMBANTOTA",
+      "ds_division_name": "WEERAKETIYA"
+    },
+    {
+      "objectid": 20160,
+      "gnd_name": "Amarathungagama",
+      "district_name": "HAMBANTOTA",
+      "ds_division_name": "ANGUNAKOLAPELESSA"
+    },
+    {
+      "objectid": 20200,
+      "gnd_name": "Yatigala Pahala",
+      "district_name": "HAMBANTOTA",
+      "ds_division_name": "OKEWELA"
+    },
+    {
+      "objectid": 20250,
+      "gnd_name": "Parikarikandal",
+      "district_name": "MANNAR",
+      "ds_division_name": "NANADDAN"
+    },
+    {
+      "objectid": 20252,
+      "gnd_name": "Chemmantheevu",
+      "district_name": "MANNAR",
+      "ds_division_name": "NANADDAN"
+    },
+    {
+      "objectid": 20260,
+      "gnd_name": "Vannamottai",
+      "district_name": "MANNAR",
+      "ds_division_name": "MANNAR TOWN"
+    },
+    {
+      "objectid": 20272,
+      "gnd_name": "Punnaineeravi",
+      "district_name": "KILINOCHCHI",
+      "ds_division_name": "KANDAVALAI"
+    },
+    {
+      "objectid": 20273,
+      "gnd_name": "Piramanthanaru",
+      "district_name": "KILINOCHCHI",
+      "ds_division_name": "KANDAVALAI"
+    },
+    {
+      "objectid": 20338,
+      "gnd_name": "Kavanthissapura",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "PADAVI SRI PURA"
+    },
+    {
+      "objectid": 20361,
+      "gnd_name": "Ganeshwaram",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM NORTH(THLLIPPALAI)"
+    },
+    {
+      "objectid": 20362,
+      "gnd_name": "Vasavilan East",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM NORTH(THLLIPPALAI)"
+    },
+    {
+      "objectid": 20363,
+      "gnd_name": "Kurumbasiddy",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM NORTH(THLLIPPALAI)"
+    },
+    {
+      "objectid": 20364,
+      "gnd_name": "Vasavilan West",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM NORTH(THLLIPPALAI)"
+    },
+    {
+      "objectid": 20412,
+      "gnd_name": "Hittatiya West",
+      "district_name": "MATARA",
+      "ds_division_name": "MATARA FOUR GRAVETS"
+    },
+    {
+      "objectid": 20458,
+      "gnd_name": "Kanattegoda South",
+      "district_name": "MATARA",
+      "ds_division_name": "MATARA FOUR GRAVETS"
+    },
+    {
+      "objectid": 20615,
+      "gnd_name": "Uduppiddy",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VADAMARADCHCHI SOUTH-WEST(KARAVEDDY)"
+    },
+    {
+      "objectid": 20621,
+      "gnd_name": "Aththikkuli",
+      "district_name": "MANNAR",
+      "ds_division_name": "NANADDAN"
+    },
+    {
+      "objectid": 20702,
+      "gnd_name": "Hittatiya Meda",
+      "district_name": "MATARA",
+      "ds_division_name": "MATARA FOUR GRAVETS"
+    },
+    {
+      "objectid": 20704,
+      "gnd_name": "Hittatiya East",
+      "district_name": "MATARA",
+      "ds_division_name": "MATARA FOUR GRAVETS"
+    },
+    {
+      "objectid": 20723,
+      "gnd_name": "Viyaparimulai",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VADAMARADCHI NORTH(POINT PEDRO)"
+    },
+    {
+      "objectid": 20725,
+      "gnd_name": "Palampoddaru",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "THAMBALAGAMUWA"
+    },
+    {
+      "objectid": 20733,
+      "gnd_name": "Pattanichchoor puliyankulam",
+      "district_name": "VAVUNIYA",
+      "ds_division_name": "VAVUNIYA"
+    },
+    {
+      "objectid": 20743,
+      "gnd_name": "Natpiddimunai MD 01",
+      "district_name": "AMPARA",
+      "ds_division_name": "KALMUNAI"
+    },
+    {
+      "objectid": 20746,
+      "gnd_name": "Natpiddimunai MD 03",
+      "district_name": "AMPARA",
+      "ds_division_name": "KALMUNAI"
+    },
+    {
+      "objectid": 20747,
+      "gnd_name": "Natpiddimunai MD 02",
+      "district_name": "AMPARA",
+      "ds_division_name": "KALMUNAI"
+    },
+    {
+      "objectid": 20757,
+      "gnd_name": "Dehigaspe",
+      "district_name": "MATARA",
+      "ds_division_name": "PITABADDARA"
+    },
+    {
+      "objectid": 20762,
+      "gnd_name": "Vachchikudah",
+      "district_name": "AMPARA",
+      "ds_division_name": "ALAYADIVEMBU"
+    },
+    {
+      "objectid": 20763,
+      "gnd_name": "Kattankudy Division 5 South",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KATTANKUDY"
+    },
+    {
+      "objectid": 20764,
+      "gnd_name": "Mandur 1 and  2 North",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "PORATIVU PATTU"
+    },
+    {
+      "objectid": 20781,
+      "gnd_name": "Arumugathanputhukulam",
+      "district_name": "VAVUNIYA",
+      "ds_division_name": "VAVUNIYA"
+    },
+    {
+      "objectid": 20786,
+      "gnd_name": "Pandiruppu 02",
+      "district_name": "AMPARA",
+      "ds_division_name": "KALMUNAI"
+    },
+    {
+      "objectid": 20787,
+      "gnd_name": "Thampalagauwa",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "THAMBALAGAMUWA"
+    },
+    {
+      "objectid": 20792,
+      "gnd_name": "Hidagahawewa",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "PANDUWASNUWARA WEST"
+    },
+    {
+      "objectid": 20868,
+      "gnd_name": "Mankumpan",
+      "district_name": "JAFFNA",
+      "ds_division_name": "ISLANDS SOUTH(VELANAI)"
+    },
+    {
+      "objectid": 20878,
+      "gnd_name": "Vettilaikerny",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VADAMARADCHCHI EAST"
+    },
+    {
+      "objectid": 20880,
+      "gnd_name": "Uduththurai",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VADAMARADCHCHI EAST"
+    },
+    {
+      "objectid": 20881,
+      "gnd_name": "Vaththirayan",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VADAMARADCHCHI EAST"
+    },
+    {
+      "objectid": 20888,
+      "gnd_name": "Vadducoddai South West",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM WEST(CHANKANAI)"
+    },
+    {
+      "objectid": 20905,
+      "gnd_name": "Achchuveli South",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM EAST(KOPAY)"
+    },
+    {
+      "objectid": 20906,
+      "gnd_name": "Achchuveli West",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM EAST(KOPAY)"
+    },
+    {
+      "objectid": 20907,
+      "gnd_name": "Achchuveli North",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM EAST(KOPAY)"
+    },
+    {
+      "objectid": 20908,
+      "gnd_name": "Pattameni",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM EAST(KOPAY)"
+    },
+    {
+      "objectid": 20911,
+      "gnd_name": "Kopai South",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM EAST(KOPAY)"
+    },
+    {
+      "objectid": 20917,
+      "gnd_name": "Vithakapuram",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM NORTH(THLLIPPALAI)"
+    },
+    {
+      "objectid": 20928,
+      "gnd_name": "Aththiyadi",
+      "district_name": "JAFFNA",
+      "ds_division_name": "JAFFNA"
+    },
+    {
+      "objectid": 20932,
+      "gnd_name": "Vannarponnai N.E. (South)",
+      "district_name": "JAFFNA",
+      "ds_division_name": "NALLUR"
+    },
+    {
+      "objectid": 20940,
+      "gnd_name": "Ariyalai S. W. (East)",
+      "district_name": "JAFFNA",
+      "ds_division_name": "NALLUR"
+    },
+    {
+      "objectid": 20945,
+      "gnd_name": "Nallur Rajathani",
+      "district_name": "JAFFNA",
+      "ds_division_name": "NALLUR"
+    },
+    {
+      "objectid": 20955,
+      "gnd_name": "Anaikottai",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM SOUTH WEST(SANDILIPAY)"
+    },
+    {
+      "objectid": 20973,
+      "gnd_name": "Marisankoodal",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM SOUTH WEST(SANDILIPAY)"
+    },
+    {
+      "objectid": 20981,
+      "gnd_name": "Evinai",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM SOUTH(UDUVIL)"
+    },
+    {
+      "objectid": 20987,
+      "gnd_name": "Kollankaladdy",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM NORTH(THLLIPPALAI)"
+    },
+    {
+      "objectid": 20990,
+      "gnd_name": "Theiyiddy South",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM NORTH(THLLIPPALAI)"
+    },
+    {
+      "objectid": 20991,
+      "gnd_name": "Achchelu",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM EAST(KOPAY)"
+    },
+    {
+      "objectid": 20993,
+      "gnd_name": "Siruppiddy West",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM EAST(KOPAY)"
+    },
+    {
+      "objectid": 21011,
+      "gnd_name": "Varani-Iyattalai",
+      "district_name": "JAFFNA",
+      "ds_division_name": "THENMARADCHI(CHAVAKACHCHERI)"
+    },
+    {
+      "objectid": 21022,
+      "gnd_name": "Rejendrankulam",
+      "district_name": "VAVUNIYA",
+      "ds_division_name": "VAVUNIYA"
+    },
+    {
+      "objectid": 21026,
+      "gnd_name": "Hulannuge West",
+      "district_name": "AMPARA",
+      "ds_division_name": "LAHUGALA"
+    },
+    {
+      "objectid": 21047,
+      "gnd_name": "Pan\u00edippulam",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM WEST(CHANKANAI)"
+    },
+    {
+      "objectid": 21061,
+      "gnd_name": "Theiyiddy East",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM NORTH(THLLIPPALAI)"
+    },
+    {
+      "objectid": 21063,
+      "gnd_name": "Uduppiddy North",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VADAMARADCHCHI SOUTH-WEST(KARAVEDDY)"
+    },
+    {
+      "objectid": 21073,
+      "gnd_name": "Vannarponnai N.E. (North)",
+      "district_name": "JAFFNA",
+      "ds_division_name": "NALLUR"
+    },
+    {
+      "objectid": 21074,
+      "gnd_name": "Vannarponnai N.W. (North)",
+      "district_name": "JAFFNA",
+      "ds_division_name": "NALLUR"
+    },
+    {
+      "objectid": 21083,
+      "gnd_name": "Deegawapie 02",
+      "district_name": "AMPARA",
+      "ds_division_name": "ADDALAICHENAI"
+    },
+    {
+      "objectid": 21096,
+      "gnd_name": "Rantetiyawa",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "UDUBADDAWA"
+    },
+    {
+      "objectid": 21099,
+      "gnd_name": "Navagrinagar",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "PORATIVU PATTU"
+    },
+    {
+      "objectid": 21100,
+      "gnd_name": "Thettativu North",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI SOUTH & ERUVIL PATTU"
+    },
+    {
+      "objectid": 21106,
+      "gnd_name": "Kathnoruwa",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "EHETUWEWA"
+    },
+    {
+      "objectid": 21118,
+      "gnd_name": "Uduppiddy South",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VADAMARADCHCHI SOUTH-WEST(KARAVEDDY)"
+    },
+    {
+      "objectid": 21126,
+      "gnd_name": "Iranailluppaikulam",
+      "district_name": "MANNAR",
+      "ds_division_name": "MADHU"
+    },
+    {
+      "objectid": 21132,
+      "gnd_name": "Thalaimannar",
+      "district_name": "MANNAR",
+      "ds_division_name": "MANNAR TOWN"
+    },
+    {
+      "objectid": 21134,
+      "gnd_name": "Thalaimannar Pier West",
+      "district_name": "MANNAR",
+      "ds_division_name": "MANNAR TOWN"
+    },
+    {
+      "objectid": 21135,
+      "gnd_name": "Thalaimannar Pier East",
+      "district_name": "MANNAR",
+      "ds_division_name": "MANNAR TOWN"
+    },
+    {
+      "objectid": 21138,
+      "gnd_name": "Semmanodai",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KORALAI PATTU CENTRAL"
+    },
+    {
+      "objectid": 21145,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "WATER AREA"
+    },
+    {
+      "objectid": 21158,
+      "gnd_name": "Vannarponnai N.W. (West)",
+      "district_name": "JAFFNA",
+      "ds_division_name": "NALLUR"
+    },
+    {
+      "objectid": 21164,
+      "gnd_name": "Siruppiddy East",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM EAST(KOPAY)"
+    },
+    {
+      "objectid": 21166,
+      "gnd_name": "Kopai North",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM EAST(KOPAY)"
+    },
+    {
+      "objectid": 21195,
+      "gnd_name": "Kannakigramam 01",
+      "district_name": "AMPARA",
+      "ds_division_name": "ALAYADIVEMBU"
+    },
+    {
+      "objectid": 21196,
+      "gnd_name": "Paddiyadipiddy",
+      "district_name": "AMPARA",
+      "ds_division_name": "AKKARAIPATTU"
+    },
+    {
+      "objectid": 21209,
+      "gnd_name": "Sammanthurai TD 02",
+      "district_name": "AMPARA",
+      "ds_division_name": "SAMMANTHURAI"
+    },
+    {
+      "objectid": 21210,
+      "gnd_name": "Sammanthurai TD 01",
+      "district_name": "AMPARA",
+      "ds_division_name": "SAMMANTHURAI"
+    },
+    {
+      "objectid": 21211,
+      "gnd_name": "Sammanthurai TD 04",
+      "district_name": "AMPARA",
+      "ds_division_name": "SAMMANTHURAI"
+    },
+    {
+      "objectid": 21217,
+      "gnd_name": "Kudaththanai",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VADAMARADCHCHI EAST"
+    },
+    {
+      "objectid": 21218,
+      "gnd_name": "Manatkadu",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VADAMARADCHCHI EAST"
+    },
+    {
+      "objectid": 21221,
+      "gnd_name": "Chirampiyadi",
+      "district_name": "JAFFNA",
+      "ds_division_name": "JAFFNA"
+    },
+    {
+      "objectid": 21226,
+      "gnd_name": " ",
+      "district_name": "JAFFNA",
+      "ds_division_name": "THENMARADCHI(CHAVAKACHCHERI)"
+    },
+    {
+      "objectid": 21242,
+      "gnd_name": "Eggaloya",
+      "district_name": "AMPARA",
+      "ds_division_name": "DAMANA"
+    },
+    {
+      "objectid": 21244,
+      "gnd_name": "Dewalahinda",
+      "district_name": "AMPARA",
+      "ds_division_name": "DAMANA"
+    },
+    {
+      "objectid": 21253,
+      "gnd_name": "Akkaraipattu 09",
+      "district_name": "AMPARA",
+      "ds_division_name": "ALAYADIVEMBU"
+    },
+    {
+      "objectid": 21280,
+      "gnd_name": "Kattankudy Division 6 South",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KATTANKUDY"
+    },
+    {
+      "objectid": 21281,
+      "gnd_name": "Puthukudiyiruppu",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KORALAI PATTU"
+    },
+    {
+      "objectid": 21306,
+      "gnd_name": "Kumbalanga",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "IBBAGAMUWA"
+    },
+    {
+      "objectid": 21307,
+      "gnd_name": "Medagama",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "WEERABUGEDARA"
+    },
+    {
+      "objectid": 21317,
+      "gnd_name": "Ariyalai Center West",
+      "district_name": "JAFFNA",
+      "ds_division_name": "NALLUR"
+    },
+    {
+      "objectid": 21321,
+      "gnd_name": "Kopai Centre",
+      "district_name": "JAFFNA",
+      "ds_division_name": "VALIKAMAM EAST(KOPAY)"
+    },
+    {
+      "objectid": 21349,
+      "gnd_name": "Muthur Central",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "MUTHUR"
+    },
+    {
+      "objectid": 21350,
+      "gnd_name": "Pallikudiyiruppu",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "MUTHUR"
+    },
+    {
+      "objectid": 21354,
+      "gnd_name": "Kachchakodithivu",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "KINNIYA"
+    },
+    {
+      "objectid": 21401,
+      "gnd_name": "Karambaikkurichchi",
+      "district_name": "JAFFNA",
+      "ds_division_name": "THENMARADCHI(CHAVAKACHCHERI)"
+    },
+    {
+      "objectid": 21407,
+      "gnd_name": "Thattuwankotty",
+      "district_name": "KILINOCHCHI",
+      "ds_division_name": "KANDAVALAI"
+    },
+    {
+      "objectid": 21408,
+      "gnd_name": "Korakkankattu",
+      "district_name": "KILINOCHCHI",
+      "ds_division_name": "KANDAVALAI"
+    },
+    {
+      "objectid": 21417,
+      "gnd_name": "Skandapuram",
+      "district_name": "KILINOCHCHI",
+      "ds_division_name": "KARACHCHI"
+    },
+    {
+      "objectid": 21421,
+      "gnd_name": "Barathipuram",
+      "district_name": "KILINOCHCHI",
+      "ds_division_name": "KARACHCHI"
+    },
+    {
+      "objectid": 21423,
+      "gnd_name": "Vivekanandanagar",
+      "district_name": "KILINOCHCHI",
+      "ds_division_name": "KARACHCHI"
+    },
+    {
+      "objectid": 21431,
+      "gnd_name": "Kanagampikaikulam",
+      "district_name": "KILINOCHCHI",
+      "ds_division_name": "KARACHCHI"
+    },
+    {
+      "objectid": 21434,
+      "gnd_name": "Arasarkeni",
+      "district_name": "KILINOCHCHI",
+      "ds_division_name": "PACHCHILAIPALLI"
+    },
+    {
+      "objectid": 21437,
+      "gnd_name": "Pulopalai",
+      "district_name": "KILINOCHCHI",
+      "ds_division_name": "PACHCHILAIPALLI"
+    },
+    {
+      "objectid": 21439,
+      "gnd_name": "Thambagamam",
+      "district_name": "KILINOCHCHI",
+      "ds_division_name": "PACHCHILAIPALLI"
+    },
+    {
+      "objectid": 21441,
+      "gnd_name": "Pallavarayankattu",
+      "district_name": "KILINOCHCHI",
+      "ds_division_name": "POONAKARY"
+    },
+    {
+      "objectid": 21443,
+      "gnd_name": "Nachchikuda",
+      "district_name": "KILINOCHCHI",
+      "ds_division_name": "POONAKARY"
+    },
+    {
+      "objectid": 21449,
+      "gnd_name": "Pannankandy",
+      "district_name": "KILINOCHCHI",
+      "ds_division_name": "KARACHCHI"
+    },
+    {
+      "objectid": 21450,
+      "gnd_name": "Kanakapuram",
+      "district_name": "KILINOCHCHI",
+      "ds_division_name": "KARACHCHI"
+    },
+    {
+      "objectid": 21461,
+      "gnd_name": "Tharmakeny",
+      "district_name": "KILINOCHCHI",
+      "ds_division_name": "PACHCHILAIPALLI"
+    },
+    {
+      "objectid": 21462,
+      "gnd_name": "Pulopalai West",
+      "district_name": "KILINOCHCHI",
+      "ds_division_name": "PACHCHILAIPALLI"
+    },
+    {
+      "objectid": 21464,
+      "gnd_name": "Alankeni",
+      "district_name": "KILINOCHCHI",
+      "ds_division_name": "POONAKARY"
+    },
+    {
+      "objectid": 21469,
+      "gnd_name": "Jeyapuram South",
+      "district_name": "KILINOCHCHI",
+      "ds_division_name": "POONAKARY"
+    },
+    {
+      "objectid": 21479,
+      "gnd_name": "Ilanthaimoddai",
+      "district_name": "MANNAR",
+      "ds_division_name": "NANADDAN"
+    },
+    {
+      "objectid": 21482,
+      "gnd_name": "Valkkaipettankandal",
+      "district_name": "MANNAR",
+      "ds_division_name": "NANADDAN"
+    },
+    {
+      "objectid": 21492,
+      "gnd_name": "Panankaddikoddu East",
+      "district_name": "MANNAR",
+      "ds_division_name": "MANNAR TOWN"
+    },
+    {
+      "objectid": 21493,
+      "gnd_name": "Panankaddikoddu West",
+      "district_name": "MANNAR",
+      "ds_division_name": "MANNAR TOWN"
+    },
+    {
+      "objectid": 21494,
+      "gnd_name": "Uppukulam South",
+      "district_name": "MANNAR",
+      "ds_division_name": "MANNAR TOWN"
+    },
+    {
+      "objectid": 21498,
+      "gnd_name": "Uppukulam North",
+      "district_name": "MANNAR",
+      "ds_division_name": "MANNAR TOWN"
+    },
+    {
+      "objectid": 21502,
+      "gnd_name": "Nanattan",
+      "district_name": "MANNAR",
+      "ds_division_name": "NANADDAN"
+    },
+    {
+      "objectid": 21510,
+      "gnd_name": "Udayarkattu North",
+      "district_name": "MULLAITIVU",
+      "ds_division_name": "PUTHUKKUDIYIRUPPU"
+    },
+    {
+      "objectid": 21517,
+      "gnd_name": "Vattapalai",
+      "district_name": "MULLAITIVU",
+      "ds_division_name": "MARITIMEPATTU"
+    },
+    {
+      "objectid": 21527,
+      "gnd_name": "Muthuvinayagapuram",
+      "district_name": "MULLAITIVU",
+      "ds_division_name": "ODDUSUDDAN"
+    },
+    {
+      "objectid": 21540,
+      "gnd_name": "Kattankudy Division 2 North",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KATTANKUDY"
+    },
+    {
+      "objectid": 21541,
+      "gnd_name": "Ayiththiyamalai South",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI WEST"
+    },
+    {
+      "objectid": 21547,
+      "gnd_name": "Bamunugedara",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "WEERABUGEDARA"
+    },
+    {
+      "objectid": 21555,
+      "gnd_name": "Madawachchiya",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "GALGAMUWA"
+    },
+    {
+      "objectid": 21589,
+      "gnd_name": "Periyakallar 01",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI SOUTH & ERUVIL PATTU"
+    },
+    {
+      "objectid": 21597,
+      "gnd_name": "Arayampathy_South",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI PATTU"
+    },
+    {
+      "objectid": 21599,
+      "gnd_name": "Rajadurai Gramam",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI PATTU"
+    },
+    {
+      "objectid": 21600,
+      "gnd_name": "Kattankudy Division 6 West",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KATTANKUDY"
+    },
+    {
+      "objectid": 21624,
+      "gnd_name": "Kallampattu",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "KUCHCHAWELI"
+    },
+    {
+      "objectid": 21625,
+      "gnd_name": "Pulmoddai Division No. 1",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "KUCHCHAWELI"
+    },
+    {
+      "objectid": 21626,
+      "gnd_name": "Jayanagar",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "KUCHCHAWELI"
+    },
+    {
+      "objectid": 21649,
+      "gnd_name": "Shemmalai East",
+      "district_name": "MULLAITIVU",
+      "ds_division_name": "MARITIMEPATTU"
+    },
+    {
+      "objectid": 21650,
+      "gnd_name": "Kathaliyarsamalankulam",
+      "district_name": "MULLAITIVU",
+      "ds_division_name": "ODDUSUDDAN"
+    },
+    {
+      "objectid": 21654,
+      "gnd_name": "Shemmalai",
+      "district_name": "MULLAITIVU",
+      "ds_division_name": "MARITIMEPATTU"
+    },
+    {
+      "objectid": 21662,
+      "gnd_name": "Kiriibbanwewa",
+      "district_name": "MULLAITIVU",
+      "ds_division_name": "WELIOYA"
+    },
+    {
+      "objectid": 21665,
+      "gnd_name": "Kalyanapura",
+      "district_name": "MULLAITIVU",
+      "ds_division_name": "WELIOYA"
+    },
+    {
+      "objectid": 21669,
+      "gnd_name": "Ethawetunawewa",
+      "district_name": "MULLAITIVU",
+      "ds_division_name": "WELIOYA"
+    },
+    {
+      "objectid": 21672,
+      "gnd_name": "Pandarikulam",
+      "district_name": "VAVUNIYA",
+      "ds_division_name": "VAVUNIYA"
+    },
+    {
+      "objectid": 21693,
+      "gnd_name": "Kristhavakulam",
+      "district_name": "VAVUNIYA",
+      "ds_division_name": "VENGALACHEDDIKULAM"
+    },
+    {
+      "objectid": 21697,
+      "gnd_name": "Kaththarsinnakulam",
+      "district_name": "VAVUNIYA",
+      "ds_division_name": "VAVUNIYA"
+    },
+    {
+      "objectid": 21712,
+      "gnd_name": "Deegawapie 01",
+      "district_name": "AMPARA",
+      "ds_division_name": "ADDALAICHENAI"
+    },
+    {
+      "objectid": 21725,
+      "gnd_name": "Periyakallar 03",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI SOUTH & ERUVIL PATTU"
+    },
+    {
+      "objectid": 21726,
+      "gnd_name": "Periyakallar 02",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI SOUTH & ERUVIL PATTU"
+    },
+    {
+      "objectid": 21727,
+      "gnd_name": "Periyakallar 02 West",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI SOUTH & ERUVIL PATTU"
+    },
+    {
+      "objectid": 21728,
+      "gnd_name": "Periyakallar 01 South",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI SOUTH & ERUVIL PATTU"
+    },
+    {
+      "objectid": 21742,
+      "gnd_name": "Marukkarampalai",
+      "district_name": "VAVUNIYA",
+      "ds_division_name": "VAVUNIYA"
+    },
+    {
+      "objectid": 21745,
+      "gnd_name": "Sasthrikoolankulam",
+      "district_name": "VAVUNIYA",
+      "ds_division_name": "VAVUNIYA"
+    },
+    {
+      "objectid": 21780,
+      "gnd_name": "Periyaneelavanai MD 01",
+      "district_name": "AMPARA",
+      "ds_division_name": "KALMUNAI"
+    },
+    {
+      "objectid": 21781,
+      "gnd_name": "Periyaneelavanai MD 02",
+      "district_name": "AMPARA",
+      "ds_division_name": "KALMUNAI"
+    },
+    {
+      "objectid": 21785,
+      "gnd_name": "Kaluthawalai 4 Santhipuram",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI SOUTH & ERUVIL PATTU"
+    },
+    {
+      "objectid": 21817,
+      "gnd_name": "Sammanthurai TD 03",
+      "district_name": "AMPARA",
+      "ds_division_name": "SAMMANTHURAI"
+    },
+    {
+      "objectid": 21836,
+      "gnd_name": "Kantale Town South",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "KANTALE"
+    },
+    {
+      "objectid": 21852,
+      "gnd_name": "Sandamadulla",
+      "district_name": "AMPARA",
+      "ds_division_name": "DEHIATTAKANDIYA"
+    },
+    {
+      "objectid": 21880,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "ERAVUR PATTU"
+    },
+    {
+      "objectid": 21882,
+      "gnd_name": "Mahadivulwewa",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "MORAWEWA"
+    },
+    {
+      "objectid": 21883,
+      "gnd_name": "Mahadiulwewa Stage 2",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "MORAWEWA"
+    },
+    {
+      "objectid": 21889,
+      "gnd_name": "New Kattankudy East",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KATTANKUDY"
+    },
+    {
+      "objectid": 21907,
+      "gnd_name": "Konwewa",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "MAHO"
+    },
+    {
+      "objectid": 21912,
+      "gnd_name": "Wanduressa",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "AMBANPOLA"
+    },
+    {
+      "objectid": 21915,
+      "gnd_name": "Udhagama",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "AMBANPOLA"
+    },
+    {
+      "objectid": 21944,
+      "gnd_name": "Siyambalangamuwa",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "POLPITIGAMA"
+    },
+    {
+      "objectid": 21945,
+      "gnd_name": "Rathnadivulwewa",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "EHETUWEWA"
+    },
+    {
+      "objectid": 21948,
+      "gnd_name": "Ethinimale",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "EHETUWEWA"
+    },
+    {
+      "objectid": 22000,
+      "gnd_name": "Sangamankanda",
+      "district_name": "AMPARA",
+      "ds_division_name": "POTTUVIL"
+    },
+    {
+      "objectid": 22013,
+      "gnd_name": "Arayampathy_3",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI PATTU"
+    },
+    {
+      "objectid": 22014,
+      "gnd_name": "Arayampathy_Central",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI PATTU"
+    },
+    {
+      "objectid": 22016,
+      "gnd_name": "Kattankudy Division 4  West",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KATTANKUDY"
+    },
+    {
+      "objectid": 22063,
+      "gnd_name": "Sagamam",
+      "district_name": "AMPARA",
+      "ds_division_name": "TIRUKKOVIL"
+    },
+    {
+      "objectid": 22101,
+      "gnd_name": "Sorikalmunai 2",
+      "district_name": "AMPARA",
+      "ds_division_name": "NAVITHANVELI"
+    },
+    {
+      "objectid": 22102,
+      "gnd_name": "Sorikalmunai 1",
+      "district_name": "AMPARA",
+      "ds_division_name": "NAVITHANVELI"
+    },
+    {
+      "objectid": 22103,
+      "gnd_name": "Sorikalmunai 3",
+      "district_name": "AMPARA",
+      "ds_division_name": "NAVITHANVELI"
+    },
+    {
+      "objectid": 22104,
+      "gnd_name": "Nawagampura",
+      "district_name": "AMPARA",
+      "ds_division_name": "AMPARA"
+    },
+    {
+      "objectid": 22109,
+      "gnd_name": "Kannakigramam 02",
+      "district_name": "AMPARA",
+      "ds_division_name": "ALAYADIVEMBU"
+    },
+    {
+      "objectid": 22136,
+      "gnd_name": "Sinna Puthukkudiyiruppu",
+      "district_name": "AMPARA",
+      "ds_division_name": "POTTUVIL"
+    },
+    {
+      "objectid": 22137,
+      "gnd_name": "Pothuvil 02 / Unit 2",
+      "district_name": "AMPARA",
+      "ds_division_name": "POTTUVIL"
+    },
+    {
+      "objectid": 22138,
+      "gnd_name": "Pothuvil 02 / Unit 3",
+      "district_name": "AMPARA",
+      "ds_division_name": "POTTUVIL"
+    },
+    {
+      "objectid": 22171,
+      "gnd_name": "Natpiddimunai TD 01",
+      "district_name": "AMPARA",
+      "ds_division_name": "KALMUNAI"
+    },
+    {
+      "objectid": 22173,
+      "gnd_name": "Natpiddimunai MD 05",
+      "district_name": "AMPARA",
+      "ds_division_name": "KALMUNAI"
+    },
+    {
+      "objectid": 22174,
+      "gnd_name": "Natpiddimunai TD 02",
+      "district_name": "AMPARA",
+      "ds_division_name": "KALMUNAI"
+    },
+    {
+      "objectid": 22175,
+      "gnd_name": "Natpiddimunai MD 04",
+      "district_name": "AMPARA",
+      "ds_division_name": "KALMUNAI"
+    },
+    {
+      "objectid": 22178,
+      "gnd_name": "Natpiddimunai TD 03",
+      "district_name": "AMPARA",
+      "ds_division_name": "KALMUNAI"
+    },
+    {
+      "objectid": 22218,
+      "gnd_name": "Thettativu South - 01",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI SOUTH & ERUVIL PATTU"
+    },
+    {
+      "objectid": 22219,
+      "gnd_name": "Thettativu South - 02",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI SOUTH & ERUVIL PATTU"
+    },
+    {
+      "objectid": 22221,
+      "gnd_name": "Thettativu South",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI SOUTH & ERUVIL PATTU"
+    },
+    {
+      "objectid": 22223,
+      "gnd_name": "Unnichchai",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI WEST"
+    },
+    {
+      "objectid": 22228,
+      "gnd_name": "Gnanasooriyam Square",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI NORTH"
+    },
+    {
+      "objectid": 22233,
+      "gnd_name": "Thissaweerasingam Square",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI NORTH"
+    },
+    {
+      "objectid": 22238,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KORALAI PATTU CENTRAL"
+    },
+    {
+      "objectid": 22239,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KORALAI PATTU CENTRAL"
+    },
+    {
+      "objectid": 22240,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KORALAI PATTU CENTRAL"
+    },
+    {
+      "objectid": 22241,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KORALAI PATTU CENTRAL"
+    },
+    {
+      "objectid": 22242,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KORALAI PATTU CENTRAL"
+    },
+    {
+      "objectid": 22243,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "WATER AREA"
+    },
+    {
+      "objectid": 22244,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "WATER AREA"
+    },
+    {
+      "objectid": 22246,
+      "gnd_name": "Kinnaiyady",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KORALAI PATTU"
+    },
+    {
+      "objectid": 22247,
+      "gnd_name": "Punanai East",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KORALAI PATTU NORTH"
+    },
+    {
+      "objectid": 22252,
+      "gnd_name": "New Kattankudy West",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KATTANKUDY"
+    },
+    {
+      "objectid": 22253,
+      "gnd_name": "Kattankudy Division 3 East",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KATTANKUDY"
+    },
+    {
+      "objectid": 22255,
+      "gnd_name": "Kattankudy Division 1 South",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KATTANKUDY"
+    },
+    {
+      "objectid": 22257,
+      "gnd_name": "Kaneshapuram",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "PORATIVU PATTU"
+    },
+    {
+      "objectid": 22258,
+      "gnd_name": "Thampalawattai",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "PORATIVU PATTU"
+    },
+    {
+      "objectid": 22262,
+      "gnd_name": "Mandur 1 and  2 South",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "PORATIVU PATTU"
+    },
+    {
+      "objectid": 22265,
+      "gnd_name": "Mandur Kottamunai",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "PORATIVU PATTU"
+    },
+    {
+      "objectid": 22269,
+      "gnd_name": "Arayampathy_North",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI PATTU"
+    },
+    {
+      "objectid": 22270,
+      "gnd_name": "Arayampathy_West",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI PATTU"
+    },
+    {
+      "objectid": 22271,
+      "gnd_name": "Arayampathy_1",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI PATTU"
+    },
+    {
+      "objectid": 22273,
+      "gnd_name": "Arayampathy_2",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI PATTU"
+    },
+    {
+      "objectid": 22276,
+      "gnd_name": "Arayampathy_East",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI PATTU"
+    },
+    {
+      "objectid": 22292,
+      "gnd_name": "Sangarpuram",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "PORATIVU PATTU"
+    },
+    {
+      "objectid": 22298,
+      "gnd_name": "Kalkudah",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KORALAI PATTU"
+    },
+    {
+      "objectid": 22300,
+      "gnd_name": "Maruththanai",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KORALAI PATTU SOUTH"
+    },
+    {
+      "objectid": 22303,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "ERAVUR TOWN"
+    },
+    {
+      "objectid": 22304,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "ERAVUR PATTU"
+    },
+    {
+      "objectid": 22305,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KATTANKUDY"
+    },
+    {
+      "objectid": 22306,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI SOUTH & ERUVIL PATTU"
+    },
+    {
+      "objectid": 22307,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI SOUTH WEST"
+    },
+    {
+      "objectid": 22308,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KORALAI PATTU"
+    },
+    {
+      "objectid": 22309,
+      "gnd_name": "Thuraineelavanai North 01",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI SOUTH & ERUVIL PATTU"
+    },
+    {
+      "objectid": 22310,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "PORATIVU PATTU"
+    },
+    {
+      "objectid": 22311,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KORALAI PATTU"
+    },
+    {
+      "objectid": 22313,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KORALAI PATTU"
+    },
+    {
+      "objectid": 22314,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KORALAI PATTU"
+    },
+    {
+      "objectid": 22324,
+      "gnd_name": "Malligaithivu",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "MUTHUR"
+    },
+    {
+      "objectid": 22325,
+      "gnd_name": "Morawewa Pankulama",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "MORAWEWA"
+    },
+    {
+      "objectid": 22339,
+      "gnd_name": "Hindawewa\u00a0",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "GANEWATTA"
+    },
+    {
+      "objectid": 22351,
+      "gnd_name": "Mylavedduvan",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "ERAVUR PATTU"
+    },
+    {
+      "objectid": 22361,
+      "gnd_name": "Ganthinagar",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI WEST"
+    },
+    {
+      "objectid": 22369,
+      "gnd_name": "Kaluwankerny 1",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "ERAVUR PATTU"
+    },
+    {
+      "objectid": 22375,
+      "gnd_name": "Kakkamunai",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "KINNIYA"
+    },
+    {
+      "objectid": 22389,
+      "gnd_name": "Kumbukwewa",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "MAHO"
+    },
+    {
+      "objectid": 22390,
+      "gnd_name": "Bogolla",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "POLPITIGAMA"
+    },
+    {
+      "objectid": 22403,
+      "gnd_name": "Jinna Nagar",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "MUTHUR"
+    },
+    {
+      "objectid": 22404,
+      "gnd_name": "Iqbal Nagar",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "MUTHUR"
+    },
+    {
+      "objectid": 22406,
+      "gnd_name": "Shafinagar",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "MUTHUR"
+    },
+    {
+      "objectid": 22408,
+      "gnd_name": "Jayanagar",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "MUTHUR"
+    },
+    {
+      "objectid": 22419,
+      "gnd_name": "Thennamaranvadiya",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "KUCHCHAWELI"
+    },
+    {
+      "objectid": 22426,
+      "gnd_name": "Muthugalayagama",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "PANNALA"
+    },
+    {
+      "objectid": 22463,
+      "gnd_name": "Panichchaiyady",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI NORTH"
+    },
+    {
+      "objectid": 22467,
+      "gnd_name": "Kokkadicholai South",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI SOUTH WEST"
+    },
+    {
+      "objectid": 22469,
+      "gnd_name": "Kokkadicholai",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI SOUTH WEST"
+    },
+    {
+      "objectid": 22475,
+      "gnd_name": "Mahiladitivu South",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI SOUTH WEST"
+    },
+    {
+      "objectid": 22476,
+      "gnd_name": "Puthukudiyiruppu",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI PATTU"
+    },
+    {
+      "objectid": 22477,
+      "gnd_name": "Iluppadichenai",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI WEST"
+    },
+    {
+      "objectid": 22480,
+      "gnd_name": "Kannankudah",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI WEST"
+    },
+    {
+      "objectid": 22482,
+      "gnd_name": "Kattankudy Division 3 West",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KATTANKUDY"
+    },
+    {
+      "objectid": 22487,
+      "gnd_name": "Veechchukalmunai",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI NORTH"
+    },
+    {
+      "objectid": 22488,
+      "gnd_name": "Puliyantivu East",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI NORTH"
+    },
+    {
+      "objectid": 22489,
+      "gnd_name": "Kithul",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "ERAVUR PATTU"
+    },
+    {
+      "objectid": 22492,
+      "gnd_name": "Ayiththiyamalai North",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI WEST"
+    },
+    {
+      "objectid": 22495,
+      "gnd_name": "Puliyantivu South",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI NORTH"
+    },
+    {
+      "objectid": 22497,
+      "gnd_name": "Puliyantivu West",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI NORTH"
+    },
+    {
+      "objectid": 22498,
+      "gnd_name": "Puliyantivu Central",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI NORTH"
+    },
+    {
+      "objectid": 22503,
+      "gnd_name": "Eachchantivu",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI WEST"
+    },
+    {
+      "objectid": 22506,
+      "gnd_name": "Mahilavedduvaan",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI WEST"
+    },
+    {
+      "objectid": 22507,
+      "gnd_name": "Kallady Mugaththuwaram",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI NORTH"
+    },
+    {
+      "objectid": 22515,
+      "gnd_name": "Kirimichchai",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KORALAI PATTU NORTH"
+    },
+    {
+      "objectid": 22521,
+      "gnd_name": "Ammanthanaveli",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KORALAI PATTU NORTH"
+    },
+    {
+      "objectid": 22522,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "WATER AREA"
+    },
+    {
+      "objectid": 22523,
+      "gnd_name": "Puchchakkerni",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KORALAI PATTU NORTH"
+    },
+    {
+      "objectid": 22531,
+      "gnd_name": "Ganthipuram",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "PORATIVU PATTU"
+    },
+    {
+      "objectid": 22537,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KORALAI PATTU CENTRAL"
+    },
+    {
+      "objectid": 22542,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI SOUTH & ERUVIL PATTU"
+    },
+    {
+      "objectid": 22545,
+      "gnd_name": "Periyakallar 03 South",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI SOUTH & ERUVIL PATTU"
+    },
+    {
+      "objectid": 22546,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "WATER AREA"
+    },
+    {
+      "objectid": 22557,
+      "gnd_name": "Uthuchchenai",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KORALAI PATTU SOUTH"
+    },
+    {
+      "objectid": 22558,
+      "gnd_name": "Kumaraveliyar Kiramam",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "ERAVUR PATTU"
+    },
+    {
+      "objectid": 22561,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "ERAVUR PATTU"
+    },
+    {
+      "objectid": 22565,
+      "gnd_name": "Thihiliveddai",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KORALAI PATTU SOUTH"
+    },
+    {
+      "objectid": 22568,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "ERAVUR PATTU"
+    },
+    {
+      "objectid": 22569,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "ERAVUR PATTU"
+    },
+    {
+      "objectid": 22570,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "KATTANKUDY"
+    },
+    {
+      "objectid": 22571,
+      "gnd_name": " ",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI PATTU"
+    },
+    {
+      "objectid": 22572,
+      "gnd_name": "Thuraineelavanai South 01",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI SOUTH & ERUVIL PATTU"
+    },
+    {
+      "objectid": 22573,
+      "gnd_name": "Kurinchamunai",
+      "district_name": "BATTICALOA",
+      "ds_division_name": "MANMUNAI WEST"
+    },
+    {
+      "objectid": 22581,
+      "gnd_name": "Echchalampattu",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "VERUGAL"
+    },
+    {
+      "objectid": 22592,
+      "gnd_name": "Varodayanagar",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "TOWN & GRAVETS"
+    },
+    {
+      "objectid": 22596,
+      "gnd_name": "Thiriyaya",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "KUCHCHAWELI"
+    },
+    {
+      "objectid": 22600,
+      "gnd_name": "Anaithivu",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "VERUGAL"
+    },
+    {
+      "objectid": 22605,
+      "gnd_name": "Chinabay",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "TOWN & GRAVETS"
+    },
+    {
+      "objectid": 22606,
+      "gnd_name": "Kawattikuda",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "TOWN & GRAVETS"
+    },
+    {
+      "objectid": 22608,
+      "gnd_name": "Sumedhankarapura",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "TOWN & GRAVETS"
+    },
+    {
+      "objectid": 22618,
+      "gnd_name": "Singhapura",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "TOWN & GRAVETS"
+    },
+    {
+      "objectid": 22619,
+      "gnd_name": "Thirukkadaloor",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "TOWN & GRAVETS"
+    },
+    {
+      "objectid": 22621,
+      "gnd_name": "Andankulam",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "TOWN & GRAVETS"
+    },
+    {
+      "objectid": 22624,
+      "gnd_name": "Jinnanagar",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "TOWN & GRAVETS"
+    },
+    {
+      "objectid": 22681,
+      "gnd_name": "Jinna Nagar",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "MUTHUR"
+    },
+    {
+      "objectid": 22683,
+      "gnd_name": "Muthur West",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "MUTHUR"
+    },
+    {
+      "objectid": 22690,
+      "gnd_name": "Iqbalnagar",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "KUCHCHAWELI"
+    },
+    {
+      "objectid": 22694,
+      "gnd_name": "Vallaiyoothu",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "KUCHCHAWELI"
+    },
+    {
+      "objectid": 22700,
+      "gnd_name": "Periyathumunai",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "KINNIYA"
+    },
+    {
+      "objectid": 22702,
+      "gnd_name": "Naduthivu",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "MUTHUR"
+    },
+    {
+      "objectid": 22707,
+      "gnd_name": "Pulmoddai Division No. 2",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "KUCHCHAWELI"
+    },
+    {
+      "objectid": 22708,
+      "gnd_name": "Pulmoddai Division No. 3",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "KUCHCHAWELI"
+    },
+    {
+      "objectid": 22709,
+      "gnd_name": "Pulmoddai Division No. 4",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "KUCHCHAWELI"
+    },
+    {
+      "objectid": 22716,
+      "gnd_name": "Naduuttu",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "KINNIYA"
+    },
+    {
+      "objectid": 22718,
+      "gnd_name": "Samavachchathivu",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "KINNIYA"
+    },
+    {
+      "objectid": 22726,
+      "gnd_name": "Kantale Town",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "KANTALE"
+    },
+    {
+      "objectid": 22748,
+      "gnd_name": "Pahala Gettuwana",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "MALLAWAPITIYA"
+    },
+    {
+      "objectid": 22845,
+      "gnd_name": "Medawachchiya",
+      "district_name": "TRINCOMALEE",
+      "ds_division_name": "GOMARANKADAWALA"
+    },
+    {
+      "objectid": 22888,
+      "gnd_name": "Vilattawa Palatha",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "BINGIRIYA"
+    },
+    {
+      "objectid": 22891,
+      "gnd_name": "Dolahamuna",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "PANDUWASNUWARA WEST"
+    },
+    {
+      "objectid": 22950,
+      "gnd_name": "Andigama",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "MAHAKUMBUKKADAWALA"
+    },
+    {
+      "objectid": 22954,
+      "gnd_name": "Thammennagama",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "ANAMADUWA"
+    },
+    {
+      "objectid": 22997,
+      "gnd_name": "Aluthgama",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "KOTAWEHERA"
+    },
+    {
+      "objectid": 23101,
+      "gnd_name": "Hewanellagara",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "KULIYAPITIYA EAST"
+    },
+    {
+      "objectid": 23119,
+      "gnd_name": "Lunuvila South",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "WENNAPPUWA"
+    },
+    {
+      "objectid": 23125,
+      "gnd_name": "Vanathavilluwa South",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "VANATHAVILLUWA"
+    },
+    {
+      "objectid": 23169,
+      "gnd_name": "Wanduressa",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "NIKAWERATIYA"
+    },
+    {
+      "objectid": 23186,
+      "gnd_name": "Kalugamuwa",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "WEERABUGEDARA"
+    },
+    {
+      "objectid": 23195,
+      "gnd_name": "Uda Iguruwatta",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "MAWATHAGAMA"
+    },
+    {
+      "objectid": 23269,
+      "gnd_name": "Ellanda",
+      "district_name": "BADULLA",
+      "ds_division_name": "MEEGAHAKIULA"
+    },
+    {
+      "objectid": 23274,
+      "gnd_name": "Wewelhinna",
+      "district_name": "BADULLA",
+      "ds_division_name": "HALI-ELA"
+    },
+    {
+      "objectid": 23292,
+      "gnd_name": "Udugama",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "WEERABUGEDARA"
+    },
+    {
+      "objectid": 23295,
+      "gnd_name": "Medakanda",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "POLPITIGAMA"
+    },
+    {
+      "objectid": 23299,
+      "gnd_name": "Ambagaswewa",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "POLPITIGAMA"
+    },
+    {
+      "objectid": 23316,
+      "gnd_name": "Sirigampala South",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "WENNAPPUWA"
+    },
+    {
+      "objectid": 23322,
+      "gnd_name": "Udappuwa",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "MUNDEL"
+    },
+    {
+      "objectid": 23323,
+      "gnd_name": "Battaluoya",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "ARACHCHIKATTUWA"
+    },
+    {
+      "objectid": 23355,
+      "gnd_name": "Hanwella",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "WEERABUGEDARA"
+    },
+    {
+      "objectid": 23356,
+      "gnd_name": "Thammita",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "WEERABUGEDARA"
+    },
+    {
+      "objectid": 23397,
+      "gnd_name": "Kavdawatta",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "MASPOTHA"
+    },
+    {
+      "objectid": 23415,
+      "gnd_name": "Kuthurumahana",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "RIDEEGAMA"
+    },
+    {
+      "objectid": 23423,
+      "gnd_name": "Wawagedara",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "MASPOTHA"
+    },
+    {
+      "objectid": 23454,
+      "gnd_name": "Moonamale",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "BAMUNAKOTUWA"
+    },
+    {
+      "objectid": 23458,
+      "gnd_name": "Dodamgasalanada",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "RIDEEGAMA"
+    },
+    {
+      "objectid": 23465,
+      "gnd_name": "Kandulawa",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "IBBAGAMUWA"
+    },
+    {
+      "objectid": 23498,
+      "gnd_name": "Pitapahamuna",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "IBBAGAMUWA"
+    },
+    {
+      "objectid": 23503,
+      "gnd_name": "Kumbukwewa",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "MAHO"
+    },
+    {
+      "objectid": 23504,
+      "gnd_name": "Thalakolawewa",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "POLPITIGAMA"
+    },
+    {
+      "objectid": 23547,
+      "gnd_name": "Dunkannawa",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "NATTANDIYA"
+    },
+    {
+      "objectid": 23562,
+      "gnd_name": "Henewatta",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "MIHINTHALE"
+    },
+    {
+      "objectid": 23567,
+      "gnd_name": "Thammennawa",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "MIHINTHALE"
+    },
+    {
+      "objectid": 23618,
+      "gnd_name": "Yaya 12",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "RAJANGANAYA"
+    },
+    {
+      "objectid": 23621,
+      "gnd_name": "Beddewela",
+      "district_name": "BADULLA",
+      "ds_division_name": "ELLA"
+    },
+    {
+      "objectid": 23642,
+      "gnd_name": "Duechbay",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "KALPITIYA"
+    },
+    {
+      "objectid": 23653,
+      "gnd_name": "Hangamuwa",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "POLPITIGAMA"
+    },
+    {
+      "objectid": 23666,
+      "gnd_name": "Koilandigama",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "ANAMADUWA"
+    },
+    {
+      "objectid": 23716,
+      "gnd_name": "Kumbukwewa",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "KOTAWEHERA"
+    },
+    {
+      "objectid": 23727,
+      "gnd_name": "Pothuvila",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "POLPITIGAMA"
+    },
+    {
+      "objectid": 23734,
+      "gnd_name": "Moragolla",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "KOTAWEHERA"
+    },
+    {
+      "objectid": 23739,
+      "gnd_name": "Bulnewa",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "POLPITIGAMA"
+    },
+    {
+      "objectid": 23754,
+      "gnd_name": "Kandattawa",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "KOBEIGANE"
+    },
+    {
+      "objectid": 23757,
+      "gnd_name": "Dekanduwala",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "POLPITIGAMA"
+    },
+    {
+      "objectid": 23766,
+      "gnd_name": "Bakmeewewa",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "POLPITIGAMA"
+    },
+    {
+      "objectid": 23802,
+      "gnd_name": "Ledgerwatta",
+      "district_name": "BADULLA",
+      "ds_division_name": "SORANATHOTA"
+    },
+    {
+      "objectid": 23844,
+      "gnd_name": "Kumbukwewa",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "MAHO"
+    },
+    {
+      "objectid": 23850,
+      "gnd_name": "Konwewa",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "MAHO"
+    },
+    {
+      "objectid": 23861,
+      "gnd_name": "Tikkanpothana",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "KAHATAGASDIGILIYA"
+    },
+    {
+      "objectid": 23942,
+      "gnd_name": "Peddegama",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "GALGAMUWA"
+    },
+    {
+      "objectid": 23969,
+      "gnd_name": "Medagama West",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "GALGAMUWA"
+    },
+    {
+      "objectid": 23980,
+      "gnd_name": "Thelbedda Estate",
+      "district_name": "BADULLA",
+      "ds_division_name": "BADULLA"
+    },
+    {
+      "objectid": 23997,
+      "gnd_name": "Karuwalagaswewa",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "GALENBIDUNUWEWA"
+    },
+    {
+      "objectid": 24066,
+      "gnd_name": "Maha Hammillawewa",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "KAHATAGASDIGILIYA"
+    },
+    {
+      "objectid": 24096,
+      "gnd_name": "Marandagolla",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "NARAMMALA"
+    },
+    {
+      "objectid": 24187,
+      "gnd_name": "Esseddama",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "KULIYAPITIYA WEST"
+    },
+    {
+      "objectid": 24377,
+      "gnd_name": "Aluthwatta",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "CHILAW"
+    },
+    {
+      "objectid": 24388,
+      "gnd_name": "Nandimithrapura",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "PALLAMA"
+    },
+    {
+      "objectid": 24389,
+      "gnd_name": "Udappuwa",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "MUNDEL"
+    },
+    {
+      "objectid": 24393,
+      "gnd_name": "Siyambalagaswewa",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "PALLAMA"
+    },
+    {
+      "objectid": 24398,
+      "gnd_name": " ",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "MUNDEL"
+    },
+    {
+      "objectid": 24418,
+      "gnd_name": "Perukkuvattan",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "MUNDEL"
+    },
+    {
+      "objectid": 24463,
+      "gnd_name": "Karavitagara West",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "CHILAW"
+    },
+    {
+      "objectid": 24464,
+      "gnd_name": "Aluthwatta",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "CHILAW"
+    },
+    {
+      "objectid": 24470,
+      "gnd_name": "Galwaduwagama",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "GALENBIDUNUWEWA"
+    },
+    {
+      "objectid": 24512,
+      "gnd_name": "Korathota",
+      "district_name": "COLOMBO",
+      "ds_division_name": "KADUWELA"
+    },
+    {
+      "objectid": 24523,
+      "gnd_name": "Kammanadaluwa",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "PALLAMA"
+    },
+    {
+      "objectid": 24539,
+      "gnd_name": "Puliyankadawara",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "CHILAW"
+    },
+    {
+      "objectid": 24572,
+      "gnd_name": "Mahakanadarawa L.B. Track 02",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "MIHINTHALE"
+    },
+    {
+      "objectid": 24573,
+      "gnd_name": "Mahakanadarawa L.B. Track 03",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "MIHINTHALE"
+    },
+    {
+      "objectid": 24575,
+      "gnd_name": "Thuruvila",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "NACHCHADUWA"
+    },
+    {
+      "objectid": 24619,
+      "gnd_name": "Bogahakumbura",
+      "district_name": "BADULLA",
+      "ds_division_name": "KANDEKETIYA"
+    },
+    {
+      "objectid": 24646,
+      "gnd_name": "Thummodara West",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "NATTANDIYA"
+    },
+    {
+      "objectid": 24647,
+      "gnd_name": "Thummodara East",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "NATTANDIYA"
+    },
+    {
+      "objectid": 24656,
+      "gnd_name": "Vanathavilluwa North",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "VANATHAVILLUWA"
+    },
+    {
+      "objectid": 24661,
+      "gnd_name": "Thambaravila",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "WENNAPPUWA"
+    },
+    {
+      "objectid": 24695,
+      "gnd_name": "Dematawewa",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "HOROWPATHANA"
+    },
+    {
+      "objectid": 24699,
+      "gnd_name": "Diganhalmillawewa",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "KAHATAGASDIGILIYA"
+    },
+    {
+      "objectid": 24719,
+      "gnd_name": "Kahatavila Part",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "DANKOTUWA"
+    },
+    {
+      "objectid": 24725,
+      "gnd_name": "Meda Lunuvila",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "WENNAPPUWA"
+    },
+    {
+      "objectid": 24727,
+      "gnd_name": "Lunuvila West",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "WENNAPPUWA"
+    },
+    {
+      "objectid": 24752,
+      "gnd_name": "Thaniwellagama",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "MADAMPE"
+    },
+    {
+      "objectid": 24795,
+      "gnd_name": "Siyambalagashena",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "ANAMADUWA"
+    },
+    {
+      "objectid": 24801,
+      "gnd_name": "Thammennagama",
+      "district_name": "PUTTALAM",
+      "ds_division_name": "PUTTALAM"
+    },
+    {
+      "objectid": 24824,
+      "gnd_name": "Yodhagama",
+      "district_name": "KEGALLE",
+      "ds_division_name": "ARANAYAKE"
+    },
+    {
+      "objectid": 24881,
+      "gnd_name": "Kattaduwagama",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "MIHINTHALE"
+    },
+    {
+      "objectid": 24888,
+      "gnd_name": "Maha Rambawewa",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "PALUGASWEWA"
+    },
+    {
+      "objectid": 24890,
+      "gnd_name": "Wannamkulama",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "GALENBIDUNUWEWA"
+    },
+    {
+      "objectid": 24900,
+      "gnd_name": "Maradankadawala",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "HOROWPATHANA"
+    },
+    {
+      "objectid": 24907,
+      "gnd_name": "Hurulunikawewa Track-04",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "GALENBIDUNUWEWA"
+    },
+    {
+      "objectid": 24932,
+      "gnd_name": "Thalgahawewa",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "RAMBEWA"
+    },
+    {
+      "objectid": 24937,
+      "gnd_name": "Dampelassagama",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "IPALOGAMA"
+    },
+    {
+      "objectid": 24941,
+      "gnd_name": "Mailagaswewa",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "GALENBIDUNUWEWA"
+    },
+    {
+      "objectid": 24942,
+      "gnd_name": "Ihalagama",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "GALENBIDUNUWEWA"
+    },
+    {
+      "objectid": 24945,
+      "gnd_name": "Balaluwewa1",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "PALAGALA"
+    },
+    {
+      "objectid": 24976,
+      "gnd_name": "Thammennagama",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "THAMBUTHTHEGAMA"
+    },
+    {
+      "objectid": 24977,
+      "gnd_name": "Veheragala",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "THAMBUTHTHEGAMA"
+    },
+    {
+      "objectid": 24980,
+      "gnd_name": "Konwewa",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "THAMBUTHTHEGAMA"
+    },
+    {
+      "objectid": 25005,
+      "gnd_name": "Narangala",
+      "district_name": "KEGALLE",
+      "ds_division_name": "ARANAYAKE"
+    },
+    {
+      "objectid": 25105,
+      "gnd_name": "Mahakanadarawa L.B. Track 01",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "MIHINTHALE"
+    },
+    {
+      "objectid": 25120,
+      "gnd_name": "Kumbukwewa",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "GALENBIDUNUWEWA"
+    },
+    {
+      "objectid": 25130,
+      "gnd_name": "Nabadagaswewa",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "RAMBEWA"
+    },
+    {
+      "objectid": 25163,
+      "gnd_name": "Nachchadoowa New Town",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "NACHCHADUWA"
+    },
+    {
+      "objectid": 25166,
+      "gnd_name": "Hurulunikawewa Track-03",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "GALENBIDUNUWEWA"
+    },
+    {
+      "objectid": 25167,
+      "gnd_name": "Kudagalenbidunuwewa",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "GALENBIDUNUWEWA"
+    },
+    {
+      "objectid": 25169,
+      "gnd_name": "Thammennagama",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "GALENBIDUNUWEWA"
+    },
+    {
+      "objectid": 25170,
+      "gnd_name": "Thammennawa",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "THAMBUTHTHEGAMA"
+    },
+    {
+      "objectid": 25199,
+      "gnd_name": "Nachchadoowa",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "NACHCHADUWA"
+    },
+    {
+      "objectid": 25224,
+      "gnd_name": "Thimbiriattawala",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "HOROWPATHANA"
+    },
+    {
+      "objectid": 25226,
+      "gnd_name": "Dutuwewa",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "HOROWPATHANA"
+    },
+    {
+      "objectid": 25232,
+      "gnd_name": "Parasangaswewa",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "NUWARAGAM PALATHA CENTRAL"
+    },
+    {
+      "objectid": 25255,
+      "gnd_name": "Muriyakadawala",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "GALENBIDUNUWEWA"
+    },
+    {
+      "objectid": 25273,
+      "gnd_name": "Devanampiyathissapura",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "NUWARAGAM PALATHA CENTRAL"
+    },
+    {
+      "objectid": 25278,
+      "gnd_name": "Nelumkanniya",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "NUWARAGAM PALATHA EAST"
+    },
+    {
+      "objectid": 25329,
+      "gnd_name": "Helambawewa",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "THAMBUTHTHEGAMA"
+    },
+    {
+      "objectid": 25368,
+      "gnd_name": "Pallewela",
+      "district_name": "BADULLA",
+      "ds_division_name": "KANDEKETIYA"
+    },
+    {
+      "objectid": 25369,
+      "gnd_name": "Wewathenna",
+      "district_name": "BADULLA",
+      "ds_division_name": "KANDEKETIYA"
+    },
+    {
+      "objectid": 25371,
+      "gnd_name": "Godigamuwa South A",
+      "district_name": "COLOMBO",
+      "ds_division_name": "MAHARAGAMA"
+    },
+    {
+      "objectid": 25406,
+      "gnd_name": "Erenawela",
+      "district_name": "BADULLA",
+      "ds_division_name": "HAPUTALE"
+    },
+    {
+      "objectid": 25415,
+      "gnd_name": "Eththalamulla",
+      "district_name": "MONARAGALA",
+      "ds_division_name": "BADALKUMBURA"
+    },
+    {
+      "objectid": 25421,
+      "gnd_name": "Kavudugama",
+      "district_name": "KEGALLE",
+      "ds_division_name": "KEGALLE"
+    },
+    {
+      "objectid": 25430,
+      "gnd_name": "Bibila",
+      "district_name": "MONARAGALA",
+      "ds_division_name": "BIBILE"
+    },
+    {
+      "objectid": 25446,
+      "gnd_name": "Dutuwewa",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "GALENBIDUNUWEWA"
+    },
+    {
+      "objectid": 25448,
+      "gnd_name": "Konwewa",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "GALENBIDUNUWEWA"
+    },
+    {
+      "objectid": 25449,
+      "gnd_name": "Ellawewa",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "GALENBIDUNUWEWA"
+    },
+    {
+      "objectid": 25491,
+      "gnd_name": "Dimbulamure",
+      "district_name": "MONARAGALA",
+      "ds_division_name": "WELLAWAYA"
+    },
+    {
+      "objectid": 25591,
+      "gnd_name": "Dachchihalmillawewa",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "KAHATAGASDIGILIYA"
+    },
+    {
+      "objectid": 25609,
+      "gnd_name": "Kavuduluwewa",
+      "district_name": "POLONNARUWA",
+      "ds_division_name": "MEDIRIGIRIYA"
+    },
+    {
+      "objectid": 25617,
+      "gnd_name": "Meewathpura",
+      "district_name": "POLONNARUWA",
+      "ds_division_name": "DIMBULAGALA"
+    },
+    {
+      "objectid": 25622,
+      "gnd_name": "Aralaganwila East",
+      "district_name": "POLONNARUWA",
+      "ds_division_name": "DIMBULAGALA"
+    },
+    {
+      "objectid": 25631,
+      "gnd_name": "Mahavillachchiya",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "MAHAWILACHCHIYA"
+    },
+    {
+      "objectid": 25641,
+      "gnd_name": "Jayapura",
+      "district_name": "POLONNARUWA",
+      "ds_division_name": "HIGURAKGODA"
+    },
+    {
+      "objectid": 25645,
+      "gnd_name": "Bathgampattuwa",
+      "district_name": "POLONNARUWA",
+      "ds_division_name": "HIGURAKGODA"
+    },
+    {
+      "objectid": 25657,
+      "gnd_name": "Wewathenna",
+      "district_name": "BADULLA",
+      "ds_division_name": "MEEGAHAKIULA"
+    },
+    {
+      "objectid": 25708,
+      "gnd_name": "04 1/2 Kanuwa",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "RAJANGANAYA"
+    },
+    {
+      "objectid": 25740,
+      "gnd_name": "Thammenna Elawaka",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "MEDAWACHCHIYA"
+    },
+    {
+      "objectid": 25797,
+      "gnd_name": "Pahalagama",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "THAMBUTHTHEGAMA"
+    },
+    {
+      "objectid": 25803,
+      "gnd_name": "Paindikulama",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "THIRAPPANE"
+    },
+    {
+      "objectid": 25809,
+      "gnd_name": "Perimiyankulama",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "THIRAPPANE"
+    },
+    {
+      "objectid": 25869,
+      "gnd_name": "Maithrigama",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "PALUGASWEWA"
+    },
+    {
+      "objectid": 25883,
+      "gnd_name": "Gallalla East",
+      "district_name": "POLONNARUWA",
+      "ds_division_name": "THAMANKADUWA"
+    },
+    {
+      "objectid": 25894,
+      "gnd_name": "Sirikaduyaya",
+      "district_name": "POLONNARUWA",
+      "ds_division_name": "ELAHERA"
+    },
+    {
+      "objectid": 25914,
+      "gnd_name": "Kekuluwela",
+      "district_name": "POLONNARUWA",
+      "ds_division_name": "DIMBULAGALA"
+    },
+    {
+      "objectid": 25947,
+      "gnd_name": "Katukeliyawa",
+      "district_name": "POLONNARUWA",
+      "ds_division_name": "HIGURAKGODA"
+    },
+    {
+      "objectid": 25950,
+      "gnd_name": "Yaya 05 Pedesa",
+      "district_name": "POLONNARUWA",
+      "ds_division_name": "HIGURAKGODA"
+    },
+    {
+      "objectid": 25953,
+      "gnd_name": "Yaya 12 Pedesa",
+      "district_name": "POLONNARUWA",
+      "ds_division_name": "HIGURAKGODA"
+    },
+    {
+      "objectid": 25963,
+      "gnd_name": "Ulpathwewa",
+      "district_name": "POLONNARUWA",
+      "ds_division_name": "HIGURAKGODA"
+    },
+    {
+      "objectid": 26009,
+      "gnd_name": "Uda Karadupana",
+      "district_name": "KEGALLE",
+      "ds_division_name": "KEGALLE"
+    },
+    {
+      "objectid": 26095,
+      "gnd_name": "Nawasenapura",
+      "district_name": "POLONNARUWA",
+      "ds_division_name": "WELIKANDA"
+    },
+    {
+      "objectid": 26189,
+      "gnd_name": "Mahathenna",
+      "district_name": "BADULLA",
+      "ds_division_name": "KANDEKETIYA"
+    },
+    {
+      "objectid": 26205,
+      "gnd_name": "Attanagolla",
+      "district_name": "BADULLA",
+      "ds_division_name": "LUNUGALA"
+    },
+    {
+      "objectid": 26223,
+      "gnd_name": "Dambavinna",
+      "district_name": "BADULLA",
+      "ds_division_name": "WELIMADA"
+    },
+    {
+      "objectid": 26244,
+      "gnd_name": "Wattegedara",
+      "district_name": "KEGALLE",
+      "ds_division_name": "ARANAYAKE"
+    },
+    {
+      "objectid": 26248,
+      "gnd_name": "Godigamuwa",
+      "district_name": "KEGALLE",
+      "ds_division_name": "ARANAYAKE"
+    },
+    {
+      "objectid": 26255,
+      "gnd_name": "Marudhamadu",
+      "district_name": "MANNAR",
+      "ds_division_name": "MUSALI"
+    },
+    {
+      "objectid": 26291,
+      "gnd_name": "Kebillewela North",
+      "district_name": "BADULLA",
+      "ds_division_name": "BANDARAWELA"
+    },
+    {
+      "objectid": 26408,
+      "gnd_name": "Kivulayaya",
+      "district_name": "MONARAGALA",
+      "ds_division_name": "SIYAMBALANDUWA"
+    },
+    {
+      "objectid": 26457,
+      "gnd_name": "Miyanakadura",
+      "district_name": "MONARAGALA",
+      "ds_division_name": "BADALKUMBURA"
+    },
+    {
+      "objectid": 26517,
+      "gnd_name": "Detagamuwa",
+      "district_name": "MONARAGALA",
+      "ds_division_name": "KATHARAGAMA"
+    },
+    {
+      "objectid": 26572,
+      "gnd_name": "Miyanavita",
+      "district_name": "KEGALLE",
+      "ds_division_name": "DERANIYAGALA"
+    },
+    {
+      "objectid": 26619,
+      "gnd_name": "Pothubandhana",
+      "district_name": "MONARAGALA",
+      "ds_division_name": "MEDAGAMA"
+    },
+    {
+      "objectid": 26719,
+      "gnd_name": "Hapuvita Pallegama",
+      "district_name": "KEGALLE",
+      "ds_division_name": "KEGALLE"
+    },
+    {
+      "objectid": 26739,
+      "gnd_name": "Higgoda",
+      "district_name": "KEGALLE",
+      "ds_division_name": "BULATHKOHIPITIYA"
+    },
+    {
+      "objectid": 26771,
+      "gnd_name": "Dikella",
+      "district_name": "KEGALLE",
+      "ds_division_name": "DEHIOWITA"
+    },
+    {
+      "objectid": 26852,
+      "gnd_name": "Kahanavita",
+      "district_name": "KEGALLE",
+      "ds_division_name": "DEHIOWITA"
+    },
+    {
+      "objectid": 26879,
+      "gnd_name": "Mudduwa East",
+      "district_name": "RATNAPURA",
+      "ds_division_name": "RATNAPURA"
+    },
+    {
+      "objectid": 26925,
+      "gnd_name": "Narangala",
+      "district_name": "KEGALLE",
+      "ds_division_name": "BULATHKOHIPITIYA"
+    },
+    {
+      "objectid": 26955,
+      "gnd_name": "Kalugala",
+      "district_name": "KEGALLE",
+      "ds_division_name": "ARANAYAKE"
+    },
+    {
+      "objectid": 26983,
+      "gnd_name": "Thalewala",
+      "district_name": "KEGALLE",
+      "ds_division_name": "KEGALLE"
+    },
+    {
+      "objectid": 26996,
+      "gnd_name": "Iipangamuwa",
+      "district_name": "KEGALLE",
+      "ds_division_name": "WARAKAPOLA"
+    },
+    {
+      "objectid": 27275,
+      "gnd_name": "Unit 3",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "IBBAGAMUWA"
+    },
+    {
+      "objectid": 27305,
+      "gnd_name": "Pahala Bomiriya A",
+      "district_name": "COLOMBO",
+      "ds_division_name": "KADUWELA"
+    },
+    {
+      "objectid": 27359,
+      "gnd_name": "Ilukkumbura",
+      "district_name": "RATNAPURA",
+      "ds_division_name": "WELIGEPOLA"
+    },
+    {
+      "objectid": 27526,
+      "gnd_name": "Weralupe",
+      "district_name": "RATNAPURA",
+      "ds_division_name": "RATNAPURA"
+    },
+    {
+      "objectid": 27532,
+      "gnd_name": "Mullikulam",
+      "district_name": "MANNAR",
+      "ds_division_name": "MUSALI"
+    },
+    {
+      "objectid": 27533,
+      "gnd_name": "Marichchukkaddi",
+      "district_name": "MANNAR",
+      "ds_division_name": "MUSALI"
+    },
+    {
+      "objectid": 27535,
+      "gnd_name": "Koolankulam",
+      "district_name": "MANNAR",
+      "ds_division_name": "MUSALI"
+    },
+    {
+      "objectid": 27537,
+      "gnd_name": "Minnukkan",
+      "district_name": "MANNAR",
+      "ds_division_name": "MANTHAI WEST"
+    },
+    {
+      "objectid": 27560,
+      "gnd_name": "Vinayahapuram 2",
+      "district_name": "AMPARA",
+      "ds_division_name": "TIRUKKOVIL"
+    },
+    {
+      "objectid": 27561,
+      "gnd_name": "Kanchirankudah",
+      "district_name": "AMPARA",
+      "ds_division_name": "TIRUKKOVIL"
+    },
+    {
+      "objectid": 27562,
+      "gnd_name": "Vinayahapuram 4",
+      "district_name": "AMPARA",
+      "ds_division_name": "TIRUKKOVIL"
+    },
+    {
+      "objectid": 27563,
+      "gnd_name": "Vinayahapuram 1",
+      "district_name": "AMPARA",
+      "ds_division_name": "TIRUKKOVIL"
+    },
+    {
+      "objectid": 27565,
+      "gnd_name": "Paalu Uswewa",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "KOTAWEHERA"
+    },
+    {
+      "objectid": 27568,
+      "gnd_name": "Kelegama",
+      "district_name": "KURUNEGALA",
+      "ds_division_name": "KOTAWEHERA"
+    },
+    {
+      "objectid": 27590,
+      "gnd_name": "Koralawella East",
+      "district_name": "COLOMBO",
+      "ds_division_name": "MORATUWA"
+    },
+    {
+      "objectid": 27659,
+      "gnd_name": "Medawachchi Handiya",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "HOROWPATHANA"
+    },
+    {
+      "objectid": 27674,
+      "gnd_name": "Track 13,18",
+      "district_name": "ANURADHAPURA",
+      "ds_division_name": "RAJANGANAYA"
+    },
+    {
+      "objectid": 27707,
+      "gnd_name": "Glen Alpin Estate",
+      "district_name": "BADULLA",
+      "ds_division_name": "BADULLA"
+    },
+    {
+      "objectid": 27771,
+      "gnd_name": " ",
+      "district_name": "GAMPAHA",
+      "ds_division_name": "NEGOMBO"
+    },
+    {
+      "objectid": 27786,
+      "gnd_name": "Rathmalana East",
+      "district_name": "COLOMBO",
+      "ds_division_name": "RATMALANA"
+    },
+    {
+      "objectid": 27855,
+      "gnd_name": "Slave Island",
+      "district_name": "COLOMBO",
+      "ds_division_name": "COLOMBO"
+    },
+    {
+      "objectid": 27866,
+      "gnd_name": "Obeysekarapura",
+      "district_name": "COLOMBO",
+      "ds_division_name": "SRI JAYAWARDANAPURA KOTTE"
+    }
+  ]
+}

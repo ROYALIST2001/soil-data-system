@@ -11,6 +11,7 @@ import (
 	"soil-data-system/api/internal/database"
 	"soil-data-system/api/internal/repository"
 	"soil-data-system/api/internal/service"
+	"soil-data-system/api/internal/soilmap"
 )
 
 func main() {
@@ -29,6 +30,12 @@ func main() {
 
 	// ---------- STEP 2: build the repositories (the data layer) ----------
 	readingRepo := repository.NewReadingRepository(db)
+	schemaCtx, cancelSchema := context.WithTimeout(context.Background(), 60*time.Second)
+	if err := readingRepo.EnsureGNLocations(schemaCtx); err != nil {
+		cancelSchema()
+		log.Fatal("Cannot initialize GN reading locations: ", err)
+	}
+	cancelSchema()
 	anchorRepo := repository.NewAnchorRepository(db)
 	districtRepo := repository.NewDistrictRepository(db)
 	analyticsRepo := repository.NewAnalyticsRepository(db) // NEW
@@ -120,6 +127,11 @@ func main() {
 	// ---------- STEP 7: connect the routes ----------
 	mux := http.NewServeMux()
 	locationCatalogController := controller.NewLocationCatalogController(locationCatalogRepo)
+	gnMapController := controller.NewGNMapController(analyticsRepo)
+	mux.Handle("GET /soil-map/", http.StripPrefix("/soil-map/", soilmap.Handler()))
+	mux.HandleFunc("GET /map/gn-divisions", gnMapController.Divisions)
+	mux.HandleFunc("GET /history/gn-division/{code}", gnMapController.History)
+	mux.HandleFunc("GET /history/land/{landId}", auth.RequireAuth(gnMapController.LandHistory))
 	// Public reference data is needed before a new farmer can sign up.
 	mux.HandleFunc("GET /locations/districts", locationCatalogController.Districts)
 	mux.HandleFunc("GET /locations/gn-divisions", locationCatalogController.Divisions)

@@ -51,6 +51,24 @@ Public catalog endpoints are `/locations/districts`,
 See `api/internal/locationcatalog/data/README.md` for provenance, version details,
 refresh instructions and legacy-name handling.
 
+## GN division soil map
+
+Insights → Soil map displays GN boundaries with average pH, nitrogen, phosphorus
+or potassium, accepted reading counts and the latest test date. Pick a land to
+focus on its saved division, or choose a district and search by GN name/code.
+The map uses OpenStreetMap and bundled Leaflet assets without Google Maps keys.
+Empty divisions remain grey; colours compare observed values within a district.
+
+GPS capture is **disabled**, with the existing capture code retained behind
+`ENABLE_FIELD_LOCATION_CAPTURE` in `mobile/src/constants/features.ts`. New tests
+use the selected land's verified GN division and store no GPS coordinates. Trends
+use land history and GN monthly averages. Existing GPS tests remain supported.
+
+Rebuild the API with `docker compose up -d --build --no-deps api`, run `npm install`
+inside `mobile`, then reload Expo Go. Existing database volumes upgrade at startup.
+See `api/internal/soilmap/README.md` for boundary provenance, unmatched names,
+refresh instructions and the map's aggregation rules.
+
 ## Soil advisor chatbot
 
 The advisor now follows an enforced research order: local PDF RAG, Sri Lankan

@@ -14,6 +14,7 @@ import { useLands } from "../hooks/useLands";
 import { useAuth } from "../hooks/useAuth";
 import { useAppSelector } from "../store";
 import { NewReading } from "../types/reading";
+import { ENABLE_FIELD_LOCATION_CAPTURE } from "../constants/features";
 
 function cropLabel(value: string): string {
   const found = CROPS.find((c) => c.value === value);
@@ -97,6 +98,8 @@ export default function SoilEntryScreen() {
   function handleLandChange(value: string) {
     const newId = parseInt(value, 10);
     setLandId(newId);
+    setLat(null);
+    setLng(null);
 
     const newLand = lands.find((l) => l.land_id === newId);
     setLandCropId(
@@ -125,7 +128,7 @@ export default function SoilEntryScreen() {
       return;
     }
 
-    if (lat === null || lng === null) {
+    if (ENABLE_FIELD_LOCATION_CAPTURE && (lat === null || lng === null)) {
       Alert.alert("Location needed", "Please capture your location first.");
       return;
     }
@@ -136,8 +139,9 @@ export default function SoilEntryScreen() {
     }
 
     const reading: NewReading = {
-      raw_lat: lat,
-      raw_lng: lng,
+      raw_lat: ENABLE_FIELD_LOCATION_CAPTURE ? lat : null,
+      raw_lng: ENABLE_FIELD_LOCATION_CAPTURE ? lng : null,
+      location_source: ENABLE_FIELD_LOCATION_CAPTURE ? "gps" : "gn_division",
       n: parseFloat(n),
       p: parseFloat(p),
       k: parseFloat(k),
@@ -209,12 +213,14 @@ export default function SoilEntryScreen() {
         </View>
       </View>
       <View style={ui.card}>
-        <View style={styles.sectionHead}><Text style={styles.step}>03</Text><Text style={styles.sectionTitle}>Growth & location</Text><Icon name="location" size={21} /></View>
+        <View style={styles.sectionHead}><Text style={styles.step}>03</Text><Text style={styles.sectionTitle}>Growth & division</Text><Icon name="location" size={21} /></View>
         <SelectField label="Growth stage" value={stage} options={STAGES} onSelect={setStage} />
         <InputField label="Target yield (tonnes per hectare)" value={targetYield} onChangeText={setTargetYield} numeric placeholder="Your expected yield" />
         {maxYieldForCrop !== undefined && <Text style={styles.hint}>Up to {maxYieldForCrop} tonnes per hectare for this crop.</Text>}
-        <AppButton title={locating ? "Finding your field..." : lat !== null ? "Update field location" : "Capture field location"} onPress={handleGetLocation} loading={locating} variant="secondary" icon="location" />
+        <View style={styles.locationNote}><Icon name="location" size={17} /><Text style={[styles.areaText, { flex: 1 }]}>GN division: {selectedLand?.gn_division}. Your test will use this land’s division.</Text></View>
+        <AppButton disabled={!ENABLE_FIELD_LOCATION_CAPTURE} title={locating ? "Finding your field..." : lat !== null ? "Update field location" : "Capture field location"} onPress={handleGetLocation} loading={locating} variant="secondary" icon="location" />
         {lat !== null && lng !== null && <View style={styles.locationNote}><Icon name="check" size={17} /><Text style={styles.areaText}>Location captured · {lat.toFixed(4)}, {lng.toFixed(4)}</Text></View>}
+        {!ENABLE_FIELD_LOCATION_CAPTURE && <Text style={styles.hint}>GPS capture is currently disabled. No location permission is needed.</Text>}
         {locationError && <Text style={styles.error}>{locationError}</Text>}
       </View>
       {submitError && <View style={styles.errorBox}><Text style={styles.error}>{submitError}</Text></View>}
