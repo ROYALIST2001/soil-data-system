@@ -11,7 +11,7 @@ type ChatRequest struct {
 	History []ChatMessage `json:"history"`
 
 	// Which field the farmer is asking about.
-	// Optional - if empty, we use their latest reading.
+	// Optional for general reference questions; required by personal field tools.
 	ReadingID *int `json:"reading_id"`
 }
 
@@ -34,5 +34,22 @@ type ChatResponse struct {
 
 	// Which tools were used. Useful for showing the farmer
 	// that the answer is based on their real data.
-	ToolsUsed []string `json:"tools_used"`
+	ToolsUsed     []string       `json:"tools_used"`
+	Sources       []ChatSource   `json:"sources"`
+	ResearchSteps []ResearchStep `json:"research_steps"`
+}
+
+type ChatSource struct {
+	ID    string `json:"id"`
+	Kind  string `json:"kind"`
+	Title string `json:"title"`
+	Page  int    `json:"page,omitempty"`
+	URL   string `json:"url,omitempty"`
+	Tier  string `json:"tier"`
+}
+
+type ResearchStep struct {
+	Stage  string `json:"stage"`
+	Status string `json:"status"`
+	Detail string `json:"detail"`
 }

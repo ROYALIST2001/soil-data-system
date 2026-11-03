@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ChatMessage, DisplayMessage } from "../types/chat";
+import { ChatMessage, DisplayMessage, ChatSource } from "../types/chat";
 
 interface ChatState {
   status: "idle" | "thinking" | "error" | "no_reading";
@@ -55,6 +55,7 @@ const chatSlice = createSlice({
         answer: string;
         history: ChatMessage[];
         toolsUsed: string[];
+        sources?: ChatSource[];
       }>
     ) {
       state.messages.push({
@@ -62,6 +63,7 @@ const chatSlice = createSlice({
         from: "advisor",
         text: action.payload.answer,
         toolsUsed: action.payload.toolsUsed,
+        sources: action.payload.sources,
       });
       state.history = action.payload.history;
       state.status = "idle";

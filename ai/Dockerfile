@@ -28,6 +28,10 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     --extra-index-url https://download.pytorch.org/whl/cpu \
     --timeout 120 --retries 10
 
+# Keep the small retrieval dependencies separate from the cached ML stack.
+COPY requirements-agent.txt ./
+RUN pip install --no-cache-dir -r requirements-agent.txt
+
 # Copy everything else: main.py, the app package, and artifacts.
 COPY . .
 

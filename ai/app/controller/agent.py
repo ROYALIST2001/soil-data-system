@@ -11,6 +11,8 @@ from app.schema.agent import (
 )
 from app.service import quality_agent, advisory_agent
 from app.client.llm_client import LLMError, is_available
+from app.service.book_index import book_index
+from app.service.research import SEARCH_TIERS
 
 router = APIRouter()
 
@@ -75,6 +77,8 @@ def agent_status():
     """
     return {
         "llm_configured": is_available(),
+        "books": book_index.status(),
+        "search_order": ["books"] + [tier for tier, _ in SEARCH_TIERS] + ["llm_generation"],
         "note": (
             "Set LLM_BASE_URL, LLM_API_KEY and LLM_MODEL in .env "
             "to enable the agents."

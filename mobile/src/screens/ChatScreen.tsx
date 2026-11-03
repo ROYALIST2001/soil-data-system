@@ -1,12 +1,10 @@
 import React, { useState, useRef } from "react";
 import {
   View, Text, TextInput, TouchableOpacity, ScrollView,
-  StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator,
+  StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator, Linking,
 } from "react-native";
 
-import { useNavigation } from "@react-navigation/native";
 import Icon from "../components/Icon";
-import AppButton from "../components/AppButton";
 import { colors } from "../theme";
 
 import { useChat } from "../hooks/useChat";
@@ -19,6 +17,10 @@ import { DisplayMessage } from "../types/chat";
 // NEVER show a user an internal name. Same rule as "Cluster 0"
 // in Phase 7: if a word will do, use the word.
 const TOOL_LABELS: Record<string, string> = {
+  books: "reference books",
+  sri_lankan_agriculture: "Sri Lankan agriculture websites",
+  sri_lankan_web: "Sri Lankan websites",
+  agriculture_web: "agriculture websites",
   get_soil_history: "your soil history",
   get_fertilizer_advice: "fertilizer advice",
   get_region_info: "regional soil data",
@@ -60,7 +62,23 @@ function MessageBubble({ message }: { message: DisplayMessage }) {
             WHY? So the farmer can SEE the answer came from THEIR data.
             It builds trust, and it is not a black box. */}
         {toolText && (
-          <Text style={styles.toolNote}>Based on: {toolText}</Text>
+          <Text style={styles.toolNote}>Checked: {toolText}</Text>
+        )}
+        {message.sources && message.sources.length > 0 && (
+          <View style={styles.sources}>
+            <Text style={styles.sourceHeading}>Sources / මූලාශ්‍ර</Text>
+            {message.sources.map((source) => source.kind === "web" && source.url?.startsWith("https://") ? (
+              <TouchableOpacity key={source.id} accessibilityRole="link" onPress={() => Linking.openURL(source.url!)} style={styles.sourceCard}>
+                <Text style={styles.sourceTitle}>[{source.id}] {source.title}</Text>
+                <Text style={styles.sourceDetail}>{source.url}</Text>
+              </TouchableOpacity>
+            ) : (
+              <View key={source.id} style={styles.sourceCard}>
+                <Text style={styles.sourceTitle}>[{source.id}] {source.title}</Text>
+                <Text style={styles.sourceDetail}>PDF page / පිටුව {source.page}</Text>
+              </View>
+            ))}
+          </View>
         )}
       </View>
     </View>
@@ -69,7 +87,6 @@ function MessageBubble({ message }: { message: DisplayMessage }) {
 
 export default function ChatScreen() {
   const [text, setText] = useState("");
-  const navigation = useNavigation<any>();
   const dispatch = useAppDispatch();
   const { send } = useChat();
 
@@ -94,24 +111,6 @@ export default function ChatScreen() {
     setText("");
   }
 
-  // ---------- No soil reading yet ----------
-  //
-  // The tools need a field to look at. Explain kindly,
-  // and give the next step.
-  if (!lastReading) {
-    return (
-      <View style={styles.centre}>
-        <View style={styles.emptyIcon}><Icon name="sprout" size={40} /></View>
-        <Text style={styles.emptyTitle}>Let’s get to know your soil</Text>
-        <Text style={styles.emptyText}>
-          The advisor needs your soil data to give real answers.
-          Start with a soil test to get advice for your field.
-        </Text>
-        <AppButton title="Start a soil test" icon="arrow" onPress={() => navigation.navigate("Test")} style={{ marginTop: 24 }} />
-      </View>
-    );
-  }
-
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -123,8 +122,8 @@ export default function ChatScreen() {
     >
       <View style={styles.contextBar}>
         <View style={styles.contextIcon}><Icon name="sprout" size={20} /></View>
-        <View style={{ flex: 1 }}><Text style={styles.contextTitle}>Advice rooted in your field</Text>
-          <Text style={styles.contextDetail}>{lastReading.crop} · Based on your saved soil test</Text></View>
+        <View style={{ flex: 1 }}><Text style={styles.contextTitle}>Your farming research assistant</Text>
+          <Text style={styles.contextDetail}>{lastReading ? `${lastReading.crop} · Your field and trusted references` : "Books first · Trusted websites next"}</Text></View>
       </View>
       {/* ---------- The message list ---------- */}
       <ScrollView
@@ -143,8 +142,7 @@ export default function ChatScreen() {
             <Text style={styles.welcomeTitle}>Let’s talk soil.</Text>
 
             <Text style={styles.welcomeText}>
-              A little guidance for your next growing season.
-              Ask a question or try one below.
+              Ask in Sinhala or English. I’ll check the reference books first, then trusted agriculture websites when needed.
             </Text>
 
             {SUGGESTIONS.map((s) => (
@@ -171,7 +169,7 @@ export default function ChatScreen() {
           <View style={[styles.row, styles.rowLeft]}>
             <View style={[styles.bubble, styles.bubbleAdvisor, styles.thinking]}>
               <ActivityIndicator size="small" color="#40916c" />
-              <Text style={styles.thinkingText}>Checking your data...</Text>
+              <Text style={styles.thinkingText}>Checking books and sources...</Text>
             </View>
           </View>
         )}
@@ -226,6 +224,11 @@ export default function ChatScreen() {
 }
 
 const styles = StyleSheet.create({
+  sources: { marginTop: 16, gap: 8 },
+  sourceHeading: { color: colors.forest, fontSize: 11, fontWeight: "700" },
+  sourceCard: { padding: 11, borderRadius: 10, backgroundColor: colors.sage, minHeight: 44 },
+  sourceTitle: { color: colors.primary, fontSize: 11, fontWeight: "600", lineHeight: 18 },
+  sourceDetail: { color: colors.secondary, fontSize: 10, lineHeight: 17, marginTop: 4 },
   container: { flex: 1, backgroundColor: colors.background },
   centre: { flex: 1, justifyContent: "center", alignItems: "center", padding: 30, backgroundColor: colors.background },
   contextBar: { flexDirection: "row", alignItems: "center", gap: 11, paddingHorizontal: 20, paddingVertical: 13, borderBottomWidth: 1, borderBottomColor: colors.border },

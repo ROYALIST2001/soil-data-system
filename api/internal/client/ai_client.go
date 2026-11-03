@@ -63,9 +63,8 @@ func NewAIClient() *AIClient {
 			// startup can be slower.
 			Timeout: 10 * time.Second,
 		},
-		// The Python LLM client allows 30 seconds for a provider reply.
-		// Chat requests must allow that time plus the service overhead.
-		chatHTTPClient: &http.Client{Timeout: 35 * time.Second},
+		// Reference retrieval and prioritized searches span multiple LLM calls.
+		chatHTTPClient: &http.Client{Timeout: 180 * time.Second},
 	}
 }
 
@@ -246,10 +245,13 @@ type AgentToolCall struct {
 
 // AgentChatResponse is what the agent sends back.
 type AgentChatResponse struct {
-	NeedsTools bool               `json:"needs_tools"`
-	ToolCalls  []AgentToolCall    `json:"tool_calls"`
-	Answer     *string            `json:"answer"`
-	Messages   []AgentChatMessage `json:"messages"`
+	NeedsTools    bool                 `json:"needs_tools"`
+	ToolCalls     []AgentToolCall      `json:"tool_calls"`
+	Answer        *string              `json:"answer"`
+	Messages      []AgentChatMessage   `json:"messages"`
+	Sources       []model.ChatSource   `json:"sources"`
+	ResearchSteps []model.ResearchStep `json:"research_steps"`
+	ToolsUsed     []string             `json:"tools_used"`
 }
 
 // Chat runs one round of the agent loop.

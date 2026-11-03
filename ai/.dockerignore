@@ -12,3 +12,5 @@ __pycache__/
 
 # Git metadata, if the context ever contains any.
 .git/
+books/
+data/

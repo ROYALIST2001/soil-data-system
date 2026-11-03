@@ -22,14 +22,6 @@ export function useChat() {
       return;
     }
 
-    // No soil reading yet. The tools would have nothing to look at.
-    if (!lastReading) {
-      dispatch(noReading(
-        "Please submit a soil test first, so the advisor can see your field."
-      ));
-      return;
-    }
-
     // Show the farmer's message IMMEDIATELY, before the server answers.
     // The app feels much faster this way.
     dispatch(messageSent(text.trim()));
@@ -37,7 +29,7 @@ export function useChat() {
     try {
       const result = await sendChatMessage({
         message: text.trim(),
-        reading_id: lastReading.reading_id,
+        reading_id: lastReading?.reading_id,
         history: history,   // the LLM has no memory, so we re-send it all
       });
 
@@ -45,6 +37,7 @@ export function useChat() {
         answer: result.answer,
         history: result.history,
         toolsUsed: result.tools_used || [],
+        sources: result.sources || [],
       }));
 
     } catch (e) {

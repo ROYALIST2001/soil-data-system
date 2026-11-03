@@ -33,7 +33,39 @@ to check the app's TypeScript.
 
 ## Soil advisor chatbot
 
-The mobile app's **Ask** tab calls the Go API, which runs the advisory agent
+The advisor now follows an enforced research order: local PDF RAG, Sri Lankan
+agriculture websites, other Sri Lankan `.lk` websites, then other agriculture
+websites. It stops when evidence is sufficient; the existing LLM writes the final
+answer. Sinhala questions receive Sinhala replies, including in an existing chat.
+General questions work before a farmer has submitted a soil test. Personal field
+tools still need a saved reading.
+
+Put PDFs in `ai/books` (see its README). The AI service builds a multilingual
+embedding index on startup and keeps it in the persistent `rag_data` volume.
+Initial indexing sends extracted book passages to the configured embeddings API.
+Wait for `books.ready: true` at `/agent/status` before testing book retrieval.
+The mobile advisor displays book titles/PDF pages and clickable web sources.
+
+`LLM_MODEL` remains the final-answer model. `EMBEDDING_MODEL` defaults to
+`text-embedding-3-small`; the separate `WEB_SEARCH_MODEL` defaults to `gpt-5-mini`
+because domain-filtered web search requires a supporting Responses API model.
+Both use `LLM_API_KEY`/`LLM_BASE_URL`. OpenAI-compatible providers that only support
+chat completions cannot supply these research endpoints; failures are recorded
+as unavailable, never represented as successful searches. Search and embeddings
+have their own API usage charges.
+
+Default first-tier domain: `doa.gov.lk`. The last tier uses FAO, IRRI, CIMMYT,
+ICRISAT and CABI. Override `SL_AGRICULTURE_DOMAINS`/`AGRICULTURE_DOMAINS` in `.env`.
+Every search tier validates returned citation hostnames. Retrieved content is
+untrusted evidence; it cannot replace agent instructions. If references fail or
+do not establish the answer, the agent identifies that limit and does not invent
+fertilizer doses. Research has a bounded time budget; incomplete later tiers are
+marked as skipped. Old statistics are labeled as historical.
+
+Reference: [OpenAI web search](https://developers.openai.com/api/docs/guides/tools-web-search),
+[multilingual embeddings](https://developers.openai.com/api/docs/guides/embeddings).
+
+The mobile app's **Advisor** tab calls the Go API, which runs the advisory agent
 through the Python AI service. It requires a valid API key and internet access.
 
 1. Copy `.env.example` to `.env` if you do not already have one.
@@ -48,9 +80,9 @@ through the Python AI service. It requires a valid API key and internet access.
    Recreate the AI service after changing `.env`; `docker compose restart`
    alone does not reload container environment variables.
 
-4. Log into the mobile app and submit a soil test (or use your saved latest
-   reading). Open **Ask** and try "What does soil pH mean?", then
-   "What fertilizer does my field need?".
+4. Log into the mobile app, open **Advisor**, and try "What does soil pH mean?"
+   or a Sinhala crop question. For "What fertilizer does my field need?",
+   submit a soil test first or use your saved latest reading.
 
 `http://localhost:8000/agent/status` reports whether a key is configured; it
 does not check whether the provider accepts it. For failures, check

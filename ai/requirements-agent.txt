@@ -1,0 +1,2 @@
+pypdf==6.19.0
+pandukabhaya==1.0.1
