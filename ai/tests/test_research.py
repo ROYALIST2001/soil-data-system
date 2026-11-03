@@ -3,7 +3,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import httpx
 import numpy as np
@@ -16,16 +16,17 @@ from app.schema.agent import ChatRequest, ChatMessage
 
 class BookTests(unittest.TestCase):
     def test_mung_question_cannot_use_an_onion_chapter(self):
-        index = BookIndex()
-        index.ready = True
-        index.chunks = [
-            {"title": "guide.pdf", "page": 35, "text": "Onion soil", "section_crops": ["onion"]},
-            {"title": "guide.pdf", "page": 17, "text": "මුං වගාවට සුදුසු පස", "section_crops": ["mung"]},
+        store = Mock()
+        store.search.return_value = [
+            {"title": "guide.pdf", "page": 35, "text": "Onion soil", "section_crops": ["onion"], "score": 1.0},
+            {"title": "guide.pdf", "page": 17, "text": "මුං වගාවට සුදුසු පස", "section_crops": ["mung"], "score": 0.6},
         ]
-        index.vectors = np.asarray([[1., 0.], [0.6, 0.8]], dtype=np.float32)
+        index = BookIndex(store=store)
+        index.ready = True
         with patch.object(research_client, "embed", return_value=[[1., 0.]]):
             hits = index.search("මුං වගාවට සුදුසු පස කුමක්ද?")
         self.assertEqual([hit["page"] for hit in hits], [17])
+        self.assertEqual(store.search.call_args.args[1], {"mung"})
     def test_legacy_font_conversion_preserves_english_and_numbers(self):
         def extraction(visitor_text=None, **kwargs):
             visitor_text("fnda. j.d", [], [], {"/BaseFont": "/ABC+FMBindumathix"}, 12)
@@ -60,12 +61,15 @@ class BookTests(unittest.TestCase):
             book.write_bytes(b"first edition")
             with patch("app.service.book_index.extract_pages", return_value=[(5, "mung cultivation information " * 8, False)]), \
                  patch.object(research_client, "embed", side_effect=lambda texts: [[1., 0.] for _ in texts]) as embedding:
-                index = BookIndex(root, root / "index")
+                store = Mock(dimension=2)
+                store.load.return_value = None
+                store.search.return_value = [{"title": "guide.pdf", "page": 5, "text": "Mung", "score": 0.8}]
+                index = BookIndex(root, root / "index", store=store)
                 index.ensure()
                 self.assertTrue(index.ready)
                 self.assertEqual(index.search("mung")[0]["page"], 5)
                 embedding.reset_mock()
-                cached = BookIndex(root, root / "index")
+                cached = BookIndex(root, root / "index", store=store)
                 cached.ensure()
                 embedding.assert_not_called()
                 self.assertEqual(cached.chunks, index.chunks)
@@ -73,6 +77,21 @@ class BookTests(unittest.TestCase):
                 cached.ensure()
                 self.assertTrue(cached.ready)
                 self.assertEqual(len(list((root / "index").glob("*.npz"))), 2)
+
+    def test_hosted_startup_and_search_need_no_local_pdfs_or_vectors(self):
+        store = Mock()
+        store.load.return_value = {"documents": [{"title": "guide.pdf"}], "chunks": 42}
+        store.search.return_value = [{"title": "guide.pdf", "page": 17, "text": "මුං",
+                                      "page_text": "මුං වගාවට සුදුසු පස", "score": 0.8}]
+        with TemporaryDirectory() as folder, patch.object(research_client, "embed", return_value=[[1., 0.]]) as embedding:
+            index = BookIndex(folder, Path(folder) / "cache", store=store)
+            index.ensure()
+            embedding.assert_not_called()
+            self.assertTrue(index.ready)
+            self.assertEqual(index.chunk_count, 42)
+            self.assertEqual(index.search("මුං")[0]["text"], "මුං වගාවට සුදුසු පස")
+            store.load.assert_called_once_with(None)
+            store.upload.assert_not_called()
 
 
 class ResearchTests(unittest.TestCase):
