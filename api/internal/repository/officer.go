@@ -250,7 +250,7 @@ func (repo *OfficerRepository) ListMapPoints(
 		       COALESCE(TRIM(f.gn_division), '')
 		FROM readings r
 		LEFT JOIN farmers f ON f.farmer_id = r.farmer_id
-		WHERE ($1 = '' OR LOWER(TRIM(f.gn_division)) = LOWER(TRIM($1)))
+		WHERE r.raw_lat IS NOT NULL AND r.raw_lng IS NOT NULL AND ($1 = '' OR LOWER(TRIM(f.gn_division)) = LOWER(TRIM($1)))
 		ORDER BY r.created_at DESC
 		LIMIT $2
 	`

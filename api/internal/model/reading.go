@@ -4,11 +4,14 @@ import "time"
 
 // Reading is the shape of one soil test.
 type Reading struct {
-	ReadingID   int       `json:"reading_id"`
-	RawLat      float64   `json:"raw_lat"`
-	RawLng      float64   `json:"raw_lng"`
-	AnchorID    *int      `json:"anchor_id"`    // *int = can be empty (null)
-	DistrictID  *int      `json:"district_id"`  // *int = can be empty (null)
+	ReadingID      int      `json:"reading_id"`
+	RawLat         *float64 `json:"raw_lat"`
+	RawLng         *float64 `json:"raw_lng"`
+	LocationSource string   `json:"location_source"`
+	GNDivisionCode *string  `json:"gn_division_code"`
+	GNDivision     string   `json:"gn_division"`
+	AnchorID       *int     `json:"anchor_id"`   // *int = can be empty (null)
+	DistrictID     *int     `json:"district_id"` // *int = can be empty (null)
 
 	// NEW in Phase 10: WHO sent this reading, and from WHICH land and crop.
 	//
@@ -16,9 +19,9 @@ type Reading struct {
 	// while testing, before accounts existed, have no owner and never will.
 	// The officer dashboards show those honestly as unassigned rather than
 	// pretending they belong to somebody.
-	FarmerID   *int `json:"farmer_id"`
-	LandID     *int `json:"land_id"`
-	LandCropID *int `json:"land_crop_id"`
+	FarmerID    *int      `json:"farmer_id"`
+	LandID      *int      `json:"land_id"`
+	LandCropID  *int      `json:"land_crop_id"`
 	N           float64   `json:"n"`
 	P           float64   `json:"p"`
 	K           float64   `json:"k"`

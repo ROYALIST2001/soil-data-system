@@ -1,14 +1,17 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
+	"time"
 
 	"soil-data-system/api/internal/client"
 	"soil-data-system/api/internal/controller"
 	"soil-data-system/api/internal/database"
 	"soil-data-system/api/internal/repository"
 	"soil-data-system/api/internal/service"
+	"soil-data-system/api/internal/soilmap"
 )
 
 func main() {
@@ -17,16 +20,29 @@ func main() {
 	db := database.Connect()
 	defer db.Close()
 	log.Println("Connected to database.")
+	locationCatalogRepo := repository.NewLocationCatalogRepository(db)
+	catalogContext, cancelCatalog := context.WithTimeout(context.Background(), 60*time.Second)
+	if err := locationCatalogRepo.Ensure(catalogContext); err != nil {
+		cancelCatalog()
+		log.Fatal("Cannot initialize GN division catalog: ", err)
+	}
+	cancelCatalog()
 
 	// ---------- STEP 2: build the repositories (the data layer) ----------
 	readingRepo := repository.NewReadingRepository(db)
+	schemaCtx, cancelSchema := context.WithTimeout(context.Background(), 60*time.Second)
+	if err := readingRepo.EnsureGNLocations(schemaCtx); err != nil {
+		cancelSchema()
+		log.Fatal("Cannot initialize GN reading locations: ", err)
+	}
+	cancelSchema()
 	anchorRepo := repository.NewAnchorRepository(db)
 	districtRepo := repository.NewDistrictRepository(db)
 	analyticsRepo := repository.NewAnalyticsRepository(db) // NEW
-	farmerRepo := repository.NewFarmerRepository(db)    // NEW in Phase 9
-	landRepo := repository.NewLandRepository(db)        // NEW in Phase 9
-	sessionRepo := repository.NewSessionRepository(db)  // NEW in Phase 10
-	officerRepo := repository.NewOfficerRepository(db)  // NEW in Phase 10
+	farmerRepo := repository.NewFarmerRepository(db)       // NEW in Phase 9
+	landRepo := repository.NewLandRepository(db)           // NEW in Phase 9
+	sessionRepo := repository.NewSessionRepository(db)     // NEW in Phase 10
+	officerRepo := repository.NewOfficerRepository(db)     // NEW in Phase 10
 	correctionRepo := repository.NewCorrectionRepository(db)
 	disasterRepo := repository.NewDisasterRepository(db) // NEW in Phase 11
 	subsidyRepo := repository.NewSubsidyRepository(db)   // NEW in Phase 12
@@ -99,7 +115,7 @@ func main() {
 	analyticsController := controller.NewAnalyticsController(analyticsService) // NEW
 	chatController := controller.NewChatController(chatService)                // NEW
 	farmerController := controller.NewFarmerController(farmerService)          // NEW
-	landController := controller.NewLandController(landService)                 // NEW
+	landController := controller.NewLandController(landService)                // NEW
 	officerController := controller.NewOfficerController(officerService)       // NEW
 	correctionController := controller.NewCorrectionController(correctionService)
 	disasterController := controller.NewDisasterController(disasterService)
@@ -110,6 +126,16 @@ func main() {
 
 	// ---------- STEP 7: connect the routes ----------
 	mux := http.NewServeMux()
+	locationCatalogController := controller.NewLocationCatalogController(locationCatalogRepo)
+	gnMapController := controller.NewGNMapController(analyticsRepo)
+	mux.Handle("GET /soil-map/", http.StripPrefix("/soil-map/", soilmap.Handler()))
+	mux.HandleFunc("GET /map/gn-divisions", gnMapController.Divisions)
+	mux.HandleFunc("GET /history/gn-division/{code}", gnMapController.History)
+	mux.HandleFunc("GET /history/land/{landId}", auth.RequireAuth(gnMapController.LandHistory))
+	// Public reference data is needed before a new farmer can sign up.
+	mux.HandleFunc("GET /locations/districts", locationCatalogController.Districts)
+	mux.HandleFunc("GET /locations/gn-divisions", locationCatalogController.Divisions)
+	mux.HandleFunc("GET /locations/gn-divisions/resolve", locationCatalogController.Resolve)
 
 	mux.HandleFunc("GET /health", controller.HealthCheck)
 	mux.HandleFunc("POST /readings", readingController.CreateReading)

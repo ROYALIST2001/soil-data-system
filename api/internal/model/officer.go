@@ -79,8 +79,8 @@ type ReadingRow struct {
 	// was already written for the farmer.
 	AgentNote *string `json:"agent_note"`
 
-	RawLat    float64   `json:"raw_lat"`
-	RawLng    float64   `json:"raw_lng"`
+	RawLat    *float64  `json:"raw_lat"`
+	RawLng    *float64  `json:"raw_lng"`
 	CreatedAt time.Time `json:"created_at"`
 }
 

@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GN division soil map</title>
+<link rel="stylesheet" href="leaflet.css">
+<style>
+*{box-sizing:border-box}html,body{height:100%;margin:0;font-family:system-ui,sans-serif;color:#223b2c;background:#f5f7f2}
+body{display:flex;flex-direction:column}.toolbar{padding:10px 12px;background:#fff;border-bottom:1px solid #dee7db;z-index:1100}
+.controls{display:flex;gap:10px}.control{flex:1;min-width:0}label{display:block;font-size:11px;font-weight:600;margin-bottom:4px;color:#536657}
+select,input{width:100%;height:40px;border:1px solid #dee7db;border-radius:9px;background:#f5f7f2;padding:7px;color:#173f2d;font:inherit;font-size:13px}
+.search{position:relative;margin-top:8px}#suggestions{position:absolute;top:41px;width:100%;max-height:180px;overflow:auto;background:white;box-shadow:0 4px 14px #0002;border-radius:8px}
+.suggestion{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid #e8f1e5;background:#fff;padding:12px;font-size:13px;color:#173f2d}
+#status{font-size:11px;line-height:1.5;color:#536657;margin-top:6px}#warning{font-size:12px;background:#fff4de;padding:9px 12px;display:none}
+#map{flex:1;min-height:80px;background:#e8ede5}.leaflet-container{font:inherit}.leaflet-control-attribution{font-size:9px}
+.legend{padding:9px 12px;background:#fff;border-top:1px solid #dee7db;font-size:11px}.legend-row{display:flex;align-items:center;gap:8px}
+.gradient{height:9px;width:80px;border-radius:5px;background:linear-gradient(90deg,#b8dbb4,#24734a,#173f2d)}.grey{display:inline-block;width:10px;height:10px;background:#d9dfd7;margin:0 4px 0 12px}
+#details{background:#fff;padding:12px;border-top:1px solid #dee7db;max-height:35vh;overflow:auto;flex-shrink:0}#details[hidden]{display:none}
+#division-name{font-size:16px;font-weight:700;margin:0 25px 3px 0}#division-area,#reading-info{font-size:11px;color:#536657;line-height:1.6}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}.metric{padding:8px 4px;background:#e8f1e5;border-radius:8px;text-align:center;font-size:10px}.metric strong{display:block;font-size:17px;color:#173f2d}
+#close{float:right;border:0;background:#e8f1e5;border-radius:6px;color:#173f2d;padding:4px 8px;font-size:16px}button{cursor:pointer}.retry{margin-left:8px;border:1px solid #956016;border-radius:6px;background:#fff;padding:3px 9px;color:#956016}
+.leaflet-control-zoom a{color:#24734a}
+@media(max-height:480px){.toolbar{padding:8px 10px}.legend{padding:6px 10px}#map{min-height:60px}#details{padding:9px 10px;max-height:32vh}.metrics{margin:6px 0}#status{font-size:10px}}
+</style>
+</head>
+<body>
+<div class="toolbar">
+ <div class="controls"><div class="control"><label for="district">District</label><select id="district" aria-label="District"></select></div>
+ <div class="control"><label for="metric">Colour by average</label><select id="metric"><option value="ph">Soil pH</option><option value="n">Nitrogen (mg/kg)</option><option value="p">Phosphorus (mg/kg)</option><option value="k">Potassium (mg/kg)</option></select></div></div>
+ <div class="search"><input id="search" type="search" placeholder="Find a GN division…" aria-label="Find a GN division" autocomplete="off"><div id="suggestions" hidden></div></div>
+ <div id="status" role="status">Loading division boundaries…</div>
+</div>
+<div id="warning" role="alert"></div>
+<div id="map" aria-label="Map of GN division soil averages"></div>
+<div class="legend"><div class="legend-row"><span id="low">Lower</span><span class="gradient"></span><span id="high">Higher</span><span><i class="grey"></i>No data</span></div><div style="margin-top:5px">Colours compare measured levels within this district.</div></div>
+<div id="details" hidden><button id="close" aria-label="Close division details">×</button><h2 id="division-name"></h2><div id="division-area"></div><div id="values" class="metrics"></div><div id="reading-info"></div></div>
+<script src="leaflet.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const query = new URLSearchParams(location.search);
+let features = [], collection, active, selectedCode = '', requestNumber = 0, controller;
+let minimum = 0, maximum = 0;
+const map = L.map('map', {preferCanvas:true, zoomControl:true}).setView([7.8731,80.7718],7);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+ maxZoom:19, attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | Boundaries: <a href="https://gisapps.nsdi.gov.lk/server/rest/services/Srilanka/Boundaries/MapServer/1">Sri Lanka NSDI</a>'
+}).addTo(map).on('tileerror', () => warn('The background map is unavailable. GN division boundaries are still shown.'));
+new ResizeObserver(() => map.invalidateSize()).observe($('map'));
+function warn(message, retry=false) {
+ const el=$('warning'); el.replaceChildren(); el.style.display=message?'block':'none';
+ el.append(document.createTextNode(message));
+ if(retry){const button=document.createElement('button');button.className='retry';button.textContent='Retry';button.onclick=()=>loadDistrict($('district').value);el.append(button);}
+}
+async function fetchJSON(url, signal) {
+ const response=await fetch(url,{signal,cache:'no-store'});
+ if(!response.ok) throw new Error('Could not load map data. Check your connection and retry.');
+ return response.json();
+}
+function range() {
+ const values=features.filter(f=>f.properties.stats).map(f=>f.properties.stats[$('metric').value]);
+ minimum=values.length?Math.min(...values):0; maximum=values.length?Math.max(...values):0;
+ $('low').textContent=values.length?minimum.toFixed(1):'Lower';$('high').textContent=values.length?maximum.toFixed(1):'Higher';
+}
+function style(feature) {
+ const stats=feature.properties.stats;
+ const fraction=stats?(maximum===minimum?0.5:(stats[$('metric').value]-minimum)/(maximum-minimum)):0;
+ return {color:'#698766',weight:0.8,fillOpacity:stats?0.72:0.35,
+  fillColor:stats?(fraction<0.33?'#b8dbb4':fraction<0.67?'#24734a':'#173f2d'):'#d9dfd7'};
+}
+function select(layer, zoom=true) {
+ if(active)collection.resetStyle(active);
+ active=layer;layer.setStyle({color:'#e2a324',weight:3});layer.bringToFront();
+ const p=layer.feature.properties;selectedCode=p.code;
+ $('division-name').textContent=p.name;$('division-area').textContent=p.ds_division+' · '+p.district;
+ $('values').replaceChildren();
+ for(const [key,label] of [['ph','pH'],['n','N · mg/kg'],['p','P · mg/kg'],['k','K · mg/kg']]){
+  const item=document.createElement('div');item.className='metric';const value=document.createElement('strong');
+  value.textContent=p.stats?p.stats[key].toFixed(1):'—';item.append(value,document.createTextNode(label));$('values').append(item);
+ }
+ $('reading-info').textContent=p.stats?
+  'Average of '+p.stats.reading_count+' accepted reading'+(p.stats.reading_count===1?'':'s')+' · Latest: '+new Date(p.stats.last_reading).toLocaleDateString()+
+  (p.stats.reading_count<3?' · Limited data: fewer than 3 readings.':''):
+  (p.code?'No accepted soil readings for this division yet.':'This boundary name is not yet linked to the official GN list.');
+ $('details').hidden=false;
+ map.invalidateSize({pan:false});
+ if(zoom)map.fitBounds(layer.getBounds(),{padding:[20,20],maxZoom:14,animate:false});
+}
+function search() {
+ const text=$('search').value.trim().toLowerCase();const box=$('suggestions');box.replaceChildren();box.hidden=!text;
+ if(!text||!collection)return;
+ const matches=[];collection.eachLayer(layer=>{if(layer.feature.properties.name.toLowerCase().startsWith(text)||layer.feature.properties.code.startsWith(text))matches.push(layer)});
+ for(const layer of matches.sort((a,b)=>a.feature.properties.name.localeCompare(b.feature.properties.name)).slice(0,30)){
+  const button=document.createElement('button');button.className='suggestion';button.textContent=layer.feature.properties.name+' · '+layer.feature.properties.ds_division;
+  button.onclick=()=>{box.hidden=true;$('search').value=layer.feature.properties.name;select(layer)};box.append(button);
+ }
+ if(!matches.length){const item=document.createElement('div');item.className='suggestion';item.textContent='No matching division in this district.';box.append(item);}
+}
+async function loadDistrict(code, focusCode='') {
+ const serial=++requestNumber;if(controller)controller.abort();controller=new AbortController();
+ $('status').textContent='Loading division boundaries…';$('details').hidden=true;$('suggestions').hidden=true;
+ $('search').value='';active=null;warn('');
+ if(collection){map.removeLayer(collection);collection=null}features=[];
+ try{
+  const data=await fetchJSON('/map/gn-divisions?district='+encodeURIComponent(code),controller.signal);
+  if(serial!==requestNumber)return;
+  features=data.features;range();
+  collection=L.geoJSON(data,{style,onEachFeature:(feature,layer)=>layer.on('click',()=>select(layer,false))}).addTo(map);
+  $('status').textContent=features.length+' GN boundaries · '+data.mapped_divisions_with_readings+(data.mapped_divisions_with_readings===1?' division':' divisions')+' with readings';
+  if(data.unlinked_boundaries||data.divisions_with_readings>data.mapped_divisions_with_readings)
+   $('status').textContent+=' · Some boundary names could not be linked to the GN catalog.';
+  let focused=false;
+  if(focusCode){collection.eachLayer(layer=>{if(layer.feature.properties.code===focusCode){select(layer);focused=true}});
+   if(!focused)warn('Your land’s division has no matching boundary in this boundary dataset. District boundaries are shown.');}
+  if(!focused&&collection.getBounds().isValid())map.fitBounds(collection.getBounds(),{padding:[10,10],animate:false});
+ }catch(error){if(error.name!=='AbortError'&&serial===requestNumber){$('status').textContent='Map data could not be loaded.';warn(error.message,true)}}
+}
+$('search').oninput=search;
+$('district').onchange=()=>loadDistrict($('district').value);
+$('metric').onchange=()=>{range();if(collection){collection.setStyle(style);if(active)active.setStyle({color:'#e2a324',weight:3})}};
+$('close').onclick=()=>{$('details').hidden=true;if(active)collection.resetStyle(active);active=null;selectedCode=''};
+async function start(){
+ try{
+  const data=await fetchJSON('/locations/districts');
+  for(const district of data.districts){const option=document.createElement('option');option.value=district.code;option.textContent=district.name;$('district').append(option)}
+  let district='11',focus='',matchWarning='';
+  if(query.get('division')){try{const division=await fetchJSON('/locations/gn-divisions/resolve?value='+encodeURIComponent(query.get('division')));district=division.district_code;focus=division.code}catch{matchWarning='Your saved division could not be matched. Choose a district to explore.'}}
+  $('district').value=district;await loadDistrict(district,focus);if(matchWarning&&collection)warn(matchWarning);
+ }catch(error){$('status').textContent='Could not connect to the soil server.';warn(error.message);const button=document.createElement('button');button.className='retry';button.textContent='Retry';button.onclick=()=>location.reload();$('warning').append(button)}
+}
+start();
+</script>
+</body></html>

@@ -31,6 +31,44 @@ trends, maps and regional patterns, **Advisor** for the soil chatbot,
 disaster relief and account details. Run `npm run typecheck` from `mobile`
 to check the app's TypeScript.
 
+## District and GN division selection
+
+Signup, land registration and officer selection forms use **District → Grama
+Niladhari Division**, with no Divisional Secretariat selector. The GN dropdown
+contains only the selected district's entries. Typing even one letter narrows the
+list immediately by its starting letters; names and official census codes are
+searchable. Changing the district clears a single GN selection; multi-select relief/subsidy forms retain
+explicitly chosen divisions across districts.
+
+The API imports 14,008 coded entries across 25 districts from the official DCS
+workbook into PostgreSQL at startup. Existing database volumes are updated without
+deleting farmer accounts or resetting data. Rebuild/restart the API after updating
+the project: `docker compose up -d --build --no-deps api`.
+
+Public catalog endpoints are `/locations/districts`,
+`/locations/gn-divisions?district=11&q=a` and
+`/locations/gn-divisions/resolve?value=6154165`.
+See `api/internal/locationcatalog/data/README.md` for provenance, version details,
+refresh instructions and legacy-name handling.
+
+## GN division soil map
+
+Insights → Soil map displays GN boundaries with average pH, nitrogen, phosphorus
+or potassium, accepted reading counts and the latest test date. Pick a land to
+focus on its saved division, or choose a district and search by GN name/code.
+The map uses OpenStreetMap and bundled Leaflet assets without Google Maps keys.
+Empty divisions remain grey; colours compare observed values within a district.
+
+GPS capture is **disabled**, with the existing capture code retained behind
+`ENABLE_FIELD_LOCATION_CAPTURE` in `mobile/src/constants/features.ts`. New tests
+use the selected land's verified GN division and store no GPS coordinates. Trends
+use land history and GN monthly averages. Existing GPS tests remain supported.
+
+Rebuild the API with `docker compose up -d --build --no-deps api`, run `npm install`
+inside `mobile`, then reload Expo Go. Existing database volumes upgrade at startup.
+See `api/internal/soilmap/README.md` for boundary provenance, unmatched names,
+refresh instructions and the map's aggregation rules.
+
 ## Soil advisor chatbot
 
 The advisor now follows an enforced research order: local PDF RAG, Sri Lankan
@@ -40,11 +78,32 @@ answer. Sinhala questions receive Sinhala replies, including in an existing chat
 General questions work before a farmer has submitted a soil test. Personal field
 tools still need a saved reading.
 
-Put PDFs in `ai/books` (see its README). The AI service builds a multilingual
-embedding index on startup and keeps it in the persistent `rag_data` volume.
-Initial indexing sends extracted book passages to the configured embeddings API.
-Wait for `books.ready: true` at `/agent/status` before testing book retrieval.
-The mobile advisor displays book titles/PDF pages and clickable web sources.
+Book vectors and page text are stored in **Pinecone**. Put PDFs in `ai/books`
+(see its README) for initial ingestion. The AI service embeds readable passages
+and uploads them to Pinecone on startup, reusing the existing local embedding
+cache when possible. Searches run against Pinecone, with crop filters and page
+citations. The `rag_data` volume is an optional ingestion cache, not the vector
+database. The mobile advisor displays book titles/PDF pages and clickable web
+sources.
+
+Create a project API key in the [Pinecone console](https://app.pinecone.io/) and
+set `PINECONE_API_KEY` in `.env`. The service creates the default serverless
+`soil-advisor-books` index on AWS `us-east-1` if it does not exist. It uses a dense
+`embedding` field, 1536 dimensions and cosine similarity. Configure the index,
+namespace prefix, region and dimension using the `PINECONE_*` settings in
+`.env.example`. An incompatible existing index is rejected; use a new index name.
+Custom embedding models must match `PINECONE_DIMENSION`.
+
+Wait for `books.ready: true` and `books.provider: "pinecone"` at
+`http://localhost:8000/agent/status`. A missing key or failed connection makes
+book research unavailable; the agent continues through the existing web fallback
+without silently using a local vector search. Provider errors never expose keys.
+Pinecone storage and requests use your project's quota/billing.
+
+After one successful upload, a hosted AI service (including Railway) can start
+without PDFs or an ingestion cache: use the same Pinecone project, index,
+namespace prefix and embedding model. It reads the published book collection and
+page text directly from Pinecone. The API key stays on the server.
 
 `LLM_MODEL` remains the final-answer model. `EMBEDDING_MODEL` defaults to
 `text-embedding-3-small`; the separate `WEB_SEARCH_MODEL` defaults to `gpt-5-mini`
@@ -69,8 +128,8 @@ The mobile app's **Advisor** tab calls the Go API, which runs the advisory agent
 through the Python AI service. It requires a valid API key and internet access.
 
 1. Copy `.env.example` to `.env` if you do not already have one.
-2. Set `LLM_API_KEY` in `.env` to your OpenAI API key. The example uses
-   `https://api.openai.com/v1` and `gpt-4o-mini`. Keep the key out of Git.
+2. Set `LLM_API_KEY` and `PINECONE_API_KEY` in `.env`. The example uses
+   `https://api.openai.com/v1` and `gpt-4o-mini`. Keep both keys out of Git.
 3. Apply the configuration and backend changes:
 
    ```powershell

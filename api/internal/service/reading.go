@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"soil-data-system/api/internal/client"
+	"soil-data-system/api/internal/locationcatalog"
 	"soil-data-system/api/internal/model"
 	"soil-data-system/api/internal/repository"
 )
@@ -41,8 +42,7 @@ func NewReadingService(
 	}
 }
 
-// CreateReading validates, places in space, checks quality, then saves.
-// UNCHANGED from Phase 4.
+// CreateReading validates, resolves GPS or the verified land's division, checks quality and saves.
 func (s *ReadingService) CreateReading(reading model.Reading) (int, error) {
 
 	// STEP 0a: clean the text fields.
@@ -66,15 +66,35 @@ func (s *ReadingService) CreateReading(reading model.Reading) (int, error) {
 		return 0, err
 	}
 
-	// STEP 1: find the matching field.
-	anchorID, err := s.location.FindOrCreateAnchor(reading.RawLat, reading.RawLng)
-	if err != nil {
-		return 0, err
+	// Resolve the verified land, never a client-supplied GN code.
+	reading.GNDivisionCode = nil
+	reading.AnchorID, reading.DistrictID = nil, nil
+	if reading.LandID != nil {
+		land, err := s.landRepo.FindLandForFarmer(*reading.LandID, *reading.FarmerID)
+		if err != nil {
+			return 0, err
+		}
+		if division, ok := locationcatalog.Resolve(land.GNDivision); ok {
+			reading.GNDivisionCode = &division.Code
+			if reading.LocationSource == "gn_division" {
+				id, err := s.repo.DistrictByName(division.District)
+				if err != nil {
+					return 0, err
+				}
+				reading.DistrictID = &id
+			}
+		} else if reading.LocationSource == "gn_division" {
+			return 0, fmt.Errorf("Field area has an unrecognized GN division. Please register a land with a division from the official list")
+		}
 	}
-	reading.AnchorID = &anchorID
-
-	// STEP 2: find the district.
-	reading.DistrictID = s.location.FindDistrictID(reading.RawLat, reading.RawLng)
+	if reading.LocationSource == "gps" {
+		anchorID, err := s.location.FindOrCreateAnchor(*reading.RawLat, *reading.RawLng)
+		if err != nil {
+			return 0, err
+		}
+		reading.AnchorID = &anchorID
+		reading.DistrictID = s.location.FindDistrictID(*reading.RawLat, *reading.RawLng)
+	}
 
 	// STEP 3: soft rules. Check against history.
 	flag, err := s.validation.CheckQuality(reading)
@@ -104,7 +124,7 @@ func (s *ReadingService) GetReading(id int) (model.Reading, error) {
 		return reading, err
 	}
 
-	reading.Zone = s.location.ZoneForDistrict(reading.DistrictID)
+	s.fillLocation(&reading)
 	return reading, nil
 }
 
@@ -123,7 +143,7 @@ func (s *ReadingService) LatestForFarmer(
 
 	// Zone is DERIVED, not stored - the same as GetReading does. Without
 	// this the screen would show an empty zone for a reading that has one.
-	reading.Zone = s.location.ZoneForDistrict(reading.DistrictID)
+	s.fillLocation(&reading)
 	return reading, nil
 }
 
@@ -196,13 +216,19 @@ func (s *ReadingService) GetRecommendation(id int) (model.Recommendation, error)
 // RULE: the optional feature must never break the essential one.
 func (s *ReadingService) attachAgentNote(reading *model.Reading) {
 
-	if reading.AnchorID == nil {
+	if reading.AnchorID == nil && reading.LandID == nil {
 		return
 	}
 
 	// Get the field's recent GOOD readings, for grounding.
 	// Without real facts, the model would invent numbers.
-	history, err := s.repo.FindRecentByAnchor(*reading.AnchorID, 5)
+	var history []model.Reading
+	var err error
+	if reading.LandID != nil {
+		history, err = s.repo.FindRecentByLand(*reading.LandID, 5)
+	} else {
+		history, err = s.repo.FindRecentByAnchor(*reading.AnchorID, 5)
+	}
 	if err != nil {
 		// Cannot get history. Skip the agent. Not a failure.
 		return
@@ -294,4 +320,18 @@ func (s *ReadingService) checkLandBelongsToFarmer(reading model.Reading) error {
 	}
 
 	return nil
+}
+
+func (s *ReadingService) fillLocation(reading *model.Reading) {
+	reading.Zone = s.location.ZoneForDistrict(reading.DistrictID)
+	if reading.DistrictID != nil {
+		if zone, err := s.repo.DistrictZone(*reading.DistrictID); err == nil {
+			reading.Zone = zone
+		}
+	}
+	if reading.GNDivisionCode != nil {
+		if division, ok := locationcatalog.Resolve(*reading.GNDivisionCode); ok {
+			reading.GNDivision = division.Value
+		}
+	}
 }

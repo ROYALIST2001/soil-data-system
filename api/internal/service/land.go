@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"soil-data-system/api/internal/locationcatalog"
 	"soil-data-system/api/internal/model"
 	"soil-data-system/api/internal/repository"
 )
@@ -48,6 +49,9 @@ func (s *LandService) CreateLand(
 
 	name := strings.TrimSpace(req.Name)
 	gnDivision := strings.TrimSpace(req.GNDivision)
+	if official, ok := locationcatalog.Resolve(gnDivision); ok {
+		gnDivision = official.Value
+	}
 
 	// ---------- Does this farmer exist? ----------
 	//
@@ -73,7 +77,7 @@ func (s *LandService) CreateLand(
 	if err := validateLandName(name); err != nil {
 		return model.Land{}, err
 	}
-	if err := validateLandDivision(gnDivision); err != nil {
+	if err := validateGNDivision(gnDivision); err != nil {
 		return model.Land{}, err
 	}
 	if err := validateLandSize(req.SizeHa); err != nil {
@@ -322,15 +326,6 @@ func validateLandName(name string) error {
 	if len([]rune(name)) < 2 {
 		return ValidationError{
 			Message: "The land name is too short.",
-		}
-	}
-	return nil
-}
-
-func validateLandDivision(division string) error {
-	if division == "" {
-		return ValidationError{
-			Message: "Please enter the Grama Niladhari division of this land.",
 		}
 	}
 	return nil

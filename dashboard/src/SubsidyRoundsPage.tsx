@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import * as api from "./api";
 import { formatMoney } from "./ClaimsPage";
-import type { DivisionSummary, SubsidyRate, SubsidyRound } from "./types";
+import type { SubsidyRate, SubsidyRound } from "./types";
+import GNDivisionPicker from "./GNDivisionPicker";
 
 // ANNOUNCING A SUBSIDY ROUND, and seeing what each one has cost.
 //
@@ -30,7 +31,6 @@ function inMonths(n: number): string {
 
 export default function SubsidyRoundsPage({ isDepartment }: Props) {
   const [rounds, setRounds] = useState<SubsidyRound[]>([]);
-  const [divisions, setDivisions] = useState<DivisionSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -51,12 +51,7 @@ export default function SubsidyRoundsPage({ isDepartment }: Props) {
   async function load() {
     setLoading(true);
     try {
-      const [r, d] = await Promise.all([
-        api.getSubsidyRounds(),
-        api.getDivisions(),
-      ]);
-      setRounds(r);
-      setDivisions(d);
+      setRounds(await api.getSubsidyRounds());
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not load.");
     } finally {
@@ -67,14 +62,6 @@ export default function SubsidyRoundsPage({ isDepartment }: Props) {
   useEffect(() => {
     load();
   }, []);
-
-  function toggleDivision(division: string) {
-    setChosen((current) =>
-      current.includes(division)
-        ? current.filter((d) => d !== division)
-        : [...current, division]
-    );
-  }
 
   function addRate() {
     const value = parseFloat(rateValue);
@@ -312,21 +299,7 @@ export default function SubsidyRoundsPage({ isDepartment }: Props) {
           </h3>
           <p className="sub">Farmers outside these cannot apply.</p>
 
-          <div className="chips">
-            {divisions.length === 0 ? (
-              <span className="sub">No divisions have farmers yet.</span>
-            ) : (
-              divisions.map((d) => (
-                <button
-                  key={d.division}
-                  className={chosen.includes(d.division) ? "chip chip-on" : "chip"}
-                  onClick={() => toggleDivision(d.division)}
-                >
-                  {d.division} ({d.farmer_count})
-                </button>
-              ))
-            )}
-          </div>
+          <GNDivisionPicker multiple values={chosen} onChange={setChosen} />
 
           <h3 style={{ fontSize: 15, color: "#1b4332", margin: "18px 0 4px" }}>
             Rates

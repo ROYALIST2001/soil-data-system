@@ -1,8 +1,9 @@
 // What we SEND to the server when creating a reading.
-// Note: no id, no anchor, no district. The server makes those.
+// Coordinates are empty in GN mode. The server resolves the selected land's division.
 export interface NewReading {
-  raw_lat: number;
-  raw_lng: number;
+  location_source: "gps" | "gn_division";
+  raw_lat: number | null;
+  raw_lng: number | null;
   n: number;
   p: number;
   k: number;
@@ -27,6 +28,8 @@ export interface NewReading {
 // "extends NewReading" means: take all the fields above, and add these.
 // This saves us from typing the same 10 fields twice.
 export interface Reading extends NewReading {
+  gn_division_code: string | null;
+  gn_division: string;
   reading_id: number;
   anchor_id: number | null;    // the | means "or". This can be empty.
   district_id: number | null;  // empty if the point is outside all districts

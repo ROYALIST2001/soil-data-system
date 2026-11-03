@@ -6,6 +6,7 @@ import {
 
 import InputField from "./InputField";
 import SelectField from "./SelectField";
+import GNDivisionField from "./GNDivisionField";
 import { CROPS } from "../constants/vocabulary";
 import { NewLandCrop } from "../types/land";
 
@@ -56,7 +57,7 @@ export default function LandForm({
 }: LandFormProps) {
 
   const [name, setName] = useState("");
-  const [division, setDivision] = useState(defaultDivision);
+  const [division, setDivision] = useState("");
   const [size, setSize] = useState("");
 
   // The crop being typed right now, before it is added to the list.
@@ -128,7 +129,7 @@ export default function LandForm({
       return;
     }
     if (!division.trim()) {
-      setLocalError("Please enter the Grama Niladhari division.");
+      setLocalError("Please choose the district and Grama Niladhari division.");
       return;
     }
     if (!Number.isFinite(landSize) || landSize <= 0) {
@@ -168,12 +169,7 @@ export default function LandForm({
         Your own name for this land, so you can tell your lands apart.
       </Text>
 
-      <InputField
-        label="Grama Niladhari Division"
-        value={division}
-        onChangeText={setDivision}
-        autoCapitalize="words"
-      />
+      <GNDivisionField value={division} onSelect={setDivision} defaultDivision={defaultDivision} disabled={saving} />
 
       <InputField
         label="Land Size — hectares"

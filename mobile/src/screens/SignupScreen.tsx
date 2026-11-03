@@ -7,6 +7,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 
 import InputField from "../components/InputField";
+import GNDivisionField from "../components/GNDivisionField";
 import AppButton from "../components/AppButton";
 import Icon from "../components/Icon";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -36,6 +37,11 @@ export default function SignupScreen() {
 
   function handleSignup() {
     setLocalError(null);
+
+    if (!gnDivision) {
+      setLocalError("Please choose your district and Grama Niladhari division.");
+      return;
+    }
 
     if (password !== confirm) {
       setLocalError("The two passwords do not match.");
@@ -90,13 +96,7 @@ export default function SignupScreen() {
           This is how you will log in, so type it carefully.
         </Text>
 
-        <InputField
-          label="Grama Niladhari Division"
-          value={gnDivision}
-          onChangeText={setGnDivision}
-          autoCapitalize="words"
-          placeholder="e.g. Thalawa North"
-        />
+        <GNDivisionField value={gnDivision} onSelect={setGnDivision} disabled={busy} />
 
         <InputField
           label="Mobile Number"

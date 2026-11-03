@@ -4,6 +4,30 @@ import type {
   ReadingRow, SubsidyApplication, SubsidyDetail, SubsidyRate, SubsidyRound,
 } from "./types";
 
+export interface CatalogDistrict { code: string; name: string; division_count: number }
+export interface GNDivision { code: string; name: string; district_code: string; district: string; ds_division: string; value: string }
+
+let catalogDistricts: Promise<CatalogDistrict[]> | undefined;
+const catalogDivisions = new Map<string, Promise<GNDivision[]>>();
+
+export function getCatalogDistricts(): Promise<CatalogDistrict[]> {
+  if (!catalogDistricts) {
+    catalogDistricts = request<{ districts: CatalogDistrict[] }>("/locations/districts")
+      .then((body) => body.districts).catch((error) => { catalogDistricts = undefined; throw error; });
+  }
+  return catalogDistricts;
+}
+
+export function getCatalogGNDivisions(district: string): Promise<GNDivision[]> {
+  let promise = catalogDivisions.get(district);
+  if (!promise) {
+    promise = request<{ divisions: GNDivision[] }>(`/locations/gn-divisions?district=${encodeURIComponent(district)}`)
+      .then((body) => body.divisions).catch((error) => { catalogDivisions.delete(district); throw error; });
+    catalogDivisions.set(district, promise);
+  }
+  return promise;
+}
+
 // Where the Go API lives.
 //
 // Unlike the phone app, this one can safely say "localhost": the dashboard

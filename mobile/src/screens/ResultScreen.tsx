@@ -67,7 +67,7 @@ export default function ResultScreen() {
         <View style={styles.cardHeader}><Icon name="sprout" size={23} /><Text style={styles.crop}>{reading.crop}</Text><Text style={styles.area}>{reading.area.toFixed(2)} ha</Text></View>
         <SoilMetrics reading={reading} />
         <View style={styles.details}><Text style={styles.detail}>{reading.stage} stage</Text><Text style={styles.detail}>{reading.zone || "Unassigned"} zone</Text></View>
-        <View style={styles.location}><Icon name="location" size={15} /><Text style={styles.locationText}>{reading.raw_lat.toFixed(4)}, {reading.raw_lng.toFixed(4)}</Text></View>
+        <View style={styles.location}><Icon name="location" size={15} /><Text style={styles.locationText}>{reading.gn_division ? `${reading.gn_division} · GN division` : reading.raw_lat !== null && reading.raw_lng !== null ? `${reading.raw_lat.toFixed(4)}, ${reading.raw_lng.toFixed(4)}` : "Saved land division"}</Text></View>
       </View>
       {quality.show && (
         <View style={[styles.warningBox, { backgroundColor: quality.background, borderColor: quality.color }]}>

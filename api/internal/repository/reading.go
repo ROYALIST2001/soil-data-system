@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"fmt"
+	"soil-data-system/api/migrations"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"soil-data-system/api/internal/model"
@@ -27,10 +29,10 @@ func (repo *ReadingRepository) Insert(reading model.Reading) (int, error) {
 			(raw_lat, raw_lng, anchor_id, district_id,
 			 n, p, k, ph, crop, stage, target_yield, area,
 			 quality_flag, agent_note, agent_verdict,
-			 farmer_id, land_id, land_crop_id)
+			 farmer_id, land_id, land_crop_id, location_source, gn_division_code)
 		VALUES
 			($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
-			 $16, $17, $18)
+			 $16, $17, $18, $19, $20)
 		RETURNING reading_id
 	`
 
@@ -48,6 +50,7 @@ func (repo *ReadingRepository) Insert(reading model.Reading) (int, error) {
 		reading.FarmerID,   // NEW in Phase 10
 		reading.LandID,     // NEW in Phase 10
 		reading.LandCropID, // NEW in Phase 10
+		reading.LocationSource, reading.GNDivisionCode,
 	).Scan(&newID)
 
 	return newID, err
@@ -68,7 +71,7 @@ func (repo *ReadingRepository) GetByID(id int) (model.Reading, error) {
 		       crop, stage, target_yield, area,
 		       created_at, COALESCE(officer_flag, quality_flag),
 		       agent_note, agent_verdict,
-		       farmer_id, land_id, land_crop_id
+		       farmer_id, land_id, land_crop_id, location_source, gn_division_code
 		FROM readings
 		WHERE reading_id = $1
 	`
@@ -80,7 +83,7 @@ func (repo *ReadingRepository) GetByID(id int) (model.Reading, error) {
 		&r.N, &r.P, &r.K, &r.PH, &r.Crop, &r.Stage, &r.TargetYield, &r.Area,
 		&r.CreatedAt, &r.QualityFlag,
 		&r.AgentNote, &r.AgentVerdict,
-		&r.FarmerID, &r.LandID, &r.LandCropID, // NEW in Phase 10
+		&r.FarmerID, &r.LandID, &r.LandCropID, &r.LocationSource, &r.GNDivisionCode, // NEW in Phase 10
 	)
 
 	return r, err
@@ -108,7 +111,7 @@ func (repo *ReadingRepository) FindLatestByFarmer(
 		       crop, stage, target_yield, area,
 		       created_at, COALESCE(officer_flag, quality_flag),
 		       agent_note, agent_verdict,
-		       farmer_id, land_id, land_crop_id
+		       farmer_id, land_id, land_crop_id, location_source, gn_division_code
 		FROM readings
 		WHERE farmer_id = $1
 		ORDER BY created_at DESC
@@ -122,7 +125,7 @@ func (repo *ReadingRepository) FindLatestByFarmer(
 		&r.N, &r.P, &r.K, &r.PH, &r.Crop, &r.Stage, &r.TargetYield, &r.Area,
 		&r.CreatedAt, &r.QualityFlag,
 		&r.AgentNote, &r.AgentVerdict,
-		&r.FarmerID, &r.LandID, &r.LandCropID,
+		&r.FarmerID, &r.LandID, &r.LandCropID, &r.LocationSource, &r.GNDivisionCode,
 	)
 
 	return r, err
@@ -136,6 +139,15 @@ func (repo *ReadingRepository) FindRecentByAnchor(
 	anchorID int,
 	limit int,
 ) ([]model.Reading, error) {
+	return repo.findRecent("anchor_id", anchorID, limit)
+}
+
+func (repo *ReadingRepository) FindRecentByLand(landID, limit int) ([]model.Reading, error) {
+	return repo.findRecent("land_id", landID, limit)
+}
+
+// column is selected only by the two methods above, never by request input.
+func (repo *ReadingRepository) findRecent(column string, id, limit int) ([]model.Reading, error) {
 
 	// Read the SQL carefully. Every line matters:
 	//
@@ -153,14 +165,14 @@ func (repo *ReadingRepository) FindRecentByAnchor(
 		       crop, stage, target_yield, area,
 		       created_at, COALESCE(officer_flag, quality_flag),
 		       agent_note, agent_verdict,
-		       farmer_id, land_id, land_crop_id
+		       farmer_id, land_id, land_crop_id, location_source, gn_division_code
 		FROM readings
-		WHERE anchor_id = $1 AND COALESCE(officer_flag, quality_flag) = 'OK'
+		WHERE %s = $1 AND COALESCE(officer_flag, quality_flag) = 'OK'
 		ORDER BY created_at DESC
 		LIMIT $2
 	`
 
-	rows, err := repo.db.Query(context.Background(), query, anchorID, limit)
+	rows, err := repo.db.Query(context.Background(), fmt.Sprintf(query, column), id, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +188,7 @@ func (repo *ReadingRepository) FindRecentByAnchor(
 			&r.N, &r.P, &r.K, &r.PH, &r.Crop, &r.Stage, &r.TargetYield, &r.Area,
 			&r.CreatedAt, &r.QualityFlag,
 			&r.AgentNote, &r.AgentVerdict,
-			&r.FarmerID, &r.LandID, &r.LandCropID, // NEW in Phase 10
+			&r.FarmerID, &r.LandID, &r.LandCropID, &r.LocationSource, &r.GNDivisionCode, // NEW in Phase 10
 		)
 		if err != nil {
 			return nil, err
@@ -186,4 +198,37 @@ func (repo *ReadingRepository) FindRecentByAnchor(
 	}
 
 	return readings, rows.Err()
+}
+
+// EnsureGNLocations is additive and upgrades existing database volumes.
+func (repo *ReadingRepository) EnsureGNLocations(ctx context.Context) error {
+	tx, err := repo.db.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+	if _, err = tx.Exec(ctx, `SELECT pg_advisory_xact_lock(71344813)`); err != nil {
+		return err
+	}
+	if _, err = tx.Exec(ctx, migrations.GNReadings); err != nil {
+		return err
+	}
+	if _, err = tx.Exec(ctx, `UPDATE readings r SET gn_division_code = c.code
+ FROM lands l JOIN gn_division_catalog c ON LOWER(TRIM(l.gn_division)) IN (LOWER(c.value), c.code)
+ WHERE r.land_id = l.land_id AND r.gn_division_code IS NULL`); err != nil {
+		return err
+	}
+	return tx.Commit(ctx)
+}
+
+func (repo *ReadingRepository) DistrictByName(name string) (int, error) {
+	var id int
+	err := repo.db.QueryRow(context.Background(), `SELECT district_id FROM districts WHERE LOWER(name)=LOWER($1)`, name).Scan(&id)
+	return id, err
+}
+
+func (repo *ReadingRepository) DistrictZone(id int) (string, error) {
+	var zone string
+	err := repo.db.QueryRow(context.Background(), `SELECT zone FROM districts WHERE district_id=$1`, id).Scan(&zone)
+	return zone, err
 }

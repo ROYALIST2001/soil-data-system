@@ -1,6 +1,8 @@
 import { useAppDispatch } from "../store";
 import {
   getFieldHistory,
+  getLandHistory,
+  getGNHistory,
   getAreaHistory,
   getDistrictHistory,
   getClusters,
@@ -24,15 +26,19 @@ export function useAnalytics() {
   // One function handles all three zoom levels.
   // The 'level' decides which endpoint to call.
   async function fetchHistory(
-    level: "field" | "area" | "district",
-    params: { anchorId?: number; lat?: number; lng?: number; districtId?: number }
+    level: "field" | "land" | "gn_division" | "area" | "district",
+    params: { landId?: number; code?: string; anchorId?: number; lat?: number; lng?: number; districtId?: number }
   ) {
     dispatch(historyStarted());
 
     try {
       let result;
 
-      if (level === "field" && params.anchorId !== undefined) {
+      if (level === "land" && params.landId !== undefined) {
+        result = await getLandHistory(params.landId);
+      } else if (level === "gn_division" && params.code !== undefined) {
+        result = await getGNHistory(params.code);
+      } else if (level === "field" && params.anchorId !== undefined) {
         result = await getFieldHistory(params.anchorId);
 
       } else if (level === "area" && params.lat !== undefined && params.lng !== undefined) {

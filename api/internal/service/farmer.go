@@ -8,6 +8,7 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 
+	"soil-data-system/api/internal/locationcatalog"
 	"soil-data-system/api/internal/model"
 	"soil-data-system/api/internal/repository"
 )
@@ -119,6 +120,9 @@ func (s *FarmerService) Signup(req model.SignupRequest) (model.Farmer, error) {
 	nic := strings.ToUpper(strings.TrimSpace(req.NIC))
 	fullName := strings.TrimSpace(req.FullName)
 	gnDivision := strings.TrimSpace(req.GNDivision)
+	if official, ok := locationcatalog.Resolve(gnDivision); ok {
+		gnDivision = official.Value
+	}
 	mobile := strings.ReplaceAll(strings.TrimSpace(req.Mobile), " ", "")
 	email := strings.ToLower(strings.TrimSpace(req.Email))
 
@@ -264,9 +268,9 @@ func validateNIC(nic string) error {
 }
 
 func validateGNDivision(division string) error {
-	if division == "" {
+	if _, ok := locationcatalog.Resolve(division); !ok {
 		return ValidationError{
-			Message: "Please enter your Grama Niladhari division.",
+			Message: "Please choose your district and Grama Niladhari division from the list.",
 		}
 	}
 	return nil
